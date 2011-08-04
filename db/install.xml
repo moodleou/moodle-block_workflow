@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/workflow/db" VERSION="20110221" COMMENT="XMLDB file for Moodle blocks/workflow"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="block_workflow_emails" COMMENT="Templates for emails sent by workflow steps" NEXT="block_workflow_workflows">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="shortname"/>
+        <FIELD NAME="shortname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Email shortname - for easy reference" PREVIOUS="id" NEXT="subject"/>
+        <FIELD NAME="subject" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="The message subject" PREVIOUS="shortname" NEXT="message"/>
+        <FIELD NAME="message" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Message to be sent" PREVIOUS="subject"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="shortname"/>
+        <KEY NAME="shortname" TYPE="unique" FIELDS="shortname" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_workflow_workflows" COMMENT="Definition of the workflows" PREVIOUS="block_workflow_emails" NEXT="block_workflow_steps">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="shortname"/>
+        <FIELD NAME="shortname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Workflow shortname - for easy reference" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the workflow" PREVIOUS="shortname" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Description of the workflow" PREVIOUS="name" NEXT="descriptionformat"/>
+        <FIELD NAME="descriptionformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The format of description" PREVIOUS="description" NEXT="appliesto"/>
+        <FIELD NAME="appliesto" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="What this workflow applies to - e.g. course, mod_quiz, etc." PREVIOUS="descriptionformat" NEXT="atendgobacktostep"/>
+        <FIELD NAME="atendgobacktostep" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" COMMENT="The stepno to go back to after the last step in the workflow, or NULL to mean that the workflow ends" PREVIOUS="appliesto" NEXT="obsolete"/>
+        <FIELD NAME="obsolete" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="indicates that this workflow is no longer relevant and should no longer be used in places. Obsolete workflows that are already in use will continue to function" PREVIOUS="atendgobacktostep"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="shortname"/>
+        <KEY NAME="shortname" TYPE="unique" FIELDS="shortname" PREVIOUS="primary" NEXT="atendgobacktostep"/>
+        <KEY NAME="atendgobacktostep" TYPE="foreign" FIELDS="atendgobacktostep" REFTABLE="block_workflow_steps" REFFIELDS="id" PREVIOUS="shortname"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_workflow_steps" COMMENT="Definition of workflow steps" PREVIOUS="block_workflow_workflows" NEXT="block_workflow_step_doers">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="workflowid"/>
+        <FIELD NAME="workflowid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="stepno"/>
+        <FIELD NAME="stepno" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="workflowid" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The name of this step" PREVIOUS="stepno" NEXT="instructions"/>
+        <FIELD NAME="instructions" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Instructions to tell people what to do in this step" PREVIOUS="name" NEXT="instructionsformat"/>
+        <FIELD NAME="instructionsformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The format of instructions" PREVIOUS="instructions" NEXT="onactivescript"/>
+        <FIELD NAME="onactivescript" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Actions performed when this step becomes active" PREVIOUS="instructionsformat" NEXT="oncompletescript"/>
+        <FIELD NAME="oncompletescript" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Actions performed when this step is completed" PREVIOUS="onactivescript"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="workflowsteps"/>
+        <KEY NAME="workflowsteps" TYPE="unique" FIELDS="workflowid, stepno" PREVIOUS="primary" NEXT="workflowid"/>
+        <KEY NAME="workflowid" TYPE="foreign" FIELDS="workflowid" REFTABLE="block_workflow_workflows" REFFIELDS="id" PREVIOUS="workflowsteps"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_workflow_step_doers" COMMENT="Implements the many-to-many relationships between steps and roles" PREVIOUS="block_workflow_steps" NEXT="block_workflow_step_todos">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="stepid"/>
+        <FIELD NAME="stepid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="roleid"/>
+        <FIELD NAME="roleid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="stepid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="stepid"/>
+        <KEY NAME="stepid" TYPE="foreign" FIELDS="stepid" REFTABLE="block_workflow_steps" REFFIELDS="id" PREVIOUS="primary" NEXT="roleid"/>
+        <KEY NAME="roleid" TYPE="foreign" FIELDS="stepid" REFTABLE="role" REFFIELDS="id" PREVIOUS="stepid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_workflow_step_todos" COMMENT="To-do checklist for a step" PREVIOUS="block_workflow_step_doers" NEXT="block_workflow_step_states">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="stepid"/>
+        <FIELD NAME="stepid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="task"/>
+        <FIELD NAME="task" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" COMMENT="Description of this task" PREVIOUS="stepid" NEXT="obsolete"/>
+        <FIELD NAME="obsolete" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="indicates that this item is no longer relevant and should no longer be used in places" PREVIOUS="task"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="stepid"/>
+        <KEY NAME="stepid" TYPE="foreign" FIELDS="stepid" REFTABLE="block_workflow_steps" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_workflow_step_states" COMMENT="Tracks the progress on a step in one of the places where this workflow is used" PREVIOUS="block_workflow_step_todos" NEXT="block_workflow_state_changes">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="stepid"/>
+        <FIELD NAME="stepid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="contextid"/>
+        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="stepid" NEXT="state"/>
+        <FIELD NAME="state" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" COMMENT="The current state of this context's workflow" PREVIOUS="contextid" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" COMMENT="The time when this state last changed" PREVIOUS="state" NEXT="comment"/>
+        <FIELD NAME="comment" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="The comment left by people working on the step" PREVIOUS="timemodified" NEXT="commentformat"/>
+        <FIELD NAME="commentformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The format of comment" PREVIOUS="comment"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="stepid"/>
+        <KEY NAME="stepid" TYPE="foreign" FIELDS="stepid" REFTABLE="block_workflow_steps" REFFIELDS="id" PREVIOUS="primary" NEXT="contextid"/>
+        <KEY NAME="contextid" TYPE="foreign" FIELDS="contextid" REFTABLE="context" REFFIELDS="id" PREVIOUS="stepid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_workflow_state_changes" PREVIOUS="block_workflow_step_states" NEXT="block_workflow_todo_done" COMMENT="Changes to states">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="stepstateid"/>
+        <FIELD NAME="stepstateid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="newstate"/>
+        <FIELD NAME="newstate" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" COMMENT="The state that this step changed to" PREVIOUS="stepstateid" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" COMMENT="The user who caused the state change" PREVIOUS="newstate" NEXT="timestamp"/>
+        <FIELD NAME="timestamp" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" COMMENT="The time when this state change occurred" PREVIOUS="userid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="stepstateid"/>
+        <KEY NAME="stepstateid" TYPE="foreign" FIELDS="stepstateid" REFTABLE="block_workflow_step_states" REFFIELDS="id" PREVIOUS="primary" NEXT="userid"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="stepstateid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_workflow_todo_done" PREVIOUS="block_workflow_state_changes" COMMENT="Changes to each step in the workflow">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="stepstateid"/>
+        <FIELD NAME="stepstateid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="steptodoid"/>
+        <FIELD NAME="steptodoid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="stepstateid" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" COMMENT="The user who caused the state change" PREVIOUS="steptodoid" NEXT="timestamp"/>
+        <FIELD NAME="timestamp" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" COMMENT="The time when this state change occurred" PREVIOUS="userid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="stepstateid"/>
+        <KEY NAME="stepstateid" TYPE="foreign" FIELDS="stepstateid" REFTABLE="block_workflow_state_changes" REFFIELDS="id" PREVIOUS="primary" NEXT="steptodoid"/>
+        <KEY NAME="steptodoid" TYPE="foreign" FIELDS="steptodoid" REFTABLE="block_workflow_todos" REFFIELDS="id" PREVIOUS="stepstateid" NEXT="userid"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="steptodoid" NEXT="statetodos"/>
+        <KEY NAME="statetodos" TYPE="unique" FIELDS="stepstateid, steptodoid" PREVIOUS="userid"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
