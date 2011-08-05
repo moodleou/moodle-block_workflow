@@ -20,7 +20,7 @@ YUI.add('moodle-block_workflow-todolist', function(Y) {
             // Take each of the workflow tasks, remove the anchor, and change it to
             // call our update function
             Y.all('a.'+CSS.BLOCKTODOTASK).each(function(node) {
-                node.on('click', this.toggle, this, node);
+                node.ancestor('li').on('click', this.toggle, this, node);
                 node.setAttribute('href', '#');
             }, this);
         },
