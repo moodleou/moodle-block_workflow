@@ -79,9 +79,9 @@ YUI.add('moodle-block_workflow-comments', function(Y) {
             this._escCloseEvent = Y.on('key', this.hide, document.body, 'down:27', this);
 
             // Remove the existing handler for the closebutton
-            Y.Event.purgeElement(Y.one('.moodle-dialoge-hd .closebutton'), true);
+            Y.Event.purgeElement(Y.one('.moodle-dialogue-hd .closebutton'), true);
             // Add a new event for close button.
-            this._closeButtonEvent = Y.on('click', this.hide, Y.one('.moodle-dialoge-hd .closebutton'), this);
+            this._closeButtonEvent = Y.on('click', this.hide, Y.one('.moodle-dialogue-hd .closebutton'), this);
 
             // Build the data for submission
             var data = {
