@@ -3123,7 +3123,7 @@ class block_workflow_command_email extends block_workflow_command {
         $subject = str_replace('%%usernames%%', implode(', ', $usernames), $subject);
 
         // Replace %%instructions%%
-        $instructions = $step->format_instructions($email->context);
+        $instructions = html_to_text($step->format_instructions($email->context), 0, false);
         $string  = str_replace('%%instructions%%', $instructions, $string);
         $subject = str_replace('%%instructions%%', $instructions, $subject);
 
@@ -3134,20 +3134,18 @@ class block_workflow_command_email extends block_workflow_command {
 
         // Replace %%comment%%
         if ($state->state == BLOCK_WORKFLOW_STATE_ACTIVE) {
-            $string  = str_replace('%%comment%%', $state->comment, $string);
-            $subject = str_replace('%%comment%%', $state->comment, $subject);
-        }
-        else {
+            $comment = html_to_text($state->comment, 0, false);
+        } else {
             // Retrieve the previous step
             $laststate = $state->previous_state();
             if ($laststate) {
-                $comment = $laststate->comment;
+                $comment = html_to_text($laststate->comment, 0, false);
             } else {
                 $comment = '';
             }
-            $string  = str_replace('%%comment%%', $comment, $string);
-            $subject = str_replace('%%comment%%', $comment, $subject);
         }
+        $string  = str_replace('%%comment%%', $comment, $string);
+        $subject = str_replace('%%comment%%', $comment, $subject);
 
         // Re-assign the message
         $email->email->message = $string;
