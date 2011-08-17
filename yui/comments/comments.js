@@ -91,6 +91,14 @@ YUI.add('moodle-block_workflow-comments', function(Y) {
             };
 
             var ed = tinyMCE.get(this.get(EDITORID));
+
+            // Resize then editor when first shown if it would otherwise be too small.
+            var ifr = tinymce.DOM.get(this.get(EDITORID) + '_ifr');
+            var size = tinymce.DOM.getSize(ifr);
+            if (size.h == 30) {
+                ed.theme.resizeTo(size.w, 90);
+            }
+
             // Fetch the comment and update the form
             Y.io(M.cfg.wwwroot + AJAXURL, {
                 method:'POST',
