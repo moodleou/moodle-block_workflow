@@ -30,3 +30,8 @@
 #block-workflow-overview .completeinfo {display: block; font-size:0.8em;white-space:nowrap;}
 #block-workflow-overview .dateinfo {display: block; font-size:0.8em;}
 .path-blocks-workflow .singlebutton input[type="submit"] {width:150px;}
+body.ie7 .moodle-dialogue-base .moodle-dialogue-hd .closebutton {
+    float: none;
+    position: absolute;
+    right: 5px;
+}
