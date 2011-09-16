@@ -3133,7 +3133,7 @@ class block_workflow_command_email extends block_workflow_command {
         $subject = str_replace('%%tasks%%', implode(', ', $tasks), $subject);
 
         // Replace %%comment%%
-        if ($state->state == BLOCK_WORKFLOW_STATE_ACTIVE) {
+        if ($state->state != BLOCK_WORKFLOW_STATE_ACTIVE) {
             $comment = html_to_text($state->comment, 0, false);
         } else {
             // Retrieve the previous step
