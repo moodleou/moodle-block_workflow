@@ -3117,6 +3117,11 @@ class block_workflow_command_email extends block_workflow_command {
         $string  = str_replace('%%contextname%%', $contextname, $string);
         $subject = str_replace('%%contextname%%', $contextname, $subject);
 
+        // Replace %%contexturl%%
+        $contexturl = get_context_url($email->context);
+        $string  = str_replace('%%contexturl%%', $contexturl, $string);
+        $subject = str_replace('%%contexturl%%', $contexturl, $subject);
+
         // Replace %%usernames%%
         $usernames = array_map(create_function('$a', 'return fullname($a);'), $email->users);
         $string  = str_replace('%%usernames%%', implode(', ', $usernames), $string);
