@@ -34,7 +34,12 @@ require_capability('block/workflow:manage', $PAGE->context);
 
 // Grab the current state and the intended state
 $state = new block_workflow_step_state();
-$state->load_active_state($contextid);
+
+if (!$state->load_active_state($contextid)) {
+    // Jumping back from after the end of the workflow, so there is no current
+    // step. Just record the contextid.
+    $state->contextid = $contextid;
+}
 $step = new block_workflow_step($stepid);
 
 // Set the page URL
@@ -78,7 +83,7 @@ $PAGE->set_title(get_string('jumptosteptitle', 'block_workflow', $strparams));
 
 $confirmstr = get_string('jumptostepcheck', 'block_workflow', $strparams);
 
-// generate the confirmation button
+// Generate the confirmation button
 $confirmurl = new moodle_url('/blocks/workflow/jumptostep.php',
         array('contextid' => $contextid, 'stepid' => $stepid, 'confirm' => 1));
 $confirmbutton  = new single_button($confirmurl, get_string('confirm'), 'post');

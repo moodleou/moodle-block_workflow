@@ -15,7 +15,7 @@ if (!defined('MOODLE_INTERNAL')) {
 
 // Include our test library so that we can use the same mocking system for
 // all tests
-require_once(dirname(__FILE__) . '/testlib.php');
+require_once(dirname(__FILE__) . '/lib.php');
 
 class test_block_workflow_emails extends block_workflow_testlib {
     public function test_email_validation() {

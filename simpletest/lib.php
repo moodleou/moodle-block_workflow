@@ -60,6 +60,7 @@ class block_workflow_testlib extends UnitTestCaseUsingDatabase {
     protected $courseid;
     protected $contextid;
     protected $roles;
+    protected $users;
 
     /**
      * Set up the database and basic data for testing
@@ -161,6 +162,7 @@ class block_workflow_testlib extends UnitTestCaseUsingDatabase {
             $assignment->userid = $user->id;
             $assignment->contextid = $this->contextid;
             $this->testdb->insert_record('role_assignments', $assignment);
+            $this->users[$username] = $user->id;
         }
 
         /**

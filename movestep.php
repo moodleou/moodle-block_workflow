@@ -41,12 +41,11 @@ if ($direction == 'up') {
         redirect($returnurl);
     }
     $swapwith->load_workflow_stepno($step->workflowid, $stepno - 1);
-}
-else {
+
+} else {
     try {
         $swapwith->load_workflow_stepno($step->workflowid, $stepno + 1);
-    }
-    catch (block_workflow_invalid_workflow_step_exception $e) {
+    } catch (block_workflow_invalid_workflow_step_exception $e) {
         // This is already the last step
         redirect($returnurl);
     }

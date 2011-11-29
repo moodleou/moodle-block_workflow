@@ -149,6 +149,7 @@ $string['invalidworkflowstepno']        = 'The specified step number could not b
 $string['jumpstep']                     =' Jump to step';
 $string['jumptostep']                   = 'Jump to Step';
 $string['jumptostepcheck']              = 'Are you sure you wish to jump from step \'{$a->fromstep}\' to step \'{$a->tostep}\' for the workflow on {$a->workflowon}?';
+$string['jumptostepcommentaddition']    = '<p>[Note: the workflow just jumped from step \'{$a->fromstep}\'. This comment may seem out-of-context.]</p>{$a->comment}';
 $string['jumptostepon']                 = 'Jump to step \'{$a->stepname}\' on {$a->contextname}';
 $string['jumptosteptitle']              = 'Jump to step \'{$a->tostep}\' for \'{$a->workflowon}\' confirmation';
 $string['lastmodified']                 = 'Last modified';

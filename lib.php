@@ -434,8 +434,8 @@ class block_workflow_workflow {
         try {
             $step->load_active_step($contextid);
             $transaction->rollback(new block_workflow_exception(get_string('workflowalreadyassigned', 'block_workflow')));
-        }
-        catch (block_workflow_not_assigned_exception $e) {
+
+        } catch (block_workflow_not_assigned_exception $e) {
             // A workflow shouldn't be assigned to this context already. A
             // context may only have one workflow assigned at a time
         }
@@ -452,12 +452,12 @@ class block_workflow_workflow {
         // Check whether this workflow has been previously assigned to this
         // context
         $existingstate = $DB->get_record('block_workflow_step_states',
-            array('stepid' => $step->id, 'contextid' => $contextid));
+                array('stepid' => $step->id, 'contextid' => $contextid));
         if ($existingstate) {
             $state->id              = $existingstate->id;
             $DB->update_record('block_workflow_step_states', $state);
-        }
-        else {
+
+        } else {
             // Create a new state to associate the workflow with the context
             $state->comment             = '';
             $state->commentformat       = 1;
@@ -511,8 +511,8 @@ class block_workflow_workflow {
 
             // Abort the step by jumping to no step at all
             $state->jump_to_step();
-        }
-        catch (block_workflow_not_assigned_exception $e) {
+
+        } catch (block_workflow_not_assigned_exception $e) {
             // The workflow may be inactive so it's safe to catch this exception
         }
 
@@ -840,8 +840,7 @@ class block_workflow_workflow {
             $step = new block_workflow_step();
             try {
                 $step->load_workflow_stepno($this->id, $data->atendgobacktostep);
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 $transaction->rollback($e);
             }
         }
@@ -1039,8 +1038,7 @@ class block_workflow_step {
         // This has the effect of checking the specified workflowid is valid
         try {
             $this->workflow = new block_workflow_workflow($step->workflowid);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $transaction->rollback($e);
         }
 
@@ -1238,8 +1236,7 @@ class block_workflow_step {
         if (isset($data->workflowid)) {
             try {
                 new block_workflow_workflow($data->workflowid);
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 $transaction->rollback($e);
             }
         }
@@ -1972,9 +1969,8 @@ class block_workflow_step_state {
                 // Try and load an existing state to change status for
                 $nextstate = new block_workflow_step_state();
                 $nextstate->load_context_step($this->contextid, $nextstep->id);
-                $nextstate->change_status(BLOCK_WORKFLOW_STATE_ACTIVE);
-            }
-            catch (block_workflow_not_assigned_exception $e) {
+
+            } catch (block_workflow_not_assigned_exception $e) {
                 // No step_state for this step on this context so create a new state
                 $newstate = new stdClass;
                 $newstate->stepid           = $nextstep->id;
@@ -1986,6 +1982,9 @@ class block_workflow_step_state {
                 $newstate->id = $DB->insert_record('block_workflow_step_states', $newstate);
                 $nextstate = new block_workflow_step_state($newstate->id);
             }
+
+            $nextstate->previouscomment = $this->comment; // Hack alert!
+            $nextstate->change_status(BLOCK_WORKFLOW_STATE_ACTIVE);
         }
 
         $transaction->allow_commit();
@@ -2015,13 +2014,14 @@ class block_workflow_step_state {
         if ($contextid) {
             $state = new block_workflow_step_state();
             $state->require_active_state($contextid);
-        }
-        else {
+        } else {
             $state = $this;
         }
 
-        // Change the status
-        $state->change_status(BLOCK_WORKFLOW_STATE_ABORTED);
+        // Change the status of the current step, if there is one.
+        if ($state->id) {
+            $state->change_status(BLOCK_WORKFLOW_STATE_ABORTED);
+        }
 
         // If the newstepid wasn't specified, we're just aborting the current step
         if (!$newstepid) {
@@ -2040,9 +2040,8 @@ class block_workflow_step_state {
             // Try and load an existing state to change status for
             $nextstate = new block_workflow_step_state();
             $nextstate->load_context_step($this->contextid, $newstepid);
-            $nextstate->change_status(BLOCK_WORKFLOW_STATE_ACTIVE);
-        }
-        catch (block_workflow_not_assigned_exception $e) {
+
+        } catch (block_workflow_not_assigned_exception $e) {
             // No step_state for this step on this context so create a new state
             $newstate = new stdClass;
             $newstate->stepid           = $newstepid;
@@ -2054,6 +2053,13 @@ class block_workflow_step_state {
             $newstate->id = $DB->insert_record('block_workflow_step_states', $newstate);
             $nextstate = new block_workflow_step_state($newstate->id);
         }
+
+        $a = new stdClass();
+        $a->fromstep = $state->step()->name;
+        $a->comment = $state->comment;
+        $nextstate->previouscomment =
+                get_string('jumptostepcommentaddition', 'block_workflow', $a); // Hack alert!
+        $nextstate->change_status(BLOCK_WORKFLOW_STATE_ACTIVE);
 
         $transaction->allow_commit();
 
@@ -2112,18 +2118,6 @@ class block_workflow_step_state {
             $transaction->allow_commit();
             return true;
         }
-    }
-
-    /**
-     * Load the state previous to this one (ordered by modification time)
-     *
-     * @return  mixed               The database results, or null if no result was found
-     */
-    public function previous_state() {
-        global $DB;
-        $states = $DB->get_records('block_workflow_step_states',
-                array('contextid' => $this->contextid), 'timemodified DESC', '*', 1, 2);
-        return array_shift($states);
     }
 
     /**
@@ -2587,8 +2581,7 @@ class block_workflow_todo {
         // Ensure that the stepid related to a valid step
         try {
             new block_workflow_step($todo->stepid);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $transaction->rollback($e);
         }
 
@@ -2886,7 +2879,18 @@ class block_workflow_command {
      * @return  Array    A list of users for the specified context and role
      */
     public function role_users($role, $context) {
-        return get_role_users($role->id, $context, false);
+        $fields = 'u.id, u.confirmed, u.username, u.firstname, u.lastname, '.
+                  'u.maildisplay, u.mailformat, u.maildigest, '.
+                  // This is just the default list of fields, but adding emailstop,
+                  // which is absolutely vital when sending emails now, but which
+                  // they did not add to the default list of fields. Once MDL-30260
+                  // is fixed, we should be able to once more remove the explicit
+                  // list of fields here.
+                  'u.emailstop, '.
+                                                             'u.email, u.city, '.
+                  'u.country, u.picture, u.idnumber, u.department, u.institution, '.
+                  'u.lang, u.timezone, u.lastaccess, u.mnethostid, r.name AS rolename, r.sortorder';
+        return get_role_users($role->id, $context, false, $fields);
     }
 
     /**
@@ -3140,14 +3144,10 @@ class block_workflow_command_email extends block_workflow_command {
         // Replace %%comment%%
         if ($state->state != BLOCK_WORKFLOW_STATE_ACTIVE) {
             $comment = html_to_text($state->comment, 0, false);
+        } else if (!empty($state->previouscomment)) {
+            $comment = html_to_text($state->previouscomment, 0, false);
         } else {
-            // Retrieve the previous step
-            $laststate = $state->previous_state();
-            if ($laststate) {
-                $comment = html_to_text($laststate->comment, 0, false);
-            } else {
-                $comment = '';
-            }
+            $comment = '';
         }
         $string  = str_replace('%%comment%%', $comment, $string);
         $subject = str_replace('%%comment%%', $comment, $subject);
