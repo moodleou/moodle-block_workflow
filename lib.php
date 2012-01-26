@@ -3093,6 +3093,7 @@ class block_workflow_command_email extends block_workflow_command {
      * - %%contextname%%    The name of the context for the specified $state
      * - %%coursename%%     The name of the course for the specified $state
      * - %%usernames%%      The list of users to whom this e-mail will be sent
+     * - %%currentusername%% The name of the user who caused the state transition.
      * - %%instructions%%   The set of instructions in the step
      * - %%tasks%%          A comma-separated list of todo tasks
      * - %%comment%%        If the specified state is active, then the comment for the current
@@ -3103,6 +3104,8 @@ class block_workflow_command_email extends block_workflow_command {
      * @return  void
      */
     private function email_params(&$email, $state) {
+        global $USER;
+
         // Shorter accessors
         $string   = $email->email->message;
         $subject  = $email->email->subject;
@@ -3141,6 +3144,11 @@ class block_workflow_command_email extends block_workflow_command {
         $usernames = array_map(create_function('$a', 'return fullname($a);'), $email->users);
         $string  = str_replace('%%usernames%%', implode(', ', $usernames), $string);
         $subject = str_replace('%%usernames%%', implode(', ', $usernames), $subject);
+
+        // Replace %%currentusername%%
+        $currentusername = fullname($USER);
+        $string  = str_replace('%%currentusername%%', $currentusername, $string);
+        $subject = str_replace('%%currentusername%%', $currentusername, $subject);
 
         // Replace %%instructions%%
         $instructions = html_to_text($step->format_instructions($email->context), 0, false);
