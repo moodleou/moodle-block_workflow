@@ -3091,6 +3091,7 @@ class block_workflow_command_email extends block_workflow_command {
      * - %%workflowname%%   The name of the workflow
      * - %%stepname%%       The name of the step
      * - %%contextname%%    The name of the context for the specified $state
+     * - %%coursename%%     The name of the course for the specified $state
      * - %%usernames%%      The list of users to whom this e-mail will be sent
      * - %%instructions%%   The set of instructions in the step
      * - %%tasks%%          A comma-separated list of todo tasks
@@ -3125,6 +3126,16 @@ class block_workflow_command_email extends block_workflow_command {
         $contexturl = get_context_url($email->context);
         $string  = str_replace('%%contexturl%%', $contexturl, $string);
         $subject = str_replace('%%contexturl%%', $contexturl, $subject);
+
+        // Replace %%coursename%%
+        if ($email->context->contextlevel == CONTEXT_COURSE) {
+            $coursename = $contextname;
+        } else {
+            $parentcontextid = get_parent_contextid($email->context);
+            $coursename = print_context_name(get_context_instance_by_id($parentcontextid), false, true);
+        }
+        $string  = str_replace('%%coursename%%', $coursename, $string);
+        $subject = str_replace('%%coursename%%', $coursename, $subject);
 
         // Replace %%usernames%%
         $usernames = array_map(create_function('$a', 'return fullname($a);'), $email->users);
