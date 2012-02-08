@@ -3191,7 +3191,7 @@ class block_workflow_command_email extends block_workflow_command {
      * @return  void
      */
     public static function message_send($eventdata = null) {
-        global $DB;
+        global $DB, $SITE;
 
         static $mailqueue = array();
 
@@ -3200,12 +3200,21 @@ class block_workflow_command_email extends block_workflow_command {
         }
 
         if (count($mailqueue) > 0 && !$DB->is_transaction_started()) {
+            $fakenoreplyuser = new stdClass();
+            $fakenoreplyuser->firstname = '';
+            $fakenoreplyuser->lastname = get_string('emailfrom', 'block_workflow', $SITE->shortname);
             // Only try to send if we're not in a transaction
             while ($eventdata = array_shift($mailqueue)) {
+                $result = email_to_user($eventdata->userto, $fakenoreplyuser,
+                        $eventdata->subject, $eventdata->fullmessage, $eventdata->fullmessagehtml,
+                        '', '', false);
                 // Send each message in the array
-                if (!message_send($eventdata)) {
-                    throw new workflow_command_failed_exception(get_string('emailfailed', 'block_workflow'));
-                }
+                // This is the way it used to work, using the new Moodle messaging API
+                // but that in not capable of sending from a noreply address, so we
+                // reverted to the old email_to_user as above.
+                // if (!message_send($eventdata)) {
+                //     throw new workflow_command_failed_exception(get_string('emailfailed', 'block_workflow'));
+                // }
             }
         }
     }

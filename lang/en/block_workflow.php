@@ -91,6 +91,7 @@ $string['edittemplateinstructions']     = 'Some instructions on how to create an
 $string['editworkflow']                 = 'Editing workflow \'{$a}\'';
 $string['editworkflowinstructions']     = 'Edit workflow instructions';
 $string['emaildescription']             = 'E-mail templates may be used by the various scripts in a workflow step';
+$string['emailfrom']                    = '{$a} workflow system';
 $string['emaillist']                    = 'Email e-mail templates';
 $string['emailmessage']                 = 'Message';
 $string['emailsettings']                = 'E-mail template settings';
