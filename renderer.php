@@ -125,15 +125,15 @@ class block_workflow_renderer extends plugin_renderer_base {
             $finishbutton->class = 'singlebutton block_workflow_finishstepbutton';
 
             $output .= html_writer::tag('div', $this->output->render($finishbutton));
-
-            // Workflow overview
-            $url    = new moodle_url('/blocks/workflow/overview.php', array(
-                    'contextid'     => $state->contextid,
-                    'workflowid'    => $state->step()->workflowid));
-            $overviewbutton = new single_button($url, get_string('workflowoverview', 'block_workflow', $state->step()->name), 'get');
-
-            $output .= html_writer::tag('div', $this->output->render($overviewbutton));
         }
+
+        // Workflow overview
+        $url = new moodle_url('/blocks/workflow/overview.php', array(
+                'contextid' => $state->contextid, 'workflowid' => $state->step()->workflowid));
+        $overviewbutton = new single_button($url,
+                get_string('workflowoverview', 'block_workflow', $state->step()->name), 'get');
+
+        $output .= html_writer::tag('div', $this->output->render($overviewbutton));
 
         return $output;
     }
@@ -1147,10 +1147,21 @@ class block_workflow_renderer extends plugin_renderer_base {
         // Add finish step/jump to step buttons
         $cell = new html_table_cell();
         if ($stepstate->state == BLOCK_WORKFLOW_STATE_ACTIVE) {
-            $cell->text = html_writer::tag('div', $this->finish_step($stepstate->stateid));
-        }
-        else if (has_capability('block/workflow:manage', $context)) {
-            $cell->text = html_writer::tag('div', $this->jump_to_step($stepstate->id, $context->id));
+            $state = new block_workflow_step_state();
+            $state->id               = $stepstate->stateid;
+            $state->stepid           = $stepstate->id;
+            $state->contextid        = $stepstate->contextid;
+            $state->state            = $stepstate->state;
+            $state->timemodified     = $stepstate->timemodified;
+            $state->comment          = $stepstate->comment;
+            $state->commentformat    = $stepstate->commentformat;
+            if (block_workflow_can_make_changes($state)) {
+                $cell->text = html_writer::tag('div', $this->finish_step($stepstate->stateid));
+            }
+        } else {
+            if (has_capability('block/workflow:manage', $context)) {
+                $cell->text = html_writer::tag('div', $this->jump_to_step($stepstate->id, $context->id));
+            }
         }
         $row->cells[] = $cell;
 
