@@ -126,7 +126,7 @@ class block_workflow extends block_base {
      * @return  array       An array of the applicable formats for the block
      */
     function applicable_formats() {
-        return array('all' => true, 'tag' => false);
+        return array('course' => true, 'mod' => true);
     }
 
     /**
