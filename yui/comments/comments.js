@@ -234,8 +234,14 @@ YUI.add('moodle-block_workflow-comments', function(Y) {
             this._loadingNode.addClass(CSS.HIDDEN);
         },
         attachEvents : function() {
-            Y.one('.'+CSS.BLOCKCOMMBTN+' input').on('click', this.show, this, false);
-            Y.one('.'+CSS.BLOCKFINISHBTN+' input').on('click', this.show, this, true);
+            var commentbutton = Y.one('.' + CSS.BLOCKCOMMBTN + ' input');
+            if (commentbutton) {
+                commentbutton.on('click', this.show, this, false);
+            }
+            var finishbutton = Y.one('.' + CSS.BLOCKFINISHBTN + ' input');
+            if (finishbutton) {
+                finishbutton.on('click', this.show, this, true);
+            }
         }
 
     }, {

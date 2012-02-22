@@ -84,7 +84,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         // Instructions
         $output .= html_writer::tag('h3', get_string('instructions', 'block_workflow'));
 
-        $output .= html_writer::tag('p', $state->step()->format_instructions($state->context()));
+        $output .= html_writer::tag('div', $state->step()->format_instructions($state->context()));
 
         // Comments
         $output .= html_writer::tag('h3', get_string('comments', 'block_workflow'));
