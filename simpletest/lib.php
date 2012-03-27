@@ -16,6 +16,27 @@ if (!defined('MOODLE_INTERNAL')) {
 // Make sure the code being tested is accessible.
 require_once($CFG->dirroot . '/blocks/workflow/lib.php'); // Include the code to test
 
+
+class block_workflow_testing_context_hack extends context_system {
+    public static function clear_context_caches($testdb) {
+
+        // We need to reset the contexcache
+        context_helper::reset_caches();
+
+        // And unset the systemcontext stored in it
+        $record = new stdClass();
+        $record->contextlevel = CONTEXT_SYSTEM;
+        $record->instanceid   = 0;
+        $record->depth        = 1;
+        $record->path         = null; //not known before insert
+        $record->id = $testdb->insert_record('context', $record);
+        $record->path         = '/' . $record->id;
+        $testdb->update_record('context', $record);
+
+        context::$systemcontext = new context_system($record);
+    }
+}
+
 class block_workflow_testlib extends UnitTestCaseUsingDatabase {
 
     // Add code coverage for the libraries
@@ -31,12 +52,14 @@ class block_workflow_testlib extends UnitTestCaseUsingDatabase {
             'groups',
             'context',
             'course',
+            'course_categories',
             'modules',
             'course_modules',
             'event',
             'events_handlers',
             'grade_items',
             'cache_flags',
+            'block_instances',
         ),
         'blocks/workflow'   => array(
             'block_workflow_workflows',
@@ -68,7 +91,6 @@ class block_workflow_testlib extends UnitTestCaseUsingDatabase {
      * This will also call {@link parent::setUp}
      */
     public function setUp() {
-        global $ACCESSLIB_PRIVATE;
         parent::setUp();
 
         // And create the test tables
@@ -80,8 +102,18 @@ class block_workflow_testlib extends UnitTestCaseUsingDatabase {
         $this->switch_to_test_db();
 
         // Create a default course
+        $cat = new stdClass();
+        $cat->name          = 'Test cat';
+        $cat->parent        = 0;
+        $cat->depth         = 1;
+        $cat->coursecount   = 1;
+        $cat->id            = $this->testdb->insert_record('course_categories', $cat);
+        $cat->path          = '/' . $cat->id;
+        $this->testdb->update_record('course_categories', $cat);
+
+        // Create a default course
         $course = new stdClass();
-        $course->category   = 1;
+        $course->category   = $cat->id;
         $course->fullname   = 'Testing workflow course';
         $course->shortname  = 'TEST';
         $course->summary    = 'Test course used to test workflows';
@@ -99,21 +131,7 @@ class block_workflow_testlib extends UnitTestCaseUsingDatabase {
         /**
          * Create required contexts
          */
-
-        // We need to reset the contexcache
-        $ACCESSLIB_PRIVATE->contexcache = new context_cache();
-
-        // And unset the systemcontext stored in it
-        $context = new stdClass();
-        $context->contextlevel = CONTEXT_SYSTEM;
-        $context->instanceid   = 0;
-        $context->depth        = 1;
-        $context->path         = null; //not known before insert
-        $context->id = $this->testdb->insert_record('context', $context);
-        $context->path         = '/' . $context->id;
-        $this->testdb->update_record('context', $context);
-
-        $ACCESSLIB_PRIVATE->systemcontext = $context->id;
+        block_workflow_testing_context_hack::clear_context_caches($this->testdb);
 
         // Create the context for the course
         $context = get_context_instance(CONTEXT_COURSE, $course->id);
