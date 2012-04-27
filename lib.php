@@ -414,7 +414,8 @@ class block_workflow_workflow {
      */
     public function available_workflows($for) {
         global $DB;
-        $workflows = $DB->get_records('block_workflow_workflows', array('appliesto' => $for, 'obsolete' => 0));
+        $workflows = $DB->get_records('block_workflow_workflows',
+                array('appliesto' => $for, 'obsolete' => 0), 'shortname');
         return $workflows;
     }
 
@@ -1652,7 +1653,7 @@ class block_workflow_step {
             if ($obsolete) {
                 $params['obsolete'] = 0;
             }
-            $this->todos = $DB->get_records('block_workflow_step_todos', $params);
+            $this->todos = $DB->get_records('block_workflow_step_todos', $params, 'id');
         }
         return $this->todos;
     }
@@ -2084,7 +2085,8 @@ class block_workflow_step_state {
             $sql = 'SELECT todos.*, done.timestamp, done.userid, done.id AS doneid
                     FROM {block_workflow_step_todos} AS todos
                     LEFT JOIN {block_workflow_todo_done} AS done ON done.steptodoid = todos.id AND done.stepstateid = ?
-                    WHERE todos.stepid = ? AND todos.obsolete = 0';
+                    WHERE todos.stepid = ? AND todos.obsolete = 0
+                    ORDER BY todos.id';
             $this->todos = $DB->get_records_sql($sql, array($this->id, $this->stepid));
         }
         return $this->todos;
