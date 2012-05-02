@@ -10,7 +10,7 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
-require_once(dirname(__FILE__) . '/lib.php');
+require_once(dirname(__FILE__) . '/locallib.php');
 
 // Get the submitted paramaters
 $workflowid = required_param('workflowid', PARAM_INT);

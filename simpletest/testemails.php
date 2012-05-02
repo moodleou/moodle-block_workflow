@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Workflow block test unit for the email class in lib.php
+ * Workflow block test unit for the email class.
  *
  * @package    block
  * @subpackage workflow

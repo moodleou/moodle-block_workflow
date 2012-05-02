@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Workflow block test unit for lib.php
+ * Workflow block test unit for locallib.php
  *
  * @package    block
  * @subpackage workflow

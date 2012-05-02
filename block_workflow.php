@@ -14,8 +14,9 @@ require_once($CFG->dirroot . '/lib/form/editor.php');
 
 class block_workflow extends block_base {
     function init() {
+        global $CFG;
         $this->title = get_string('workflow', 'block_workflow');
-        require_once(dirname(__FILE__) . '/lib.php');
+        require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
     }
 
     /**

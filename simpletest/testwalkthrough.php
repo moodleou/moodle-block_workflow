@@ -41,7 +41,7 @@ require_once(dirname(__FILE__) . '/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class test_block_workflow_walkthrough extends block_workflow_testlib {
-    public static $includecoverage = array('blocks/workflow/lib.php');
+    public static $includecoverage = array('blocks/workflow/locallib.php');
 
     /**
      * Test some of the basic workflow actions including:

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Workflow block test unit for todo class in lib.php
+ * Workflow block test unit for todo class.
  *
  * @package    block
  * @subpackage workflow

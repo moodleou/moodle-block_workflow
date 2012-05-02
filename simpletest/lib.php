@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Workflow block tests for lib.php
+ * Workflow block test helper code.
  *
  * @package    block
  * @subpackage workflow
@@ -14,7 +14,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 // Make sure the code being tested is accessible.
-require_once($CFG->dirroot . '/blocks/workflow/lib.php'); // Include the code to test
+require_once($CFG->dirroot . '/blocks/workflow/locallib.php'); // Include the code to test
 
 
 class block_workflow_testing_context_hack extends context_system {
@@ -40,7 +40,7 @@ class block_workflow_testing_context_hack extends context_system {
 class block_workflow_testlib extends UnitTestCaseUsingDatabase {
 
     // Add code coverage for the libraries
-    public static $includecoverage = array('blocks/workflow/lib.php');
+    public static $includecoverage = array('blocks/workflow/locallib.php');
 
     // The list of tables that we require for these unit tests
     protected $testtables = array(
