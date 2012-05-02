@@ -39,19 +39,17 @@ class block_workflow_command_setcoursevisibility extends block_workflow_command 
         $data = new stdClass();
         $data->errors = array();
 
-        // Check that this step workflow relatees to an activity
+        // Check that this step workflow relatees to an activity.
         if (!parent::is_course($step->workflow())) {
             $data->errors[] = get_string('notacourse', 'block_workflow');
         }
 
-        // Check for the correct visibility option
+        // Check for the correct visibility option.
         if ($args == 'hidden') {
             $data->visible = 0;
-        }
-        else if ($args == 'visible') {
+        } else if ($args == 'visible') {
             $data->visible = 1;
-        }
-        else {
+        } else {
             $data->errors[] = get_string('invalidvisibilitysetting', 'block_workflow', $args);
         }
 
@@ -61,11 +59,12 @@ class block_workflow_command_setcoursevisibility extends block_workflow_command 
 
         return $data;
     }
+
     public function execute($args, $state) {
         global $DB;
         $data = $this->parse($args, $state->step(), $state);
 
-        // Change the visiblity
+        // Change the visiblity.
         $DB->update_record('course', $data);
     }
 }

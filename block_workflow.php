@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Workflow block
@@ -13,7 +27,7 @@ global $CFG;
 require_once($CFG->dirroot . '/lib/form/editor.php');
 
 class block_workflow extends block_base {
-    function init() {
+    public function init() {
         global $CFG;
         $this->title = get_string('workflow', 'block_workflow');
         require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
@@ -40,7 +54,7 @@ class block_workflow extends block_base {
     public function get_content() {
         global $PAGE;
 
-        // Save loops if we have generated the content already
+        // Save loops if we have generated the content already.
         if ($this->content !== null) {
             return $this->content;
         }
@@ -48,30 +62,30 @@ class block_workflow extends block_base {
         $this->content  = new stdClass();
 
         if (!has_capability('block/workflow:view', $this->context)) {
-            // We require the workflow:view capability at the very least
+            // We require the workflow:view capability at the very least.
             return $this->content;
         }
 
         $renderer = $this->page->get_renderer('block_workflow');
 
         $state = new block_workflow_step_state();
-        // Retrieve the active state for this contextid
+        // Retrieve the active state for this contextid.
         if ($state->load_active_state($this->instance->parentcontextid)) {
 
-            // Update block title
+            // Update block title.
             $this->title = $state->step()->workflow()->name;
 
-            // prepare editor
+            // Prepare editor.
             $editor = new MoodleQuickForm_editor('comment_editor', null,
                     array('id' => 'wkf-comment-editor'), block_workflow_editor_options());
             $editor->setValue(array('text' => $state->comment));
 
             // Include the javascript libraries:
-            // add language strings
+            // Add language strings.
             $PAGE->requires->strings_for_js(array('editcomments', 'nocomments', 'finishstep'), 'block_workflow');
             $PAGE->requires->strings_for_js(array('savechanges'), 'moodle');
 
-            // init YUI module
+            // Initialise the YUI module.
             $arguments = array(
                 'stateid' => $state->id,
                 'editorhtml' => $editor->toHtml(),
@@ -83,26 +97,24 @@ class block_workflow extends block_base {
             $PAGE->requires->yui_module('moodle-block_workflow-todolist', 'M.blocks_workflow.init_todolist',
                 array(array('stateid' => $state->id)));
 
-            // Display the block for this state
+            // Display the block for this state.
             $this->content->text = $renderer->block_display($state);
-        }
-        else {
-            // The parent context currently has no workflow assigned
+        } else {
+            // The parent context currently has no workflow assigned.
             if (!has_capability('block/workflow:manage', $this->context)) {
-                // We require workflow:manage to add a workflow
+                // We require workflow:manage to add a workflow.
                 return $this->content;
             }
 
             // If this is a module, retrieve it's name, otherwise try the pagelayout to confirm
-            // that this is a course
+            // that this is a course.
             if ($PAGE->cm) {
                 $appliesto = $PAGE->cm->modname;
-            }
-            else {
+            } else {
                 $appliesto = 'course';
             }
 
-            // Retrieve the list of workflows and display
+            // Retrieve the list of workflows and display.
             $workflows = new block_workflow_workflow();
             $this->content->text = $renderer->assign_workflow($this->instance->parentcontextid,
                     $workflows->available_workflows($appliesto),
@@ -117,7 +129,7 @@ class block_workflow extends block_base {
      *
      * @return  boolean     We do not allow multiple instances of the block in the same context
      */
-    function instance_allow_multiple() {
+    public function instance_allow_multiple() {
         return false;
     }
 
@@ -126,7 +138,7 @@ class block_workflow extends block_base {
      *
      * @return  array       An array of the applicable formats for the block
      */
-    function applicable_formats() {
+    public function applicable_formats() {
         return array('course' => true, 'mod' => true);
     }
 
@@ -135,7 +147,7 @@ class block_workflow extends block_base {
      *
      * @return  boolean     We do have configuration
      */
-    function has_config() {
+    public function has_config() {
         return true;
     }
 }

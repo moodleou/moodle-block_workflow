@@ -44,18 +44,17 @@ class block_workflow_command_override extends block_workflow_command {
             $data->context = $state->context();
         }
 
-        // Break down the line. It should be in the format:
-        //      {newrole} to {rolea} {roleb} {rolen}
+        // Break down the line.
         $line = preg_split('/[\s+]/', $args);
 
-        // Grab the role name
+        // Grab the role name.
         $data->role = parent::require_role_exists(array_shift($line), $data->errors);
         if ($data->errors) {
-            // Return early if we hit errors
+            // Return early if we hit errors.
             return $data;
         }
 
-        // Grab the override
+        // Grab the override.
         $override = array_shift($line);
         switch ($override) {
             case "inherit":
@@ -76,9 +75,7 @@ class block_workflow_command_override extends block_workflow_command {
                 break;
         }
 
-        /**
-         * And the capability
-         */
+        // And the capability.
         $cap = array_shift($line);
         if (!get_capability_info($cap)) {
             $data->errors[] = get_string('invalidcapability', 'block_workflow');
@@ -86,9 +83,7 @@ class block_workflow_command_override extends block_workflow_command {
         }
         $data->capability = $cap;
 
-        /**
-         * What is it being overridden in?
-         */
+        // What is it being overridden in?
         array_shift($line);
         $in = array_shift($line);
 
@@ -98,26 +93,24 @@ class block_workflow_command_override extends block_workflow_command {
         }
 
         switch ($in) {
-        case "course":
+            case "course":
                 if ($state) {
-                    // If we're actually running this, determine the relevant contextid
+                    // If we're actually running this, determine the relevant contextid.
                     if ($this->is_course($step->workflow())) {
-                        // Changint the contextid on the workflow's context
+                        // Changing the contextid on the workflow's context.
                         $data->contextid = $state->contextid;
-                    }
-                    else {
-                        // Changing the contextid on the workflow's parent context
+                    } else {
+                        // Changing the contextid on the workflow's parent context.
                         $data->contextid = get_parent_contextid($state->context());
                     }
                 }
                 break;
             case "activity":
                 if ($this->is_course($step->workflow())) {
-                    // You can't change activity permissions on a course
+                    // You can't change activity permissions on a course.
                     $data->errors[] = get_string('notacourse', 'block_workflow');
-                }
-                else if ($state) {
-                    // Changing the contextid on the workflow's context
+                } else if ($state) {
+                    // Changing the contextid on the workflow's context.
                     $data->contextid = $state->contextid;
                 }
                 break;

@@ -73,11 +73,11 @@ class block_workflow_command {
      * @return  boolean         Whether the command is valid
      */
     public function require_valid($args, $step, $state = null) {
-        // Parse the script to grab any errors
+        // Parse the script to grab any errors.
         $return = $this->parse($args, $step, $state);
 
         if ($return->errors) {
-            // Throw an exception -- only show the first error
+            // Throw an exception -- only show the first error.
             throw new block_workflow_invalid_command_exception(
                     get_string('invalidscript', 'block_workflow', $return->errors[0]));
         }
@@ -156,7 +156,7 @@ class block_workflow_command {
      * @return  Boolean
      */
     public function is_activity($workflow) {
-        // All workflows barring courses are activities
+        // All workflows barring courses are activities.
         return ($workflow->appliesto != 'course');
     }
 
@@ -167,7 +167,7 @@ class block_workflow_command {
      * @return  Boolean
      */
     public function is_course($workflow) {
-        // Only 'course' is a course
+        // Only 'course' is a course.
         return ($workflow->appliesto == 'course');
     }
 }

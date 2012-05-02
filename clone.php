@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Clone a workflow
@@ -13,56 +27,55 @@ require_once(dirname(__FILE__) . '/locallib.php');
 require_once(dirname(__FILE__) . '/clone_form.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-// Get the submitted paramaters
+// Get the submitted paramaters.
 $workflowid = required_param('workflowid', PARAM_INT);
 
-// This is an admin page
+// This is an admin page.
 admin_externalpage_setup('blocksettingworkflow');
 
-// Require login
+// Require login.
 require_login();
 
-// Require the workflow:editdefinitions capability
+// Require the workflow:editdefinitions capability.
 require_capability('block/workflow:editdefinitions', get_context_instance(CONTEXT_SYSTEM));
 
-// Grab a workflow object
+// Grab a workflow object.
 $workflow   = new block_workflow_workflow($workflowid);
 
-// Set page and return urls
+// Set page and return urls.
 $returnurl  = new moodle_url('/blocks/workflow/manage.php');
 $PAGE->set_url('/blocks/workflow/clone.php', array('workflowid' => $workflowid));
 
-// Page settings
+// Page settings.
 $title = get_string('cloneworkflowname', 'block_workflow', $workflow->name);
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
-// Add the breadcrumbs
+// Add the breadcrumbs.
 $PAGE->navbar->add(get_string('clone', 'block_workflow'));
 
-// Grab the renderer
+// Grab the renderer.
 $renderer = $PAGE->get_renderer('block_workflow');
 
-// Moodle form to clone the workflow
+// Moodle form to clone the workflow.
 $cloneform = new clone_workflow();
 
 if ($cloneform->is_cancelled()) {
-    // Form was cancelled
+    // Form was cancelled.
     redirect($returnurl);
-}
-else if ($data = $cloneform->get_data()) {
-    // Form was submitted
+} else if ($data = $cloneform->get_data()) {
+    // Form was submitted.
     unset($data->submitbutton);
     unset($data->workflowid);
 
-    // Clone the workflow using the data given
+    // Clone the workflow using the data given.
     $workflow = block_workflow_workflow::clone_workflow($workflowid, $data);
 
-    // Redirect to the newly created workflow
+    // Redirect to the newly created workflow.
     redirect(new moodle_url('/blocks/workflow/editsteps.php', array('workflowid' => $workflow->id)));
 }
 
-// Set the clone workflow form defaults
+// Set the clone workflow form defaults.
 $data = new stdClass();
 $data->workflowid           = $workflow->id;
 $data->shortname            = $workflow->shortname;
@@ -74,7 +87,7 @@ $data = file_prepare_standard_editor($data, 'description', array());
 
 $cloneform->set_data($data);
 
-// Display the page and form
+// Display the page and form.
 echo $OUTPUT->header();
 echo $renderer->clone_workflow_instructions($workflow);
 $cloneform->display();

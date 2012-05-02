@@ -39,23 +39,21 @@ class block_workflow_command_setactivityvisibility extends block_workflow_comman
         $data = new stdClass();
         $data->errors = array();
 
-        // Check that this step workflow relatees to an activity
+        // Check that this step workflow relatees to an activity.
         if (!parent::is_activity($step->workflow())) {
             $data->errors[] = get_string('notanactivity', 'block_workflow', 'setactivityvisibility');
         }
 
-        // Check for the correct visibility option
+        // Check for the correct visibility option.
         if ($args == 'hidden') {
             $data->visibility = 0;
-        }
-        else if ($args == 'visible') {
+        } else if ($args == 'visible') {
             $data->visibility = 1;
-        }
-        else {
+        } else {
             $data->errors[] = get_string('invalidvisibilitysetting', 'block_workflow', $args);
         }
 
-        // Check that the workflow is valid for the given state and context
+        // Check that the workflow is valid for the given state and context.
         if ($state) {
             $data->context  = $state->context();
             $data->step     = $state->step();
@@ -70,7 +68,7 @@ class block_workflow_command_setactivityvisibility extends block_workflow_comman
         require_once($CFG->dirroot . '/course/lib.php');
         $data = $this->parse($args, $state->step(), $state);
 
-        // Change the visibility
+        // Change the visibility.
         set_coursemodule_visible($data->cm->id, $data->visibility);
     }
 }

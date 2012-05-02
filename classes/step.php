@@ -162,7 +162,7 @@ class block_workflow_step {
     public function create_step($step, $beforeafter = 0) {
         global $DB;
 
-        // Set the default onactivescript and oncompletescript
+        // Set the default onactivescript and oncompletescript.
         if (!isset($step->onactivescript)) {
             $step->onactivescript = '';
         }
@@ -170,32 +170,32 @@ class block_workflow_step {
             $step->oncompletescript = '';
         }
 
-        // Set the default instructionsformat
+        // Set the default instructionsformat.
         if (!isset($step->instructionsformat)) {
             $step->instructionsformat = FORMAT_PLAIN;
         }
 
         $transaction = $DB->start_delegated_transaction();
 
-        // Check that the workflowid was specified
+        // Check that the workflowid was specified.
         if (!isset($step->workflowid)) {
             $transaction->rollback(new block_workflow_invalid_step_exception('invalidworkflowid', 'block_workflow'));
         }
 
-        // Check for a step name
+        // Check for a step name.
         if (!isset($step->name) || empty($step->name)) {
             $transaction->rollback(new block_workflow_invalid_step_exception('invalidname', 'block_workflow'));
         }
 
-        // Check for instructions
+        // Check for instructions.
         if (!isset($step->instructions)) {
             $transaction->rollback(new block_workflow_invalid_step_exception('invalidinstructions', 'block_workflow'));
         }
 
-        // We don't allow a stepid to be specified at create time
+        // We don't allow a stepid to be specified at create time.
         unset($step->id);
 
-        // This has the effect of checking the specified workflowid is valid
+        // This has the effect of checking the specified workflowid is valid.
         try {
             $this->workflow = new block_workflow_workflow($step->workflowid);
         } catch (Exception $e) {
@@ -204,31 +204,28 @@ class block_workflow_step {
 
         if ($beforeafter !== 0) {
             if ($beforeafter < 0) {
-                // A negative beforeafter is the same as $beforeafter - 1
+                // A negative beforeafter is the same as $beforeafter - 1.
                 $beforeafter = abs($beforeafter) - 1;
             }
-            // Renumber the steps from $beforeafter
-            // Placing this step after the specified step
+            // Renumber the steps from $beforeafter.
+            // Placing this step after the specified step.
             $this->workflow->renumber_steps($beforeafter, 1);
             $step->stepno = $beforeafter + 1;
-        }
-        else {
-            // Retrieve the stepno from the final step for this workflow
+        } else {
+            // Retrieve the stepno from the final step for this workflow.
             $sql = 'SELECT stepno FROM {block_workflow_steps} WHERE workflowid = ? ORDER BY stepno DESC LIMIT 1';
             $step->stepno = $DB->get_field_sql($sql, array($step->workflowid));
 
             if ($step->stepno) {
-                // If there's already a step on this workflow, add to that step
-                // number
+                // If there's already a step on this workflow, add to that step number.
                 $step->stepno++;
-            }
-            else {
-                // No steps yet for this workflow, this is step 1
+            } else {
+                // No steps yet for this workflow, this is step 1.
                 $step->stepno = 1;
             }
         }
 
-        // Check that each of the submitted data is a valid field
+        // Check that each of the submitted data is a valid field.
         $expectedsettings = $this->expected_settings();
         foreach ((array) $step as $k => $v) {
             if (!in_array($k, $expectedsettings)) {
@@ -236,7 +233,7 @@ class block_workflow_step {
             }
         }
 
-        // Validate any onactivescript and oncompletescript
+        // Validate any onactivescript and oncompletescript.
         if (isset($step->onactivescript)) {
             $result = $this->validate_script($step->onactivescript);
             if ($result->errors) {
@@ -253,13 +250,12 @@ class block_workflow_step {
             }
         }
 
-
-        // Create the step
+        // Create the step.
         $step->id = $DB->insert_record('block_workflow_steps', $step);
 
         $transaction->allow_commit();
 
-        // Reload the object using the returned step id and return it
+        // Reload the object using the returned step id and return it.
         return $this->load_step($step->id);
     }
 
@@ -285,32 +281,32 @@ class block_workflow_step {
         global $DB;
         $transaction = $DB->start_delegated_transaction();
 
-        // Retrieve the source and copy it
+        // Retrieve the source and copy it.
         $src = new block_workflow_step($srcid);
 
-        // Copy the source based on the allowed settings
+        // Copy the source based on the allowed settings.
         foreach (self::expected_settings() as $k) {
             $dst->$k = $src->$k;
         }
 
-        // Unset the id on the target
+        // Unset the id on the target.
         unset($dst->id);
 
-        // If a new workflowid was specified, then use it instead
+        // If a new workflowid was specified, then use it instead.
         if ($workflowid) {
             $dst->workflowid = $workflowid;
         }
 
-        // Create the step
+        // Create the step.
         $newstep = new block_workflow_step();
         $newstep->create_step($dst);
 
-        // Clone the todos
+        // Clone the todos.
         foreach ($src->todos() as $todo) {
             block_workflow_todo::clone_todo($todo->id, $newstep->id);
         }
 
-        // Clone the roles
+        // Clone the roles.
         foreach ($src->roles() as $role) {
             unset($role->id);
             $role->stepid = $newstep->id;
@@ -318,10 +314,10 @@ class block_workflow_step {
         }
 
         // Allow the transaction at this stage, and return the newly
-        // created object
+        // created object.
         $transaction->allow_commit();
 
-        // Reload the object using the returned step id and return it
+        // Reload the object using the returned step id and return it.
         return $newstep->load_step($newstep->id);
     }
 
@@ -336,37 +332,35 @@ class block_workflow_step {
     public function delete() {
         global $DB;
 
-        // Check whether this step may be removed and throw errors if
-        // required
+        // Check whether this step may be removed and throw errors if required.
         $this->require_deletable();
 
         $transaction = $DB->start_delegated_transaction();
 
-        // Retrieve a list of the step_states
+        // Retrieve a list of the step_states.
         $states = $DB->get_records('block_workflow_step_states', array('stepid' => $this->id), null, 'id');
         $statelist = array_map(create_function('$a', 'return $a->id;'), $states);
 
-        // Remove all of the state_change history
+        // Remove all of the state_change history.
         $DB->delete_records_list('block_workflow_state_changes', 'stepstateid', $statelist);
 
-        // Remove the todo_done entries
+        // Remove the todo_done entries.
         $DB->delete_records_list('block_workflow_todo_done', 'stepstateid', $statelist);
 
-        // Remove the states
+        // Remove the states.
         $DB->delete_records('block_workflow_step_states', array('stepid' => $this->id));
 
-        // Update the atengobacktostep setting for the workflow if required
+        // Update the atengobacktostep setting for the workflow if required.
         $workflow           = $this->workflow();
         $atendgobacktostep  = $workflow->atendgobacktostep;
         if ($atendgobacktostep && $atendgobacktostep > 1 && $this->stepno <= $atendgobacktostep) {
             $workflow->atendgobacktostep($atendgobacktostep - 1);
         }
 
-        // Remove the step
+        // Remove the step.
         $DB->delete_records('block_workflow_steps', array('id' => $this->id));
 
-        // Now that the step has been removed, renumber the remaining step
-        // numbers
+        // Now that the step has been removed, renumber the remaining step numbers.
         $workflow->renumber_steps();
 
         $transaction->allow_commit();
@@ -389,10 +383,10 @@ class block_workflow_step {
 
         $transaction = $DB->start_delegated_transaction();
 
-        // Retrieve the id for the current step
+        // Retrieve the id for the current step.
         $data->id = $this->id;
 
-        // Check that any specified workflow exists
+        // Check that any specified workflow exists.
         if (isset($data->workflowid)) {
             try {
                 new block_workflow_workflow($data->workflowid);
@@ -401,7 +395,7 @@ class block_workflow_step {
             }
         }
 
-        // Check that each of the submitted data is a valid field
+        // Check that each of the submitted data is a valid field.
         $expectedsettings = $this->expected_settings();
         foreach ((array) $data as $k => $v) {
             if (!in_array($k, $expectedsettings)) {
@@ -410,7 +404,7 @@ class block_workflow_step {
             }
         }
 
-        // Validate any changes to the onactivescript and oncompletescript
+        // Validate any changes to the onactivescript and oncompletescript.
         if (isset($data->onactivescript)) {
             $result = $this->validate_script($data->onactivescript);
             if ($result->errors) {
@@ -427,12 +421,12 @@ class block_workflow_step {
             }
         }
 
-        // Update the record
+        // Update the record.
         $DB->update_record('block_workflow_steps', $data);
 
         $transaction->allow_commit();
 
-        // Return the updated step object
+        // Return the updated step object.
         return $this->load_step($data->id);
     }
 
@@ -468,7 +462,7 @@ class block_workflow_step {
             $stepid = $this->id;
         }
 
-        // Determine how many states the step is active in
+        // Determine how many states the step is active in.
         return $DB->count_records('block_workflow_step_states',
                 array('stepid' => $stepid, 'state' => BLOCK_WORKFLOW_STATE_ACTIVE));
     }
@@ -483,19 +477,18 @@ class block_workflow_step {
      * @throws  block_workflow_exception If the step is currently in use, and the $throw parameter is true
      */
     public function is_deletable() {
-        // A step may only be removed if it isn't actively in use
+        // A step may only be removed if it isn't actively in use.
         if (($count = $this->in_use()) != 0) {
             return false;
         }
 
-        // A step may only be removed if there are other steps in the
-        // workflow
+        // A step may only be removed if there are other steps in the workflow.
         $steps = $this->workflow()->steps();
         if (count($steps) == 1) {
             return false;
         }
 
-        // All conditions must be met if getting to this point
+        // All conditions must be met if getting to this point.
         return true;
     }
 
@@ -524,7 +517,7 @@ class block_workflow_step {
     public function load_active_step($contextid) {
         global $DB;
 
-        // Contexts are associated to a step by the step_state table
+        // Contexts are associated to a step by the step_state table.
         $sql = 'SELECT steps.* FROM {block_workflow_step_states} state
                 LEFT JOIN {block_workflow_steps} steps ON steps.id = state.stepid
                 WHERE state.contextid = ? AND state.state = ?';
@@ -548,23 +541,23 @@ class block_workflow_step {
      *                              this command is provided by
      */
     public static function parse_script($script) {
-        // Our return place-holder
+        // Our return place-holder.
         $return = new stdClass();
         $return->errors     = array();
         $return->commands   = array();
 
-        // Break the script into lines
+        // Break the script into lines.
         $lines = preg_split('~[\r\n]+~', $script, null, PREG_SPLIT_NO_EMPTY);
 
         foreach ($lines as $line) {
             $c = new stdClass();
 
-            // Retrieve the command and arguments
+            // Retrieve the command and arguments.
             $args           = preg_split('/[\s]/', trim($line), 2);
             $c->command     = array_shift($args);
             $c->arguments   = array_shift($args);
 
-            // Skip comments
+            // Skip comments.
             if (preg_match('/^#/', $c->command)) {
                 continue;
             }
@@ -576,9 +569,8 @@ class block_workflow_step {
             if (!class_exists($c->classname)
                     || !is_subclass_of($c->classname, 'block_workflow_command')) {
                     $return->errors[] = get_string('invalidcommand', 'block_workflow', $c->command);
-            }
-            else {
-                // Append the current command to the array
+            } else {
+                // Append the current command to the array.
                 $return->commands[] = $c;
             }
         }
@@ -596,10 +588,10 @@ class block_workflow_step {
      * @return  array            The list of commands
      */
     public function validate_script($script) {
-        // Parse the script to retrieve a list of all valid commands
+        // Parse the script to retrieve a list of all valid commands.
         $commands =  self::parse_script($script);
 
-        // Call validate on each command
+        // Call validate on each command.
         foreach ($commands->commands as $c) {
             $class = block_workflow_command::create($c->classname);
             if (!$class->is_valid($c->arguments, $this)) {
@@ -617,10 +609,10 @@ class block_workflow_step {
      * @return  boolean          Whether the script is valid
      */
     public function is_script_valid($script) {
-        // Validate the script
+        // Validate the script.
         $return = self::validate_script($script);
 
-        // Check for errors
+        // Check for errors.
         if ($return->errors) {
             return false;
         }
@@ -635,10 +627,10 @@ class block_workflow_step {
      * @throws  block_workflow_invalid_command_exception
      */
     public function require_script_valid($script) {
-        // Validate the script
+        // Validate the script.
         $return = self::validate_script($script);
 
-        // Check for errors
+        // Check for errors.
         if ($return->errors) {
             throw new block_workflow_invalid_command_exception(
                     get_string('invalidscript', 'block_workflow', $return->errors[0]));
@@ -653,7 +645,7 @@ class block_workflow_step {
      * @return  boolean          Whether the script is valid
      */
     public function get_validation_errors($script) {
-        // Validate the script
+        // Validate the script.
         $return = self::validate_script($script);
 
         return $return->errors;
@@ -684,29 +676,29 @@ class block_workflow_step {
                 break;
         }
 
-        // Parse the script to retrieve a list of all valid commands
+        // Parse the script to retrieve a list of all valid commands.
         $commands =  self::parse_script($script);
 
-        // Check for errors
+        // Check for errors.
         if ($commands->errors) {
             throw new block_workflow_invalid_command_exception(
                     get_string('invalidscript', 'block_workflow', $commands->errors[0]));
 
         }
 
-        // Call require_valid and execute on each command
-        // We re-validate each script command in case the specific $state makes them invalid
+        // Call require_valid and execute on each command.
+        // We re-validate each script command in case the specific $state makes them invalid.
         foreach ($commands->commands as $c) {
             $class = block_workflow_command::create($c->classname);
             $class->require_valid($c->arguments, $state->step(), $state);
             $class->execute($c->arguments, $state);
         }
 
-        // We must allow the transaction to be committed before we attempt to process mail
+        // We must allow the transaction to be committed before we attempt to process mail.
         $transaction->allow_commit();
 
-        // This is a workaround for a limitation of the message_send system
-        // This must be called outside of a transaction
+        // This is a workaround for a limitation of the message_send system.
+        // This must be called outside of a transaction.
         block_workflow_command_email::message_send();
     }
 
@@ -724,23 +716,22 @@ class block_workflow_step {
     public function get_next_step() {
         global $DB;
 
-        // Determine the stepid of the next step
+        // Determine the stepid of the next step.
         $stepid = $DB->get_field('block_workflow_steps', 'id',
                 array('workflowid' => $this->workflowid, 'stepno' => ($this->stepno + 1)));
 
-
         if ($stepid) {
-            // If there is another step, return that step object
+            // If there is another step, return that step object.
             return new block_workflow_step($stepid);
         }
 
         if ($stepno = $this->workflow()->atendgobacktostep) {
-            // If the workflow has an atendgobacktostep, load that step
+            // If the workflow has an atendgobacktostep, load that step.
             $return = new block_workflow_step();
             return $return->load_workflow_stepno($this->workflowid, $stepno);
         }
 
-        // No next step, return false
+        // No next step, return false.
         return false;
     }
 
@@ -770,30 +761,30 @@ class block_workflow_step {
         global $DB;
         $transaction = $DB->start_delegated_transaction();
 
-        // Some handy refernces
+        // Some handy refernces.
         $from   = $this->stepno;
         $to     = $with->stepno;
 
         // Owing to the unique workflowid, stepno constraint, we need to
-        // set the stepno to 0 initially
+        // set the stepno to 0 initially.
         $thisstep = new stdClass();
         $thisstep->id       = $this->id;
         $thisstep->stepno   = 0;
         $DB->update_record('block_workflow_steps', $thisstep);
 
-        // Then update the step we're swapping with
+        // Then update the step we're swapping with.
         $swapstep = new stdClass();
         $swapstep->id       = $with->id;
         $swapstep->stepno   = $from;
         $DB->update_record('block_workflow_steps', $swapstep);
 
-        // Now update this step again
+        // Now update this step again.
         $thisstep->stepno   = $to;
         $DB->update_record('block_workflow_steps', $thisstep);
 
         $transaction->allow_commit();
 
-        // Return the updated step object
+        // Return the updated step object.
         return $this->load_step($this->id);
     }
 
@@ -828,14 +819,14 @@ class block_workflow_step {
     public function roles($stepid = null) {
         global $DB;
 
-        // If the stepid was not specified, load it from the loaded object
+        // If the stepid was not specified, load it from the loaded object.
         if (!$stepid) {
             $stepid = $this->id;
         }
 
-        // Retrieve a list of the roles in use
+        // Retrieve a list of the roles in use.
         // We join to the role table here to retrieve the role name data to
-        // avoid additional queries later
+        // avoid additional queries later.
         $sql = 'SELECT *
                 FROM {block_workflow_step_doers} d
                 INNER JOIN {role} r ON r.id = d.roleid
@@ -856,10 +847,8 @@ class block_workflow_step {
     public function toggle_role($roleid) {
         global $DB;
         if ($DB->get_record('block_workflow_step_doers', array('stepid' => $this->id, 'roleid' => $roleid))) {
-            // The ro
             return $DB->delete_records('block_workflow_step_doers', array('roleid' => $roleid, 'stepid' => $this->id));
-        }
-        else {
+        } else {
             $role = new stdClass();
             $role->stepid = $this->id;
             $role->roleid = $roleid;

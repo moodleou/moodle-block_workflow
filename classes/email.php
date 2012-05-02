@@ -174,40 +174,41 @@ class block_workflow_email {
 
         $transaction = $DB->start_delegated_transaction();
 
-        // Check whether a shortname was specified
+        // Check whether a shortname was specified.
         if (!isset($email->shortname) || empty($email->shortname)) {
             $transaction->rollback(new block_workflow_invalid_email_exception('invalidshortname', 'block_workflow'));
         }
 
-        // Check whether this shortname is already in use
+        // Check whether this shortname is already in use.
         if ($DB->get_record('block_workflow_emails', array('shortname' => $email->shortname))) {
             $transaction->rollback(new block_workflow_invalid_email_exception('shortnameinuse', 'block_workflow'));
         }
 
-        // Require the message
+        // Require the message.
         if (!isset($email->message)) {
             $transaction->rollback(new block_workflow_invalid_email_exception('invalidmessage', 'block_workflow'));
         }
 
-        // Require the subject
+        // Require the subject.
         if (!isset($email->subject)) {
             $transaction->rollback(new block_workflow_invalid_email_exception('invalidsubject', 'block_workflow'));
         }
 
-        // Check that each of the submitted fields is a valid field
+        // Check that each of the submitted fields is a valid field.
         $expectedsettings = $this->expected_settings();
         foreach ((array) $email as $k => $v) {
             if (!in_array($k, $expectedsettings)) {
-                $transaction->rollback(new block_workflow_invalid_email_exception(get_string('invalidfield', 'block_workflow', $k)));
+                $transaction->rollback(new block_workflow_invalid_email_exception(
+                        get_string('invalidfield', 'block_workflow', $k)));
             }
         }
 
-        // Insert the new email
+        // Insert the new email.
         $email->id = $DB->insert_record('block_workflow_emails', $email);
 
         $transaction->allow_commit();
 
-        // And load it again
+        // And load it again.
         return $this->load_email_id($email->id);
     }
 
@@ -223,32 +224,34 @@ class block_workflow_email {
     public function update($data) {
         global $DB;
 
-        // Retrieve the id for the current email
+        // Retrieve the id for the current email.
         $data->id = $this->id;
 
         $transaction = $DB->start_delegated_transaction();
 
-        // Check whether this shortname is already in use
-        if (isset($data->shortname) && ($id = $DB->get_field('block_workflow_emails', 'id', array('shortname' => $data->shortname)))) {
+        // Check whether this shortname is already in use.
+        if (isset($data->shortname) &&
+                ($id = $DB->get_field('block_workflow_emails', 'id', array('shortname' => $data->shortname)))) {
             if ($id != $data->id) {
                 $transaction->rollback(new block_workflow_invalid_email_exception('shortnameinuse', 'block_workflow'));
             }
         }
 
-        // Check that each of the submitted fields is a valid field
+        // Check that each of the submitted fields is a valid field.
         $expectedsettings = $this->expected_settings();
         foreach ((array) $data as $k => $v) {
             if (!in_array($k, $expectedsettings)) {
-                $transaction->rollback(new block_workflow_invalid_email_exception(get_string('invalidfield', 'block_workflow', $k)));
+                $transaction->rollback(new block_workflow_invalid_email_exception(
+                        get_string('invalidfield', 'block_workflow', $k)));
             }
         }
 
-        // Update the record
+        // Update the record.
         $DB->update_record('block_workflow_emails', $data);
 
         $transaction->allow_commit();
 
-        // And load it again
+        // And load it again.
         return $this->load_email_id($this->id);
     }
 
@@ -258,7 +261,7 @@ class block_workflow_email {
      * @return  boolean Whether the e-mail may be deleted or not
      */
     public function is_deletable() {
-        // Count the number of uses
+        // Count the number of uses.
         $count = $this->used_count();
 
         return (!$count > 0);
@@ -288,7 +291,7 @@ class block_workflow_email {
     public function delete() {
         global $DB;
 
-        // First check that we can delete this
+        // First check that we can delete this.
         $this->require_deletable();
         $DB->delete_records('block_workflow_emails', array('id' => $this->id));
     }
@@ -303,24 +306,24 @@ class block_workflow_email {
     public function used_count() {
         global $DB;
 
-        // Grab the count
+        // Grab the count.
         $count = 0;
 
-        // Count the uses in the activescripts
+        // Count the uses in the activescripts.
         $sql = "SELECT activescripts.onactivescript AS script
                 FROM {block_workflow_steps} AS activescripts
                 WHERE activescripts.onactivescript ILIKE '%email%' || ? || '%to%'";
         $activescripts = $DB->get_records_sql($sql, array($this->shortname));
         $count += $this->_used_count($activescripts);
 
-        // Count the uses in the completescripts
+        // Count the uses in the completescripts.
         $sql = "SELECT completescripts.oncompletescript AS script
                 FROM {block_workflow_steps} AS completescripts
                 WHERE completescripts.oncompletescript ILIKE '%email%' || ? || '%to%'";
         $completescripts =  $DB->get_records_sql($sql, array($this->shortname));
         $count += $this->_used_count($completescripts);
 
-        // Return the tital usage count
+        // Return the tital usage count.
         return $count;
     }
 
@@ -331,19 +334,19 @@ class block_workflow_email {
      * @return  integer             The number of times the template is in use
      */
     private function _used_count($scripts) {
-        // Keep track of the count
+        // Keep track of the count.
         $count = 0;
 
-        // Check each of the provided scripts
+        // Check each of the provided scripts.
         foreach ($scripts as $script) {
             $commands = block_workflow_step::parse_script($script->script);
             foreach ($commands->commands as $c) {
                 if ($c->command == 'email') {
-                    // For each e-mail command, process the command and get the shortname
+                    // For each e-mail command, process the command and get the shortname.
                     $class = block_workflow_command::create($c->classname);
                     $data = $class->parse($c->arguments, $this);
                     if ($data->email->shortname == $this->shortname) {
-                        // Shortnames match so increment the count
+                        // Shortnames match so increment the count.
                         $count++;
                     }
                 }

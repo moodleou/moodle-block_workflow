@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Form for editing steps
@@ -9,21 +23,19 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.'); //  It must be included from a Moodle page
-}
+defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/formslib.php');
 
 class step_edit extends moodleform {
-    function definition() {
+    protected function definition() {
         $mform = $this->_form;
         $state = $this->_customdata['state'];
 
         $mform->addElement('header', 'general', get_string('stepsettings', 'block_workflow'));
 
-        // Step data
+        // Step data.
         $mform->addElement('text', 'name', get_string('name', 'block_workflow'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
@@ -34,7 +46,7 @@ class step_edit extends moodleform {
         $mform->setType('instructions_editor', PARAM_RAW);
         $mform->addRule('instructions_editor', null, 'required', null, 'client');
 
-        // Scripts
+        // Scripts.
         $scriptoptions = array('cols' => 80, 'rows' => 8);
         $mform->addElement('textarea', 'onactivescript', get_string('onactivescript', 'block_workflow'), $scriptoptions);
         $mform->setType('onactivescript', PARAM_RAW);
@@ -42,46 +54,45 @@ class step_edit extends moodleform {
         $mform->addElement('textarea', 'oncompletescript', get_string('oncompletescript', 'block_workflow'), $scriptoptions);
         $mform->setType('oncompletescript', PARAM_RAW);
 
-        // IDs
+        // IDs.
         $mform->addElement('hidden', 'stepid');
         $mform->setType('stepid', PARAM_INT);
         $mform->addElement('hidden', 'workflowid');
         $mform->setType('workflowid', PARAM_INT);
 
-        // Before or after
+        // Before or after.
         $mform->addElement('hidden', 'beforeafter');
         $mform->setType('beforeafter', PARAM_INT);
 
         $this->add_action_buttons();
     }
 
-    function validation($data, $files) {
+    public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
         $step = new block_workflow_step($data['stepid']);
 
         // If the workflowid was specified, this step has not yet been created.
         // We need to set the workflow temporarily (it'll be overwritten
-        // shortly anyway) for script validation to succeed
+        // shortly anyway) for script validation to succeed.
         if ($data['workflowid']) {
             $step->set_workflow($data['workflowid']);
         }
 
-
         if (isset($data['onactivescript'])) {
-            // Validate the onactivescript
+            // Validate the onactivescript.
             $script = $step->validate_script($data['onactivescript']);
             if ($script->errors) {
-                // Only display the first error
+                // Only display the first error.
                 $errors['onactivescript'] = get_string('invalidscript', 'block_workflow', $script->errors[0]);
             }
         }
 
         if (isset($data['oncompletescript'])) {
-            // Validate the oncompletescript
+            // Validate the oncompletescript.
             $script = $step->validate_script($data['oncompletescript']);
             if ($script->errors) {
-                // Only display the first error
+                // Only display the first error.
                 $errors['oncompletescript'] = get_string('invalidscript', 'block_workflow', $script->errors[0]);
             }
         }

@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Workflow block test unit for step class.
@@ -9,164 +23,155 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.'); //  It must be included from a Moodle page
-}
+defined('MOODLE_INTERNAL') || die();
 
 // Include our test library so that we can use the same mocking system for
-// all tests
+// all tests.
 require_once(dirname(__FILE__) . '/lib.php');
 
 class test_block_workflow_steps extends block_workflow_testlib {
     public function test_step_validation() {
-        // Create a new workflow
+        // Create a new workflow.
         $workflow = $this->create_workflow();
 
-        // Create a new step
+        // Create a new step.
         $step = new block_workflow_step();
         $data = new stdClass();
 
-        /**
-         * Validate Step Creation
-         */
-        // Missing workflowid
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_step_exception',
+        // Validate Step Creation.
+        // Missing workflowid.
+        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
                 $step, 'create_step', $data);
         $data->workflowid = $workflow->id;
 
-        // Missing name
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_step_exception',
+        // Missing name.
+        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
                 $step, 'create_step', $data);
-        // Empty name
+        // Empty name.
         $data->name = '';
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_step_exception',
+        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
                 $step, 'create_step', $data);
         $data->name = 'step';
 
-        // Missing instructions
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_step_exception',
+        // Missing instructions.
+        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
             $step, 'create_step', $data);
         $data->instructions = '';
 
-        // Invalid workflowid
+        // Invalid workflowid.
         $data->workflowid = -1;
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_workflow_exception',
+        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
                 $step, 'create_step', $data);
         $data->workflowid = $workflow->id;
 
-        // Invalid setting
+        // Invalid setting.
         $data->badfield = 'baddata';
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_step_exception',
+        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
                 $step, 'create_step', $data);
         unset($data->badfield);
 
-        // A bad onactivescript
+        // A bad onactivescript.
         $data->onactivescript = 'baddata';
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_command_exception',
+        $this->expect_exception_without_halting('block_workflow_invalid_command_exception',
                 $step, 'create_step', $data);
         unset($data->onactivescript);
 
-        // A bad oncompletescript
+        // A bad oncompletescript.
         $data->oncompletescript = 'baddata';
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_command_exception',
+        $this->expect_exception_without_halting('block_workflow_invalid_command_exception',
                 $step, 'create_step', $data);
         unset($data->oncompletescript);
 
-        // Should now work
+        // Should now work.
         $step->create_step($data);
 
-        // And the workflow now has two steps
+        // And the workflow now has two steps.
         $this->assertEqual(count($workflow->steps()), 2);
 
-        // The workflow already had a step, this should be stepno two
+        // The workflow already had a step, this should be stepno two.
         $this->assertEqual($step->stepno, 2);
 
-        // Now check that we can create a step before step one
+        // Now check that we can create a step before step one.
         $step->create_step($data, -1);
         $this->assertEqual($step->stepno, 1);
 
-        // And the workflow now has three steps
+        // And the workflow now has three steps.
         $this->assertEqual(count($workflow->steps()), 3);
 
-        // Now check that we can create a new step after step 1, and before step 2 (shifting step 2->3)
+        // Now check that we can create a new step after step 1, and before step 2 (shifting step 2->3).
         $step->create_step($data, 1);
-        // i.e. This is step 2
+        // I.e. This is step 2.
         $this->assertEqual($step->stepno, 2);
 
-        // And the workflow now has 4 steps
+        // And the workflow now has 4 steps.
         $this->assertEqual(count($workflow->steps()), 4);
 
-        // Now check that we can create a new step before step 2, and after step 1
+        // Now check that we can create a new step before step 2, and after step 1.
         $step->create_step($data, -2);
-        // So this is step 2 again
+        // So this is step 2 again.
         $this->assertEqual($step->stepno, 2);
 
-        // And the workflow now has 5 steps
+        // And the workflow now has 5 steps.
         $this->assertEqual(count($workflow->steps()), 5);
 
-        /**
-         * Test atendgobacktostep is set correctly when deleting steps
-         */
-
-        // First set the atendgobacktostep to 5
+        // Test atendgobacktostep is set correctly when deleting steps.
+        // First set the atendgobacktostep to 5.
         $update = new stdClass();
         $update->atendgobacktostep = 5;
         $workflow->update($update);
         $this->assertEqual($workflow->atendgobacktostep, 5);
 
-        // Remove step 1
+        // Remove step 1.
         $s1 = new block_workflow_step();
         $s1->load_workflow_stepno($workflow->id, 1);
         $s1->delete();
 
-        // atendgobacktostep should now be 4
+        // The field atendgobacktostep should now be 4.
         $workflow->load_workflow($workflow->id);
         $this->assertEqual($workflow->atendgobacktostep, 4);
 
-        // Remove step 4
+        // Remove step 4.
         $s4 = new block_workflow_step();
         $s4->load_workflow_stepno($workflow->id, 4);
         $s4->delete();
 
-        // atendgobacktostep should now be 3
+        // The field atendgobacktostep should now be 3.
         $workflow->load_workflow($workflow->id);
         $this->assertEqual($workflow->atendgobacktostep, 3);
 
-        /**
-         * Validate step updates
-         */
+        // Validate step updates.
         $data = new stdClass();
         $step = new block_workflow_step();
         $step->load_workflow_stepno($workflow->id, 1);
 
-        // A bad workflowid
+        // A bad workflowid.
         $data->workflowid = -1;
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_workflow_exception',
+        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
                 $step, 'update_step', $data);
         unset($data->workflowid);
 
-        // Invalid setting
+        // Invalid setting.
         $data->badfield = 'baddata';
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_step_exception',
+        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
                 $step, 'update_step', $data);
         unset($data->badfield);
 
-        // A bad onactivescript
+        // A bad onactivescript.
         $data->onactivescript = 'baddata';
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_command_exception',
+        $this->expect_exception_without_halting('block_workflow_invalid_command_exception',
                 $step, 'update_step', $data);
         unset($data->onactivescript);
 
-        // A bad oncompletescript
+        // A bad oncompletescript.
         $data->oncompletescript = 'baddata';
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_command_exception',
+        $this->expect_exception_without_halting('block_workflow_invalid_command_exception',
                 $step, 'update_step', $data);
         unset($data->oncompletescript);
 
-        // And a valid update
+        // And a valid update.
         $data->name = 'Hello';
         $step->update_step($data);
-        // Assert that the update did happen
+        // Assert that the update did happen.
         $this->assertEqual($data->name, $step->name);
     }
 
@@ -182,7 +187,7 @@ class test_block_workflow_steps extends block_workflow_testlib {
      * - Ensure that we get the right result from step->roles()
      */
     public function test_step_roles() {
-        // Create a new workflow
+        // Create a new workflow.
         $data = new stdClass();
         $data->shortname            = 'courseworkflow';
         $data->name                 = 'First Course Workflow';
@@ -191,136 +196,130 @@ class test_block_workflow_steps extends block_workflow_testlib {
         $data->description          = 'This is a test workflow applying to a course for the unit test';
         $data->descriptionformat    = FORMAT_PLAIN;
 
-        // Create a new workflow object
+        // Create a new workflow object.
         $workflow = new block_workflow_workflow();
 
-        // create_workflow will return a completed workflow object
+        // The method create_workflow will return a completed workflow object.
         $workflow->create_workflow($data);
 
-        // Retrieve the first step
+        // Retrieve the first step.
         $step = new block_workflow_step();
         $step->load_workflow_stepno($workflow->id, 1);
 
-        // Find the ID for the manager role
+        // Find the ID for the manager role.
         $managerid = $this->testdb->get_field('role', 'id', array('shortname' => 'manager'));
 
-        // Enable the role
+        // Enable the role.
         $return = $step->toggle_role($managerid);
         $this->assertIsA($return, 'integer');
 
-        // Retrieve a list of all of the roles
+        // Retrieve a list of all of the roles.
         $return = $step->roles();
         $this->assertIsA($return, 'Array');
 
-        // We've only added one role
+        // We've only added one role.
         $this->assertEqual(count($return), 1);
 
         // Grab the first (and only entry) and check that it's roleid
-        // matches the manager role's id
+        // matches the manager role's id.
         $thisrole = array_shift($return);
         $this->assertEqual($thisrole->roleid, $managerid);
 
-        // Add a second role
+        // Add a second role.
         $teacherid = $this->testdb->get_field('role', 'id', array('shortname' => 'teacher'));
 
-        // Enable the second role
+        // Enable the second role.
         $return = $step->toggle_role($teacherid);
         $this->assertIsA($return, 'integer');
 
-        // Retrieve a list of all of the roles again
+        // Retrieve a list of all of the roles again.
         $return = $step->roles();
         $this->assertIsA($return, 'Array');
 
-        // There should now be two roles listed
+        // There should now be two roles listed.
         $this->assertEqual(count($return), 2);
 
-        // Disable the manager again
+        // Disable the manager again.
         $return = $step->toggle_role($managerid);
         $this->assertTrue($return);
 
-        // Retrieve a list of all of the roles again
+        // Retrieve a list of all of the roles again.
         $return = $step->roles();
         $this->assertIsA($return, 'Array');
 
-        // There should now be only one role listed
+        // There should now be only one role listed.
         $this->assertEqual(count($return), 1);
 
         // Grab the first (and only entry) and check that it's now the role
-        // matches the teacher role's id
+        // matches the teacher role's id.
         $thisrole = array_shift($return);
         $this->assertEqual($thisrole->roleid, $teacherid);
 
-        // Finally remove the teacher role
+        // Finally remove the teacher role.
         $return = $step->toggle_role($teacherid);
         $this->assertTrue($return);
 
-        // Retrieve a list of all of the roles again
+        // Retrieve a list of all of the roles again.
         $return = $step->roles();
         $this->assertIsA($return, 'Array');
 
-        // There should now be no roles listed
+        // There should now be no roles listed.
         $this->assertEqual(count($return), 0);
     }
 
     public function test_script_parse() {
-        // Create a new workflow and step
+        // Create a new workflow and step.
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
 
-        /**
-         * Giving a two-line script (with a comment) should give us one 
-         * command and no errors
-         */
+        // Giving a two-line script (with a comment) should give us one
+        // command and no errors.
         $script = "# This is a comment\nassignrole editingteacher to teacher";
 
         $command = $step->parse_script($script);
 
-        // There should be one command
+        // There should be one command.
         $this->assertEqual(count($command->commands), 1);
 
-        // And no errors
+        // And no errors.
         $this->assertEqual(count($command->errors), 0);
     }
 
     public function test_script_validation() {
-        // Create a new workflow and step
+        // Create a new workflow and step.
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
 
-        /**
-         * Try with an invalid script
-         */
+        // Try with an invalid script.
         $script = 'bad script';
 
-        // is_script_valid should return false
+        // The method is_script_valid should return false.
         $this->assertFalse($step->is_script_valid($script));
 
-        // require_script_valid should throw an exception
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_command_exception',
+        // The method require_script_valid should throw an exception.
+        $this->expect_exception_without_halting('block_workflow_invalid_command_exception',
                 $step, 'require_script_valid', $script);
 
-        // get_validation_errors should give us one error
+        // The method get_validation_errors should give us one error.
         $errors = $step->get_validation_errors($script);
         $this->assertEqual(count($errors), 1);
 
-        /**
-         * And a valid script
-         */
+        // And a valid script.
         $script = 'assignrole editingteacher to teacher';
 
-        // is_script_valid should return true
+        // The method is_script_valid should return true.
         $this->assertTrue($step->is_script_valid($script));
 
-        // require_script_valid should return true
+        // The method require_script_valid should return true.
         $this->assertTrue($step->require_script_valid($script));
 
-        // get_validation_errors should give us no errors
+        // The method get_validation_errors should give us no errors.
         $errors = $step->get_validation_errors($script);
         $this->assertEqual(count($errors), 0);
     }
 
     public function test_step_commands() {
-        // Create a new workflow
+        // Create a new workflow.
         $data = new stdClass();
         $data->shortname            = 'courseworkflow';
         $data->name                 = 'First Course Workflow';
@@ -329,24 +328,24 @@ class test_block_workflow_steps extends block_workflow_testlib {
         $data->description          = 'This is a test workflow applying to a course for the unit test';
         $data->descriptionformat    = FORMAT_PLAIN;
 
-        // Create a new workflow object
+        // Create a new workflow object.
         $workflow = new block_workflow_workflow();
         $workflow->create_workflow($data);
 
-        // Retrieve the first workflow step
+        // Retrieve the first workflow step.
         $step = new block_workflow_step();
         $step->load_workflow_stepno($workflow->id, 1);
 
-        // Check that it's a step
+        // Check that it's a step.
         $this->assertIsA($step, 'block_workflow_step');
 
-        // The default script is just a comment, first validate it and verify that we have no valid commands returned
+        // The default script is just a comment, first validate it and verify that we have no valid commands returned.
         $commands = $step->validate_script($step->onactivescript);
         $this->assertEqual(count($commands->commands), 0);
         $commands = $step->validate_script($step->oncompletescript);
         $this->assertEqual(count($commands->commands), 0);
 
-        // Now create a new email email as we'll want to test the e-mail script options
+        // Now create a new email email as we'll want to test the e-mail script options.
         $data = new stdClass();
         $data->message      = 'Example Body';
         $data->shortname    = 'testemail';
@@ -355,111 +354,103 @@ class test_block_workflow_steps extends block_workflow_testlib {
         $email = new block_workflow_email();
         $return = $email->create($data);
 
-        // Check that the return value is also a block_workflow_email
+        // Check that the return value is also a block_workflow_email.
         $this->assertIsA($return, 'block_workflow_email');
 
-        // The create function should also reload the object into $email too
+        // The create function should also reload the object into $email too.
         $this->assertIdentical($return, $email);
 
-        // Update the step script to email our new testemail to the manager role
+        // Update the step script to email our new testemail to the manager role.
         $update = new stdClass();
         $update->onactivescript = 'email testemail to manager';
         $return = $step->update_step($update);
 
-        // Check that the return value is also a block_workflow_step
+        // Check that the return value is also a block_workflow_step.
         $this->assertIsA($return, 'block_workflow_step');
 
-        // The update function should also reload the object into $step too
+        // The update function should also reload the object into $step too.
         $this->assertIdentical($return, $step);
 
-        // Check that the script still validates and now has 1 command
+        // Check that the script still validates and now has 1 command.
         $commands = $step->validate_script($step->onactivescript);
         $this->assertEqual(count($commands->commands), 1);
         $commands = $step->validate_script($step->oncompletescript);
         $this->assertEqual(count($commands->commands), 0);
 
-        // expectException seems to break things here and stop processing after catching...
-        // Now attempt to create an invalid script. This should throw a  block_workflow_invalid_command_exception
+        // The method expectException seems to break things here and stop processing after catching...
+        // Now attempt to create an invalid script. This should throw a  block_workflow_invalid_command_exception.
         $update = new stdClass();
         $update->onactivescript = 'invalidcommand';
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_command_exception', $step, 'update_step', $update);
+        $this->expect_exception_without_halting('block_workflow_invalid_command_exception', $step, 'update_step', $update);
 
-        // And a valid command with no arguments
+        // And a valid command with no arguments.
         $update = new stdClass();
         $update->onactivescript = 'email';
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_command_exception', $step, 'update_step', $update);
+        $this->expect_exception_without_halting('block_workflow_invalid_command_exception', $step, 'update_step', $update);
 
-        // And a valid command using an invalid email
+        // And a valid command using an invalid email.
         $update = new stdClass();
         $update->onactivescript = 'email noemail to manager';
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_command_exception', $step, 'update_step', $update);
+        $this->expect_exception_without_halting('block_workflow_invalid_command_exception', $step, 'update_step', $update);
 
-        // And a valid command and email, to an invalid role
+        // And a valid command and email, to an invalid role.
         $update = new stdClass();
         $update->onactivescript = 'email testemail to norole';
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_command_exception', $step, 'update_step', $update);
+        $this->expect_exception_without_halting('block_workflow_invalid_command_exception', $step, 'update_step', $update);
     }
 
     public function test_next_step_end() {
-        // Create a new workflow
+        // Create a new workflow.
         $workflow   = $this->create_workflow(false);
 
-        // And add a step to that workflow
+        // And add a step to that workflow.
         $firststep  = $this->create_step($workflow);
 
-        // And add another step
+        // And add another step.
         $secondstep = $this->create_step($workflow);
 
-        // Confirm that the workflow will end
+        // Confirm that the workflow will end.
         $this->assertNull($workflow->atendgobacktostep);
 
-        /**
-         * Get the next step for the first step
-         * This should return the second step
-         */
+        // Get the next step for the first step.
+        // This should return the second step.
         $getnext = $firststep->get_next_step();
         $this->assertIsA($getnext, 'block_workflow_step');
         $this->compare_step($secondstep, $getnext);
 
-        /**
-         * Get the next step for the second step
-         * This should return false
-         */
+        // Get the next step for the second step.
+        // This should return false.
         $getnext = $secondstep->get_next_step();
         $this->assertFalse($getnext);
     }
 
     public function test_next_step_loop() {
-        // Create a new workflow
+        // Create a new workflow.
         $workflow   = $this->create_workflow(false);
 
-        // And add a step to that workflow
+        // And add a step to that workflow.
         $firststep  = $this->create_step($workflow);
 
-        // And add another step
+        // And add another step.
         $secondstep = $this->create_step($workflow);
 
-        // Confirm that the workflow will end
+        // Confirm that the workflow will end.
         $this->assertNull($workflow->atendgobacktostep);
 
-        // Set the atendgobacktostep to step one and confirm
+        // Set the atendgobacktostep to step one and confirm.
         $workflow->atendgobacktostep(1);
         $this->assertEqual($workflow->atendgobacktostep, 1);
 
         $secondstep = new block_workflow_step($secondstep->id);
 
-        /**
-         * Get the next step for the first step
-         * This should return the second step
-         */
+        // Get the next step for the first step.
+        // This should return the second step.
         $getnext = $firststep->get_next_step();
         $this->assertIsA($getnext, 'block_workflow_step');
         $this->compare_step($secondstep, $getnext);
 
-        /**
-         * Get the next step for the second step
-         * This should return the first step
-         */
+        // Get the next step for the second step.
+        // This should return the first step.
         $getnext = $secondstep->get_next_step();
         $this->assertIsA($getnext, 'block_workflow_step');
         $this->compare_step($firststep, $getnext);
@@ -470,8 +461,8 @@ class test_block_workflow_steps extends block_workflow_testlib {
         $step->set_workflow(1);
         $this->assertEqual($step->workflowid, 1);
 
-        // Attempting to set again should throw an exception
-        $this->expectExceptionWithoutHalting('block_workflow_invalid_step_exception', $step,
+        // Attempting to set again should throw an exception.
+        $this->expect_exception_without_halting('block_workflow_invalid_step_exception', $step,
                 'set_workflow', 1);
     }
 

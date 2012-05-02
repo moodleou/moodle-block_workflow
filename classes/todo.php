@@ -119,27 +119,27 @@ class block_workflow_todo {
 
         $transaction = $DB->start_delegated_transaction();
 
-        // Check that we have a task
+        // Check that we have a task.
         if (!isset($todo->task)) {
             $transaction->rollback(new block_workflow_invalid_todo_exception(get_string('tasknotspecified', 'block_workflow')));
         }
 
-        // Ensure that a stepid was specified
+        // Ensure that a stepid was specified.
         if (!isset($todo->stepid)) {
             $transaction->rollback(new block_workflow_invalid_todo_exception(get_string('invalidstepid', 'block_workflow')));
         }
 
-        // Ensure that the stepid related to a valid step
+        // Ensure that the stepid related to a valid step.
         try {
             new block_workflow_step($todo->stepid);
         } catch (Exception $e) {
             $transaction->rollback($e);
         }
 
-        // Set the obsolete value
+        // Set the obsolete value.
         $todo->obsolete = BLOCK_WORKFLOW_ENABLED;
 
-        // Check that each of the submitted fields is a valid field
+        // Check that each of the submitted fields is a valid field.
         $expectedsettings = $this->expected_settings();
         foreach ((array) $todo as $k => $v) {
             if (!in_array($k, $expectedsettings)) {
@@ -147,13 +147,13 @@ class block_workflow_todo {
             }
         }
 
-        // Create the todo
+        // Create the todo.
         $todo->id = $DB->insert_record('block_workflow_step_todos', $todo);
 
-        // Finished with the transaction
+        // Finished with the transaction.
         $transaction->allow_commit();
 
-        // Reload the object using the returned step id and return it
+        // Reload the object using the returned step id and return it.
         return $this->load_by_id($todo->id);
     }
 
@@ -169,17 +169,18 @@ class block_workflow_todo {
     public function update_todo($data) {
         global $DB;
 
-        // Retrieve the id for the current todo
+        // Retrieve the id for the current todo.
         $data->id = $this->id;
 
         $transaction = $DB->start_delegated_transaction();
 
-        // Don't allow the stepid to be updated
+        // Don't allow the stepid to be updated.
         if (isset($data->stepid) && ($data->stepid != $this->stepid)) {
-            $transaction->rollback(new block_workflow_invalid_todo_exception(get_string('todocannotchangestepid', 'block_workflow')));
+            $transaction->rollback(new block_workflow_invalid_todo_exception(
+                    get_string('todocannotchangestepid', 'block_workflow')));
         }
 
-        // Check that each of the submitted fields is a valid field
+        // Check that each of the submitted fields is a valid field.
         $expectedsettings = $this->expected_settings();
         foreach ((array) $data as $k => $v) {
             if (!in_array($k, $expectedsettings)) {
@@ -187,12 +188,12 @@ class block_workflow_todo {
             }
         }
 
-        // Update the record
+        // Update the record.
         $DB->update_record('block_workflow_step_todos', $data);
 
         $transaction->allow_commit();
 
-        // Return the updated todo object
+        // Return the updated todo object.
         return $this->load_by_id($data->id);
     }
 
@@ -207,10 +208,10 @@ class block_workflow_todo {
         global $DB;
         $transaction = $DB->start_delegated_transaction();
 
-        // First remove any todo_done records
+        // First remove any todo_done records.
         $DB->delete_records('block_workflow_todo_done', array('steptodoid' => $this->id));
 
-        // Then remove the actual todo
+        // Then remove the actual todo.
         $DB->delete_records('block_workflow_step_todos', array('id' => $this->id));
 
         $transaction->allow_commit();
@@ -234,31 +235,31 @@ class block_workflow_todo {
         global $DB;
         $transaction = $DB->start_delegated_transaction();
 
-        // Retrieve the source, and clone it
+        // Retrieve the source, and clone it.
         $src = new block_workflow_todo($srcid);
 
-        // Copy the source based on the allowed settings
+        // Copy the source based on the allowed settings.
         foreach (self::expected_settings() as $k) {
             $dst->$k = $src->$k;
         }
 
-        // Unset the id on the target
+        // Unset the id on the target.
         unset($dst->id);
 
-        // If a new stepid was specified, then use it instead
+        // If a new stepid was specified, then use it instead.
         if ($stepid) {
             $dst->stepid = $stepid;
         }
 
-        // Ensure that obsolete is set
+        // Ensure that obsolete is set.
         $dst->obsolete = ($dst->obsolete) ? 1 : 0;
 
-        // Create the entry
+        // Create the entry.
         $newtodo = new block_workflow_todo();
         $newtodo->create_todo($dst);
 
         // Allow the transaction at this stage, and return the newly
-        // created object
+        // created object.
         $transaction->allow_commit();
 
         return $newtodo->load_by_id($newtodo->id);
@@ -278,28 +279,26 @@ class block_workflow_todo {
         if (!$todoid) {
             $todoid  = $this->id;
             $current = $this;
-        }
-        else {
-            // Retrieve the specified record
+        } else {
+            // Retrieve the specified record.
             $current = new block_workflow_todo($todoid);
         }
 
         $update = new stdClass();
         $update->id = $todoid;
 
-        // Switch the obsolete state of the todo
+        // Switch the obsolete state of the todo.
         if ($current->obsolete == BLOCK_WORKFLOW_ENABLED) {
             $update->obsolete = BLOCK_WORKFLOW_OBSOLETE;
-        }
-        else {
+        } else {
             $update->obsolete = BLOCK_WORKFLOW_ENABLED;
         }
 
-        // Update the record
+        // Update the record.
         $DB->update_record('block_workflow_step_todos', $update);
         $transaction->allow_commit();
 
-        // Return the updated todo object
+        // Return the updated todo object.
         return $current->load_by_id($todoid);
     }
 

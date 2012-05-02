@@ -50,19 +50,20 @@ class block_workflow_command_email extends block_workflow_command {
 
         // Break down the line. It should be in the format:
         //      {email} to {rolea} {roleb} {rolen}
+        // with any number of role shortnames.
         $line = preg_split('/[\s+]/', $args);
 
-        // Grab the email name
+        // Grab the email name.
         $data->emailname = array_shift($line);
 
-        // Shift off the 'to' component
+        // Shift off the 'to' component.
         $to = array_shift($line);
         if ($to !== 'to') {
             $data->errors[] = get_string('invalidsyntaxmissingto', 'block_workflow');
             return $data;
         }
 
-        // Return the remaining roles unprocessed
+        // Return the remaining roles unprocessed.
         $data->roles = $line;
 
         return $data;
@@ -87,27 +88,27 @@ class block_workflow_command_email extends block_workflow_command {
      *          - errors    - Any errors returned
      */
     public function parse($args, $step, $state = null) {
-        // Parse the arguments
+        // Parse the arguments.
         $data = $this->parse_args($args);
 
-        // Check that the e-mail email exists
+        // Check that the e-mail email exists.
         $data->email = $this->email($data->emailname, $data->errors);
         if ($data->errors) {
             return $data;
         }
 
-        // If we were given a state, then retrieve it's context for use in the execution
+        // If we were given a state, then retrieve it's context for use in the execution.
         if ($state) {
             $data->context = $state->context();
         }
 
-        // Check that some roles were specified
+        // Check that some roles were specified.
         if (count($data->roles) <= 0) {
             $data->errors[] = get_string('norolesspecified', 'block_workflow');
             return $data;
         }
 
-        // Check whether the specified roles exist and fill the list of target users
+        // Check whether the specified roles exist and fill the list of target users.
         $data->users = array();
         foreach ($data->roles as $role) {
             $thisrole = parent::require_role_exists($role, $data->errors);
@@ -116,7 +117,7 @@ class block_workflow_command_email extends block_workflow_command {
             }
 
             if ($state) {
-                // We can only get the list of users if we've got a specific context
+                // We can only get the list of users if we've got a specific context.
                 $data->users = array_merge($data->users, parent::role_users($thisrole, $data->context));
             }
         }
@@ -141,18 +142,18 @@ class block_workflow_command_email extends block_workflow_command {
      * @return  void
      */
     public function execute($args, $state) {
-        // Validate the command and use it to retrieve the required data
+        // Validate the command and use it to retrieve the required data.
         $email = $this->parse($args, $state->step(), $state);
 
         if ($email->errors) {
-            // We should never be able to execute a script which contains errors
+            // We should never be able to execute a script which contains errors.
             throw new block_workflow_invalid_command_exception(get_string('invalidscript', 'block_workflow', $email->errors[0]));
         }
 
-        // Fill in the blanks
+        // Fill in the blanks.
         $this->email_params($email, $state);
 
-        // Send the e-mail
+        // Send the e-mail.
         $eventdata = new stdClass();
         $eventdata->component   = 'block_workflow';
         $eventdata->name        = 'notification';
@@ -170,11 +171,11 @@ class block_workflow_command_email extends block_workflow_command {
          * possible to call the function within a transaction, we queue messages here to be called
          * later by the function block_workflow_command_email::send_mail()
          * It should be possible to replace this call with message_send($eventdata); if and
-         * when this limitation is removed
+         * when this limitation is removed.
          */
         foreach ($email->users as $user) {
             $eventdata->userto          = $user;
-            block_workflow_command_email::message_send($eventdata);
+            self::message_send($eventdata);
         }
     }
 
@@ -215,31 +216,31 @@ class block_workflow_command_email extends block_workflow_command {
     private function email_params(&$email, $state) {
         global $USER;
 
-        // Shorter accessors
+        // Shorter accessors.
         $string   = $email->email->message;
         $subject  = $email->email->subject;
         $step     = $state->step();
         $workflow = $step->workflow();
 
-        // Replace %%workflowname%%
+        // Replace %%workflowname%%.
         $string  = str_replace('%%workflowname%%', $workflow->name, $string);
         $subject = str_replace('%%workflowname%%', $workflow->name, $subject);
 
-        // Replace %%stepname%%
+        // Replace %%stepname%%.
         $string  = str_replace('%%stepname%%', $step->name, $string);
         $subject = str_replace('%%stepname%%', $step->name, $subject);
 
-        // Replace %%contextname%%
+        // Replace %%contextname%%.
         $contextname = print_context_name($email->context, false, true);
         $string  = str_replace('%%contextname%%', $contextname, $string);
         $subject = str_replace('%%contextname%%', $contextname, $subject);
 
-        // Replace %%contexturl%%
+        // Replace %%contexturl%%.
         $contexturl = get_context_url($email->context);
         $string  = str_replace('%%contexturl%%', $contexturl, $string);
         $subject = str_replace('%%contexturl%%', $contexturl, $subject);
 
-        // Replace %%coursename%%
+        // Replace %%coursename%%.
         if ($email->context->contextlevel == CONTEXT_COURSE) {
             $coursename = $contextname;
         } else {
@@ -249,27 +250,27 @@ class block_workflow_command_email extends block_workflow_command {
         $string  = str_replace('%%coursename%%', $coursename, $string);
         $subject = str_replace('%%coursename%%', $coursename, $subject);
 
-        // Replace %%usernames%%
+        // Replace %%usernames%%.
         $usernames = array_map(create_function('$a', 'return fullname($a);'), $email->users);
         $string  = str_replace('%%usernames%%', implode(', ', $usernames), $string);
         $subject = str_replace('%%usernames%%', implode(', ', $usernames), $subject);
 
-        // Replace %%currentusername%%
+        // Replace %%currentusername%%.
         $currentusername = fullname($USER);
         $string  = str_replace('%%currentusername%%', $currentusername, $string);
         $subject = str_replace('%%currentusername%%', $currentusername, $subject);
 
-        // Replace %%instructions%%
+        // Replace %%instructions%%.
         $instructions = html_to_text($step->format_instructions($email->context), 0, false);
         $string  = str_replace('%%instructions%%', $instructions, $string);
         $subject = str_replace('%%instructions%%', $instructions, $subject);
 
-        // Replace %%tasks%%
+        // Replace %%tasks%%.
         $tasks   = array_map(create_function('$a', 'return $a->task;'), $step->todos());
         $string  = str_replace('%%tasks%%', implode(', ', $tasks), $string);
         $subject = str_replace('%%tasks%%', implode(', ', $tasks), $subject);
 
-        // Replace %%comment%%
+        // Replace %%comment%%.
         if ($state->state != BLOCK_WORKFLOW_STATE_ACTIVE) {
             $comment = html_to_text($state->comment, 0, false);
         } else if (!empty($state->previouscomment)) {
@@ -280,7 +281,7 @@ class block_workflow_command_email extends block_workflow_command {
         $string  = str_replace('%%comment%%', $comment, $string);
         $subject = str_replace('%%comment%%', $comment, $subject);
 
-        // Re-assign the message
+        // Re-assign the message.
         $email->email->message = $string;
         $email->email->subject = $subject;
     }
@@ -312,7 +313,7 @@ class block_workflow_command_email extends block_workflow_command {
             $fakenoreplyuser = new stdClass();
             $fakenoreplyuser->firstname = '';
             $fakenoreplyuser->lastname = get_string('emailfrom', 'block_workflow', $SITE->shortname);
-            // Only try to send if we're not in a transaction
+            // Only try to send if we're not in a transaction.
             while ($eventdata = array_shift($mailqueue)) {
                 $result = email_to_user($eventdata->userto, $fakenoreplyuser,
                         $eventdata->subject, $eventdata->fullmessage, $eventdata->fullmessagehtml,

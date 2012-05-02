@@ -51,7 +51,7 @@ class block_workflow_command_assignrole extends block_workflow_command {
      * Note: No exception is thrown if there are no users to assign the newrole to.
      */
     public function parse($args, $step, $state = null) {
-        // We'll return the components in an object
+        // We'll return the components in an object.
         $data = new stdClass();
         $data->errors = array();
 
@@ -59,37 +59,38 @@ class block_workflow_command_assignrole extends block_workflow_command {
             $data->context = $state->context();
         }
 
-        // Break down the line. It should be in the format:
+        // Break down the line. It should be in the format
         //      {newrole} to {rolea} {roleb} {rolen}
+        // with any number of role shortnames.
         $line = preg_split('/[\s+]/', $args);
 
-        // Grab the new role name
+        // Grab the new role name.
         $data->newrole = parent::require_role_exists(array_shift($line), $data->errors);
 
-        // Shift off the 'to' component
+        // Shift off the 'to' component.
         $to = array_shift($line);
         if ($to !== 'to') {
             $data->errors[] = get_string('invalidsyntaxmissingto', 'block_workflow');
             return $data;
         }
 
-        // Check whether the specified roles exist and fill the list of target users
+        // Check whether the specified roles exist and fill the list of target users.
         $data->roles = array();
         $data->users = array();
 
-        // Check each role exists, and retrieve the data
+        // Check each role exists, and retrieve the data.
         foreach ($line as $role) {
-            // Check that the role exists
+            // Check that the role exists.
             if ($thisrole = parent::require_role_exists($role, $data->errors)) {
                 $data->roles[] = $thisrole;
                 if ($state) {
-                    // We can only get the list of users if we've got a specific context
+                    // We can only get the list of users if we've got a specific context.
                     $data->users = array_merge($data->users, parent::role_users($thisrole, $data->context));
                 }
             }
         }
 
-        // Check that some roles were specified
+        // Check that some roles were specified.
         if (count($data->roles) <= 0) {
             $data->errors[] = get_string('norolesspecified', 'block_workflow');
             return $data;

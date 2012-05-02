@@ -43,7 +43,7 @@ class block_workflow_command_setactivitysetting extends block_workflow_command {
 
         $workflow = $step->workflow();
 
-        // Check that this step workflow relatees to an activity
+        // Check that this step workflow relatees to an activity.
         if (!parent::is_activity($workflow)) {
             $data->errors[] = get_string('notanactivity', 'block_workflow', 'setactivityvisibility');
             return $data;
@@ -53,10 +53,10 @@ class block_workflow_command_setactivitysetting extends block_workflow_command {
             $data->cm = get_coursemodule_from_id($workflow->appliesto, $state->context()->instanceid);
         }
 
-        // We'll use the database_manager to check whether tables and fields exist
+        // We'll use the database_manager to check whether tables and fields exist.
         $dbman = $DB->get_manager();
 
-        // Check that the $appliesto table exists
+        // Check that the $appliesto table exists.
         $data->table = $workflow->appliesto;
         if (!$dbman->table_exists($data->table)) {
             $data->errors[] = get_string('invalidappliestotable', 'block_workflow', $workflow->appliesto);
@@ -65,25 +65,24 @@ class block_workflow_command_setactivitysetting extends block_workflow_command {
 
         // Break down the line. It should be in the format:
         //      {column} to {value}
+        // where column is a column in the activity settings table.
         $line = preg_split('/[\s+]/', $args);
 
-        /**
-         * Get the column and check that it exists
-         */
+        // Get the column and check that it exists.
         $data->column = array_shift($line);
         if (!$dbman->field_exists($data->table, $data->column)) {
             $data->errors[] = get_string('invalidactivitysettingcolumn', 'block_workflow', $data->column);
             return $data;
         }
 
-        // Shift off the 'to' component
+        // Shift off the 'to' component.
         $to = array_shift($line);
         if ($to !== 'to') {
             $data->errors[] = get_string('invalidsyntaxmissingto', 'block_workflow');
             return $data;
         }
 
-        // What we'll be setting it to
+        // What we'll be setting it to.
         $data->value = array_shift($line);
 
         return $data;

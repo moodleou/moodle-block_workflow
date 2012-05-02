@@ -40,34 +40,22 @@ require_once($CFG->dirroot . '/blocks/workflow/classes/command_setactivityvisibi
 require_once($CFG->dirroot . '/blocks/workflow/classes/command_setcoursevisibility.php');
 
 
-/**
- * An active state for a step_state
- */
+/** @var string An active state for a step_state. */
 define('BLOCK_WORKFLOW_STATE_ACTIVE',       'active');
 
-/**
- * A completed state for a step_state
- */
+/** @var string A completed state for a step_state. */
 define('BLOCK_WORKFLOW_STATE_COMPLETED',    'completed');
 
-/**
- * An aborted state for a step_state
- */
+/** @var string An aborted state for a step_state. */
 define('BLOCK_WORKFLOW_STATE_ABORTED',      'aborted');
 
-/**
- * The enabled state for a workflow
- */
+/** @var int The enabled state for a workflow. */
 define('BLOCK_WORKFLOW_ENABLED',            0);
 
-/**
- * The obsolste state for a workflow
- */
+/** @var int The obsolste state for a workflow. */
 define('BLOCK_WORKFLOW_OBSOLETE',           1);
 
-/**
- * The maximum comment length to be disapled in block
- */
+/** @var int The maximum comment length to be disapled in block. */
 define('BLOCK_WORKFLOW_MAX_COMMENT_LENGTH', 200);
 
 /**
@@ -100,10 +88,10 @@ function block_workflow_load_workflows() {
  * @return  array   Associative array to fill an appliesto select
  */
 function block_workflow_appliesto_list() {
-    // appliesto should contain courses
+    // Applies to should contain courses ...
     $return = array('course' => get_string('course'));
 
-    // and any installed modules
+    // ... and any installed modules.
     $mods = get_plugin_list('mod');
     foreach ($mods as $name => $path) {
         $return[$name] = get_string('pluginname', 'mod_' . $name);
@@ -164,10 +152,10 @@ function block_workflow_contextlevel_roles($contextlevel) {
 function block_workflow_editor_options() {
     $options = array();
 
-    // Disallow files
+    // Disallow files.
     $options['maxfiles'] = 0;
 
-    // Disallow use of images
+    // Disallow use of images.
     return $options;
 }
 
@@ -211,8 +199,7 @@ function block_workflow_convert_editor_format($format) {
     );
     if (isset($knownformats[$format])) {
         return $knownformats[$format];
-    }
-    else {
+    } else {
         throw new block_workflow_exception(get_string('invalidformat', 'block_workflow', $format));
     }
 }
@@ -235,8 +222,7 @@ function block_workflow_can_make_changes($state) {
 
     if (isset($canmakechanges[$context->id][$state->id])) {
         return $canmakechanges[$context->id][$state->id];
-    }
-    else {
+    } else {
         $canmakechanges[$context->id][$state->id] = false;
     }
 

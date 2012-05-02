@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Test the workflow by creating a course and a workflow, stepping through
  * the steps, and checking that the righ things happen.
@@ -29,7 +28,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Include our test library so that we can use the same mocking system for
-// all tests
+// all tests.
 require_once(dirname(__FILE__) . '/lib.php');
 
 
@@ -54,10 +53,10 @@ class test_block_workflow_walkthrough extends block_workflow_testlib {
     public function test_course_workflow() {
         global $DB;
 
-        // Create a new workflow object
+        // Create a new workflow object.
         $workflow = new block_workflow_workflow();
 
-        // Create a new workflow
+        // Create a new workflow.
         $data = new stdClass();
         $data->shortname            = 'courseworkflow';
         $data->name                 = 'First course workflow';
@@ -66,20 +65,20 @@ class test_block_workflow_walkthrough extends block_workflow_testlib {
         $data->description          = 'This is a test workflow applying to a course for the unit test';
         $data->descriptionformat    = FORMAT_PLAIN;
 
-        // create_workflow will return a completed workflow object
+        // Create_workflow will return a completed workflow object.
         $workflow->create_workflow($data);
 
         // When creating a workflow, the initial step will have automatically been created.
-        // Retrieve the list of steps
+        // Retrieve the list of steps.
         $steps  = $workflow->steps();
         $step = array_pop($steps);
         $step1 = new block_workflow_step($step->id);
 
-        // Update the first step to have some scripts
+        // Update the first step to have some scripts.
         $step->onactivescript = 'assignrole teacher to student';
         $step1->update_step($step);
 
-        // Create a new step in the workflow
+        // Create a new step in the workflow.
         $nsdata = new stdClass();
         $nsdata->workflowid         = $workflow->id;
         $nsdata->name               = 'Second step';

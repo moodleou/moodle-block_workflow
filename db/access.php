@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Workflow block role capability definitions
@@ -11,8 +25,8 @@
 
 $capabilities = array(
 
-    // By default given to manager
-    // Allows access to, and use of the workflow definition
+    // Allows access to, and use of the workflow definition.
+    // By default given to manager.
     'block/workflow:editdefinitions'    => array(
         'captype'       => 'write',
         'contextlevel'  => CONTEXT_SYSTEM,
@@ -21,8 +35,8 @@ $capabilities = array(
         )
     ),
 
-    // By default given to manager and editingteacher
-    // Allows users to see the workflow block
+    // Allows users to see the workflow block.
+    // By default given to manager and editingteacher.
     'block/workflow:view'   => array(
         'captype'       => 'read',
         'contextlevel'  => CONTEXT_COURSE,
@@ -32,8 +46,8 @@ $capabilities = array(
         )
     ),
 
-    // By default given to manager
-    // Allows use of the 'Jump to step' button
+    // Allows use of the 'Jump to step' button.
+    // By default given to manager.
     'block/workflow:manage' => array(
         'captype'       => 'write',
         'contextlevel'  => CONTEXT_COURSE,
@@ -42,14 +56,13 @@ $capabilities = array(
         )
     ),
 
-    // By default given to manager
-    // Allows use of the 'Finish step' button
+    // Allows use of the 'Finish step' button.
+    // By default given to manager.
     'block/workflow:dostep' => array(
         'captype'       => 'write',
         'contextlevel'  => CONTEXT_COURSE,
         'archetypes'    => array(
             'manager'   => CAP_ALLOW,
         )
-    ),
-
+    )
 );

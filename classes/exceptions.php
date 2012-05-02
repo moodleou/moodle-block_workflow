@@ -33,7 +33,9 @@ defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
  * @copyright  2011 Lancaster University Network Services Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_workflow_exception                  extends moodle_exception{}
+class block_workflow_exception extends moodle_exception {
+}
+
 
 /**
  * Workflow not assigned exception
@@ -46,7 +48,9 @@ class block_workflow_exception                  extends moodle_exception{}
  * @copyright  2011 Lancaster University Network Services Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_workflow_not_assigned_exception     extends block_workflow_exception{}
+class block_workflow_not_assigned_exception extends block_workflow_exception {
+}
+
 
 /**
  * Invalid Workflow exception
@@ -58,7 +62,9 @@ class block_workflow_not_assigned_exception     extends block_workflow_exception
  * @copyright  2011 Lancaster University Network Services Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_workflow_invalid_workflow_exception extends block_workflow_exception{}
+class block_workflow_invalid_workflow_exception extends block_workflow_exception {
+}
+
 
 /**
  * Invalid step exception
@@ -70,7 +76,9 @@ class block_workflow_invalid_workflow_exception extends block_workflow_exception
  * @copyright  2011 Lancaster University Network Services Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_workflow_invalid_step_exception     extends block_workflow_exception{}
+class block_workflow_invalid_step_exception extends block_workflow_exception {
+}
+
 
 /**
  * Invalid command exception
@@ -82,7 +90,9 @@ class block_workflow_invalid_step_exception     extends block_workflow_exception
  * @copyright  2011 Lancaster University Network Services Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_workflow_invalid_command_exception  extends block_workflow_exception{}
+class block_workflow_invalid_command_exception extends block_workflow_exception {
+}
+
 
 /**
  * Invalid email exception
@@ -94,7 +104,9 @@ class block_workflow_invalid_command_exception  extends block_workflow_exception
  * @copyright  2011 Lancaster University Network Services Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_workflow_invalid_email_exception extends block_workflow_exception{}
+class block_workflow_invalid_email_exception extends block_workflow_exception {
+}
+
 
 /**
  * Invalid todo exception
@@ -106,7 +118,9 @@ class block_workflow_invalid_email_exception extends block_workflow_exception{}
  * @copyright  2011 Lancaster University Network Services Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_workflow_invalid_todo_exception extends block_workflow_exception{}
+class block_workflow_invalid_todo_exception extends block_workflow_exception {
+}
+
 
 /**
  * AJAX exception
@@ -118,7 +132,9 @@ class block_workflow_invalid_todo_exception extends block_workflow_exception{}
  * @copyright  2011 Lancaster University Network Services Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_workflow_ajax_exception             extends block_workflow_exception{}
+class block_workflow_ajax_exception extends block_workflow_exception {
+}
+
 
 /**
  * Invalid import exception
@@ -130,4 +146,5 @@ class block_workflow_ajax_exception             extends block_workflow_exception
  * @copyright  2011 Lancaster University Network Services Limited
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_workflow_invalid_import_exception extends block_workflow_exception{}
+class block_workflow_invalid_import_exception extends block_workflow_exception {
+}

@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Workflow edit form
@@ -9,20 +23,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.'); //  It must be included from a Moodle page
-}
+defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/formslib.php');
 
 class edit_workflow extends moodleform {
-    function definition() {
+    protected function definition() {
         $mform = $this->_form;
 
         $mform->addElement('header', 'general', get_string('workflowsettings', 'block_workflow'));
 
-        // Workflow base data
+        // Workflow base data.
         $mform->addElement('text',     'shortname',           get_string('shortname', 'block_workflow'));
         $mform->setType('shortname', PARAM_TEXT);
         $mform->addRule('shortname', null, 'required', null, 'client');
@@ -46,7 +58,7 @@ class edit_workflow extends moodleform {
             $mform->hardFreeze('appliesto');
         }
 
-        // When reaching the end of the workflow, go back to
+        // When reaching the end of the workflow, go back to.
         $steplist = array();
         $steplist[null] = get_string('atendfinishworkflow', 'block_workflow');
         $finalstep = null;
@@ -61,7 +73,7 @@ class edit_workflow extends moodleform {
             $mform->setType('atendgobacktostep', PARAM_INT);
         }
 
-        // The current status of this workflow
+        // The current status of this workflow.
         $enabledoptions = array();
         $enabledoptions['0'] = get_string('enabled', 'block_workflow');
         $enabledoptions['1'] = get_string('disabled', 'block_workflow');
@@ -74,7 +86,7 @@ class edit_workflow extends moodleform {
         $this->add_action_buttons();
     }
 
-    function validation($data, $files) {
+    public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
         if (isset($data['shortname'])) {
@@ -84,8 +96,9 @@ class edit_workflow extends moodleform {
                 if ($workflow->id != $data['workflowid']) {
                     $errors['shortname']= get_string('shortnametaken', 'block_workflow', $workflow->name);
                 }
+            } catch (block_workflow_invalid_workflow_exception $e) {
+                // Ignore errors here.
             }
-            catch (block_workflow_invalid_workflow_exception $e) {}
         }
 
         return $errors;

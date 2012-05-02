@@ -195,11 +195,11 @@ class block_workflow_step_state {
         $state->commentformat   = $newcommentformat;
         $state->timemodified    = time();
 
-        // Update the record
+        // Update the record.
         $DB->update_record('block_workflow_step_states', $state);
         $transaction->allow_commit();
 
-        // Return the updated step_state object
+        // Return the updated step_state object.
         return $this->load_state($this->id);
     }
 
@@ -214,7 +214,7 @@ class block_workflow_step_state {
         global $DB, $USER;
         $transaction = $DB->start_delegated_transaction();
 
-        // Make a record of the change
+        // Make a record of the change.
         $change = new stdClass;
         $change->stepstateid    = $this->id;
         $change->newstate       = $newstatus;
@@ -222,17 +222,17 @@ class block_workflow_step_state {
         $change->timestamp      = time();
         $DB->insert_record('block_workflow_state_changes', $change);
 
-        // Make the change
+        // Make the change.
         $state = new stdClass;
         $state->id              = $this->id;
         $state->timemodified    = $change->timestamp;
         $state->state           = $newstatus;
         $DB->update_record('block_workflow_step_states', $state);
 
-        // Update the current state
+        // Update the current state.
         $this->load_state($this->id);
 
-        // Unassign any role assignments created for this workflow
+        // Unassign any role assignments created for this workflow.
         switch ($this->state) {
             case BLOCK_WORKFLOW_STATE_ABORTED:
             case BLOCK_WORKFLOW_STATE_COMPLETED:
@@ -242,16 +242,16 @@ class block_workflow_step_state {
                 break;
         }
 
-        // Request that any required scripts be processed
+        // Request that any required scripts be processed.
         $this->step()->process_script($this);
 
         $transaction->allow_commit();
 
-        // This is a workaround for a limitation of the message_send system
-        // This must be called outside of a transaction
+        // This is a workaround for a limitation of the message_send system.
+        // This must be called outside of a transaction.
         block_workflow_command_email::message_send();
 
-        // Return the updated step_state object
+        // Return the updated step_state object.
         return $this->load_state($this->id);
     }
 
@@ -266,21 +266,21 @@ class block_workflow_step_state {
         global $DB, $USER;
         $transaction = $DB->start_delegated_transaction();
 
-        // Update the comment
+        // Update the comment.
         $this->update_comment($newcomment, $newcommentformat);
 
-        // Change the status
+        // Change the status.
         $this->change_status(BLOCK_WORKFLOW_STATE_COMPLETED);
 
-        // move to the next step for this workflow
+        // Move to the next step for this workflow.
         if ($nextstep = $this->step()->get_next_step()) {
             try {
-                // Try and load an existing state to change status for
+                // Try and load an existing state to change status for.
                 $nextstate = new block_workflow_step_state();
                 $nextstate->load_context_step($this->contextid, $nextstep->id);
 
             } catch (block_workflow_not_assigned_exception $e) {
-                // No step_state for this step on this context so create a new state
+                // No step_state for this step on this context so create a new state.
                 $newstate = new stdClass;
                 $newstate->stepid           = $nextstep->id;
                 $newstate->contextid        = $this->contextid;
@@ -298,11 +298,11 @@ class block_workflow_step_state {
 
         $transaction->allow_commit();
 
-        // This is a workaround for a limitation of the message_send system
-        // This must be called outside of a transaction
+        // This is a workaround for a limitation of the message_send system.
+        // This must be called outside of a transaction.
         block_workflow_command_email::message_send();
 
-        // Return the new state
+        // Return the new state.
         if ($nextstep) {
             return $nextstate;
         }
@@ -332,26 +332,26 @@ class block_workflow_step_state {
             $state->change_status(BLOCK_WORKFLOW_STATE_ABORTED);
         }
 
-        // If the newstepid wasn't specified, we're just aborting the current step
+        // If the newstepid wasn't specified, we're just aborting the current step.
         if (!$newstepid) {
-            // Commit the transaction
+            // Commit the transaction.
             $transaction->allow_commit();
 
-            // This is a workaround for a limitation of the message_send system
-            // This must be called outside of a transaction
+            // This is a workaround for a limitation of the message_send system.
+            // This must be called outside of a transaction.
             block_workflow_command_email::message_send();
 
             return;
         }
 
-        // move to the specified step for this workflow
+        // Move to the specified step for this workflow.
         try {
-            // Try and load an existing state to change status for
+            // Try and load an existing state to change status for.
             $nextstate = new block_workflow_step_state();
             $nextstate->load_context_step($this->contextid, $newstepid);
 
         } catch (block_workflow_not_assigned_exception $e) {
-            // No step_state for this step on this context so create a new state
+            // No step_state for this step on this context so create a new state.
             $newstate = new stdClass;
             $newstate->stepid           = $newstepid;
             $newstate->contextid        = $state->contextid;
@@ -372,11 +372,11 @@ class block_workflow_step_state {
 
         $transaction->allow_commit();
 
-        // This is a workaround for a limitation of the message_send system
-        // This must be called outside of a transaction
+        // This is a workaround for a limitation of the message_send system.
+        // This must be called outside of a transaction.
         block_workflow_command_email::message_send();
 
-        // Return a reference to the new state
+        // Return a reference to the new state.
         return $nextstate;
     }
 
@@ -409,16 +409,15 @@ class block_workflow_step_state {
         global $DB, $USER;
         $transaction = $DB->start_delegated_transaction();
 
-        // Try and pick up the current task
+        // Try and pick up the current task.
         $todo = $DB->get_record('block_workflow_todo_done', array('stepstateid' => $this->id, 'steptodoid' => $todoid));
         if ($todo) {
-            // Remove the current record. There is no past history at present
+            // Remove the current record. There is no past history at present.
             $DB->delete_records('block_workflow_todo_done', array('id' => $todo->id));
             $transaction->allow_commit();
             return false;
-        }
-        else {
-            // Mark the step as completed
+        } else {
+            // Mark the step as completed.
             $tododone = new stdClass();
             $tododone->stepstateid  = $this->id;
             $tododone->steptodoid   = $todoid;
