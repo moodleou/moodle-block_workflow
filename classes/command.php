@@ -170,4 +170,12 @@ class block_workflow_command {
         // Only 'course' is a course.
         return ($workflow->appliesto == 'course');
     }
+
+    protected function check_next_word_is($requiredword, $actualword, $data) {
+        if ($actualword != $requiredword) {
+            $data->errors[] = get_string('invalidsyntaxmissingx', 'block_workflow', $requiredword);
+            return false;
+        }
+        return true;
+    }
 }

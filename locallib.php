@@ -38,6 +38,7 @@ require_once($CFG->dirroot . '/blocks/workflow/classes/command_override.php');
 require_once($CFG->dirroot . '/blocks/workflow/classes/command_setactivitysetting.php');
 require_once($CFG->dirroot . '/blocks/workflow/classes/command_setactivityvisibility.php');
 require_once($CFG->dirroot . '/blocks/workflow/classes/command_setcoursevisibility.php');
+require_once($CFG->dirroot . '/blocks/workflow/classes/command_setactivitylinkedsetting.php');
 
 
 /** @var string An active state for a step_state. */
