@@ -115,7 +115,7 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="stepstateid"/>
         <KEY NAME="stepstateid" TYPE="foreign" FIELDS="stepstateid" REFTABLE="block_workflow_state_changes" REFFIELDS="id" PREVIOUS="primary" NEXT="steptodoid"/>
-        <KEY NAME="steptodoid" TYPE="foreign" FIELDS="steptodoid" REFTABLE="block_workflow_todos" REFFIELDS="id" PREVIOUS="stepstateid" NEXT="userid"/>
+        <KEY NAME="steptodoid" TYPE="foreign" FIELDS="steptodoid" REFTABLE="block_workflow_step_todos" REFFIELDS="id" PREVIOUS="stepstateid" NEXT="userid"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="steptodoid" NEXT="statetodos"/>
         <KEY NAME="statetodos" TYPE="unique" FIELDS="stepstateid, steptodoid" PREVIOUS="userid"/>
       </KEYS>
