@@ -17,10 +17,14 @@
 /**
  * Workflow block versionin
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 The Open University / Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version    = 2011032800;
+$plugin->version   = 2011032800;
+$plugin->requires  = 2011120500;
+$plugin->cron      = 0;
+$plugin->component = 'block_workflow';
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->release   = 'v1';
