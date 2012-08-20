@@ -149,17 +149,20 @@ class block_workflow_email {
             (
                 SELECT COUNT(activescripts.id)
                 FROM {block_workflow_steps} AS activescripts
-                WHERE activescripts.onactivescript ILIKE '%email%' || emails.shortname || '%to%'
+                WHERE " . $DB->sql_like('activescripts.onactivescript',
+                        $DB->sql_concat(':email1', 'emails.shortname', ':to1'), false) . "
             ) AS activecount,
             (
                 SELECT COUNT(completescripts.id)
                 FROM {block_workflow_steps} AS completescripts
-                WHERE completescripts.oncompletescript ILIKE '%email%' || emails.shortname || '%to%'
+                WHERE " . $DB->sql_like('completescripts.oncompletescript',
+                        $DB->sql_concat(':email2', 'emails.shortname', ':to2'), false) . "
             ) AS completecount
             FROM {block_workflow_emails} AS emails
             ORDER BY shortname ASC
         ";
-        return $DB->get_records_sql($sql);
+        $params = array('email1' => '%email%', 'email2' => '%email%', 'to1' => '%to%', 'to2' => '%to%');
+        return $DB->get_records_sql($sql, $params);
     }
 
     /**
@@ -312,15 +315,15 @@ class block_workflow_email {
         // Count the uses in the activescripts.
         $sql = "SELECT activescripts.onactivescript AS script
                 FROM {block_workflow_steps} AS activescripts
-                WHERE activescripts.onactivescript ILIKE '%email%' || ? || '%to%'";
-        $activescripts = $DB->get_records_sql($sql, array($this->shortname));
+                WHERE " . $DB->sql_like('activescripts.onactivescript', '?', false);
+        $activescripts = $DB->get_records_sql($sql, array('%email%' . $this->shortname . '%to%'));
         $count += $this->_used_count($activescripts);
 
         // Count the uses in the completescripts.
         $sql = "SELECT completescripts.oncompletescript AS script
                 FROM {block_workflow_steps} AS completescripts
-                WHERE completescripts.oncompletescript ILIKE '%email%' || ? || '%to%'";
-        $completescripts =  $DB->get_records_sql($sql, array($this->shortname));
+                WHERE " . $DB->sql_like('completescripts.oncompletescript', '?', false);
+        $completescripts =  $DB->get_records_sql($sql, array('%email%' . $this->shortname . '%to%'));
         $count += $this->_used_count($completescripts);
 
         // Return the tital usage count.
