@@ -195,13 +195,13 @@ class test_block_workflow_todos extends block_workflow_testlib {
         // It should be possible to call in a static context
         // toggle returns a $todo too, so we should check what's returned.
         // First to disable.
-        $return = block_workflow_todo::toggle($todo->id);
+        $return = block_workflow_todo::toggle_task($todo->id);
         $check  = new block_workflow_todo($todo->id);
         $this->assertEqual($check->obsolete, BLOCK_WORKFLOW_OBSOLETE);
         $this->compare_todo($return, $check, array());
 
         // And also to re-enable.
-        $return = block_workflow_todo::toggle($todo->id);
+        $return = block_workflow_todo::toggle_task($todo->id);
         $check  = new block_workflow_todo($todo->id);
         $this->assertEqual($check->obsolete, BLOCK_WORKFLOW_ENABLED);
         $this->compare_todo($return, $check, array());

@@ -237,9 +237,10 @@ class block_workflow_todo {
 
         // Retrieve the source, and clone it.
         $src = new block_workflow_todo($srcid);
+        $dst = new stdClass();
 
         // Copy the source based on the allowed settings.
-        foreach (self::expected_settings() as $k) {
+        foreach ($src->expected_settings() as $k) {
             $dst->$k = $src->$k;
         }
 
@@ -268,27 +269,18 @@ class block_workflow_todo {
     /**
      * Toggle the obsolete flag for the current todo
      *
-     * @param   int $todoid The ID of the todo to toggle if called in a
-     *          static context
      * @return  An update block_workflow_todo record as returned by {@link load_todo}.
      */
-    public function toggle($todoid = null) {
+    public function toggle() {
         global $DB;
-        $transaction = $DB->start_delegated_transaction();
 
-        if (!$todoid) {
-            $todoid  = $this->id;
-            $current = $this;
-        } else {
-            // Retrieve the specified record.
-            $current = new block_workflow_todo($todoid);
-        }
+        $todoid  = $this->id;
 
         $update = new stdClass();
         $update->id = $todoid;
 
         // Switch the obsolete state of the todo.
-        if ($current->obsolete == BLOCK_WORKFLOW_ENABLED) {
+        if ($this->obsolete == BLOCK_WORKFLOW_ENABLED) {
             $update->obsolete = BLOCK_WORKFLOW_OBSOLETE;
         } else {
             $update->obsolete = BLOCK_WORKFLOW_ENABLED;
@@ -296,10 +288,20 @@ class block_workflow_todo {
 
         // Update the record.
         $DB->update_record('block_workflow_step_todos', $update);
-        $transaction->allow_commit();
 
         // Return the updated todo object.
-        return $current->load_by_id($todoid);
+        return $this->load_by_id($todoid);
+    }
+
+    /**
+     * Toggle the obsolete state for a todo.
+     *
+     * @param   int $todoid The ID of the todo to toggle
+     * @return  An update block_workflow_todo record as returned by {@link load_todo}.
+     */
+    public static function toggle_task($todoid) {
+        $todo = new block_workflow_todo($todoid);;
+        return $todo->toggle();
     }
 
     /**

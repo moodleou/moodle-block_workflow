@@ -36,7 +36,7 @@ require_sesskey();
 require_capability('block/workflow:editdefinitions', get_context_instance(CONTEXT_SYSTEM));
 
 // Toggle the todo item.
-$task = block_workflow_todo::toggle($taskid);
+$task = block_workflow_todo::toggle_task($taskid);
 
 // Redirect.
 redirect(new moodle_url('/blocks/workflow/editstep.php', array('stepid' => $task->stepid)));
