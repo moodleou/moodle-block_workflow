@@ -283,9 +283,10 @@ class block_workflow_step {
 
         // Retrieve the source and copy it.
         $src = new block_workflow_step($srcid);
+        $dst = new stdClass();
 
         // Copy the source based on the allowed settings.
-        foreach (self::expected_settings() as $k) {
+        foreach ($src->expected_settings() as $k) {
             $dst->$k = $src->$k;
         }
 

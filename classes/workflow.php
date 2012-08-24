@@ -303,9 +303,10 @@ class block_workflow_workflow {
 
         // Retrieve the source and copy it.
         $src = new block_workflow_workflow($srcid);
+        $dst = new stdClass();
 
         // Copy the source based on the allowed settings.
-        foreach (self::expected_settings() as $k) {
+        foreach ($src->expected_settings() as $k) {
             $dst->$k = $src->$k;
         }
 
@@ -580,20 +581,22 @@ class block_workflow_workflow {
      * ever been used and thus has state information
      *
      * @param   int $id The ID of the workflow (defaults to the id of the current workflow)
-     * @return  Boolean Whether the workflow may be deleted or not
+     * @return  bool whether the workflow may be deleted.
      */
     public function is_deletable($id = null) {
-        global $DB;
+        return self::is_workflow_deletable($this->id);
+    }
 
-        if ($id === null) {
-            // Get the current workflow id.
-            $id = $this->id;
-        }
-
-        // Count the uses.
-        $count = self::in_use_by($id);
-
-        return (!$count > 0);
+    /**
+     * Determine whether a workflow is in use or not, and thus whether it can be removed.
+     *
+     * Workflows can only be removed if they are not in use.
+     *
+     * @param   int $id The ID of the workflow.
+     * @return  bool whether the workflow may be deleted.
+     */
+    public static function is_workflow_deletable($id) {
+        return self::in_use_by($id) == 0;
     }
 
     /**
@@ -615,20 +618,14 @@ class block_workflow_workflow {
     }
 
     /**
-     * Determine how many locations the currently loaded, or the specified worklow is in use.
+     * Determine how many locations the specified worklow is in use.
      *
-     * @param   int     $id The ID of the workflow if the function is
-     *          called in a static context
-     * @param   boolean $activeonly Include active states only?
-     * @return  int     How many places the workflow is in use
+     * @param   int  $id The ID of the workflow to check.
+     * @param   bool $activeonly Include active states only?
+     * @return  int  How many places the workflow is in use.
      */
-    public function in_use_by($id = null, $activeonly = false) {
+    public static function in_use_by($id, $activeonly = false) {
         global $DB;
-
-        // If no ID was specified, use the ID from the currently loaded object.
-        if (!$id) {
-            $id = $this->id;
-        }
 
         // Determine whether the workflow is currently assigned to any
         // step_states, regardless of whether those states are are active

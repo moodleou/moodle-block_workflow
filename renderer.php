@@ -257,7 +257,7 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // Check whether each workflow is deletable.
         foreach ($workflows as $workflow) {
-            $workflow->is_deletable = block_workflow_workflow::is_deletable($workflow->id);
+            $workflow->is_deletable = block_workflow_workflow::is_workflow_deletable($workflow->id);
             $table->data[] = $this->workflow_row($workflow);
         }
 
@@ -731,7 +731,7 @@ class block_workflow_renderer extends plugin_renderer_base {
             $status = get_string('workflowactive', 'block_workflow', $togglelink->out());
         }
         // Count the times the workflow is actively in use.
-        if ($count = $workflow->in_use_by(null, true)) {
+        if ($count = block_workflow_workflow::in_use_by($workflow->id, true)) {
             $status .= get_string('inuseby', 'block_workflow', $count);
         } else {
             $status .= get_string('notcurrentlyinuse', 'block_workflow');
@@ -763,7 +763,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         $url = new moodle_url('/blocks/workflow/export.php', array('sesskey' => sesskey(), 'workflowid' => $workflow->id));
         $actions[] = html_writer::link($url, get_string('export', 'block_workflow'));
 
-        if (block_workflow_workflow::is_deletable($workflow->id)) {
+        if (block_workflow_workflow::is_workflow_deletable($workflow->id)) {
             // Delete the workflow.
             $url = new moodle_url('/blocks/workflow/delete.php', array('workflowid' => $workflow->id));
             $actions[] = html_writer::link($url, get_string('delete', 'block_workflow'));

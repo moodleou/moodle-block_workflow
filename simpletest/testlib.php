@@ -582,11 +582,11 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $this->assertEqual(count($clist), 1);
 
         // And the workflow should be in use once.
-        $inusetimes = $workflow->in_use_by();
+        $inusetimes = block_workflow_workflow::in_use_by($workflow->id);
         $this->assertEqual($inusetimes, 1);
 
         // And active once too.
-        $inusetimes = $workflow->in_use_by(null, true);
+        $inusetimes = block_workflow_workflow::in_use_by($workflow->id, true);
         $this->assertEqual($inusetimes, 1);
 
         // We should be able to grab a list of step_states for this context too.

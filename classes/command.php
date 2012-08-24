@@ -155,9 +155,9 @@ class block_workflow_command {
      * @param   object $workflow The workflow to be tested
      * @return  Boolean
      */
-    public function is_activity($workflow) {
+    public static function is_activity($workflow) {
         // All workflows barring courses are activities.
-        return ($workflow->appliesto != 'course');
+        return $workflow->appliesto != 'course';
     }
 
     /**
