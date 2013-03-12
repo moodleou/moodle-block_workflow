@@ -741,39 +741,52 @@ class block_workflow_workflow {
      */
     public function step_states($contextid) {
         global $DB;
-        $sql = "SELECT
-                    steps.id, steps.stepno, steps.name, steps.instructions, steps.instructionsformat,
-                    states.id AS stateid,
-                    states.state, states.timemodified, states.comment, states.commentformat, states.contextid,
-                    (
-                        SELECT
-                            CASE WHEN COUNT(todos.id) > 0 THEN
-                                100.0 * COUNT(done.id) / COUNT(todos.id)
-                            ELSE
-                                NULL
-                            END
-                        FROM
-                            {block_workflow_step_todos} AS todos
-                        LEFT JOIN
-                            {block_workflow_todo_done} AS done
-                        ON done.steptodoid = todos.id AND done.stepstateid = states.id
-                        WHERE stepid = steps.id
-                    ) AS complete,
-                    (
-                        SELECT
-                            " . $DB->sql_fullname('u.firstname', 'u.lastname') . "
-                        FROM {user} u
-                        JOIN {block_workflow_state_changes} wsc ON wsc.userid = u.id
-                        WHERE wsc.stepstateid = states.id
-                          AND wsc.id = (SELECT MAX(id) FROM {block_workflow_state_changes}
-                                        WHERE stepstateid = states.id)
-                    ) AS modifieduser
-                FROM {block_workflow_workflows} AS workflows
-                INNER JOIN {block_workflow_steps} AS steps ON steps.workflowid = workflows.id
-                LEFT  JOIN {block_workflow_step_states} AS states ON states.stepid = steps.id AND states.contextid = ?
-                WHERE workflows.id = ?
-                ORDER BY steps.stepno ASC";
-        $steps = $DB->get_records_sql($sql, array($contextid, $this->id));
+
+        // The 'complete' subquery below is written in a more complex way than
+        // necessary to work around a MyQSL short-coming.
+        // (It was not possible to refer to states.id in an ON clause, only in a WHERE clause.)
+        $sql = "SELECT steps.id,
+                       steps.stepno,
+                       steps.name,
+                       steps.instructions,
+                       steps.instructionsformat,
+                       states.id AS stateid,
+                       states.state,
+                       states.timemodified,
+                       states.comment,
+                       states.commentformat,
+                       states.contextid,
+                       " . $DB->sql_fullname('u.firstname', 'u.lastname') . " AS modifieduser,
+                       (
+                             SELECT CASE WHEN COUNT(todos.id) > 0 THEN
+                                        100.0 * COUNT(done.id) / COUNT(todos.id)
+                                    ELSE
+                                        NULL
+                                    END
+                               FROM {block_workflow_step_states} inner_states
+                               JOIN {block_workflow_steps}       inner_steps  ON inner_steps.id   = inner_states.stepid
+                               JOIN {block_workflow_step_todos}  todos        ON todos.stepid     = inner_steps.id
+                          LEFT JOIN {block_workflow_todo_done}   done         ON done.steptodoid  = todos.id
+                                                                             AND done.stepstateid = inner_states.id
+                              WHERE inner_states.id = states.id
+                       ) AS complete
+
+                  FROM {block_workflow_workflows}   workflows
+                  JOIN {block_workflow_steps}         steps  ON steps.workflowid = workflows.id
+             LEFT JOIN {block_workflow_step_states}   states ON states.stepid = steps.id
+                                                            AND states.contextid = :contextid
+             LEFT JOIN {block_workflow_state_changes} wsc    ON wsc.id = (
+                               SELECT MAX(iwsc.id)
+                                 FROM {block_workflow_state_changes} iwsc
+                                WHERE iwsc.stepstateid = states.id
+                       )
+             LEFT JOIN {user} u ON u.id = wsc.userid
+
+                 WHERE workflows.id = :workflowid
+
+        ORDER BY steps.stepno";
+
+        $steps = $DB->get_records_sql($sql, array('contextid' => $contextid, 'workflowid' => $this->id));
         return $steps;
     }
 
