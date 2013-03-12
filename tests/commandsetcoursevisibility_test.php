@@ -17,22 +17,22 @@
 /**
  * Workflow block tests.
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group block_workflow
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// Include our test library so that we can use the same mocking system for
-// all tests.
+// Include our test library so that we can use the same mocking system for all tests.
+global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class test_block_workflow_command_setcoursevisibility extends block_workflow_testlib {
+class block_workflow_command_setcoursevisibility_test extends block_workflow_testlib {
     public function test_setcoursevisibility() {
         $command = new block_workflow_command_setcoursevisibility();
-        $this->assertIsA($command, 'block_workflow_command');
+        $this->assertInstanceOf('block_workflow_command', $command);
     }
 
     public function test_parse_no_state_hidden() {
@@ -50,13 +50,13 @@ class test_block_workflow_command_setcoursevisibility extends block_workflow_tes
         $this->assertNotNull($result);
 
         // There should be no errors.
-        $this->assertEqual(count($result->errors), 0);
+        $this->assertEquals(count($result->errors), 0);
 
         // Test: $result should have a visible state of 0.
-        $this->assertEqual($result->visible, 0);
+        $this->assertEquals($result->visible, 0);
 
         // Test: $result should have no id.
-        $this->assertFalse(isset($result->id));
+        $this->assertFalse((bool)isset($result->id));
     }
 
     public function test_parse_no_state_visible() {
@@ -74,13 +74,13 @@ class test_block_workflow_command_setcoursevisibility extends block_workflow_tes
         $this->assertNotNull($result);
 
         // There should be no errors.
-        $this->assertEqual(count($result->errors), 0);
+        $this->assertEquals(count($result->errors), 0);
 
         // Test: $result should have a visible state of 0.
-        $this->assertEqual($result->visible, 1);
+        $this->assertEquals($result->visible, 1);
 
         // Test: $result should have no id.
-        $this->assertFalse(isset($result->id));
+        $this->assertFalse((bool)isset($result->id));
     }
 
     public function test_parse_no_state_invalid_state() {
@@ -98,13 +98,13 @@ class test_block_workflow_command_setcoursevisibility extends block_workflow_tes
         $this->assertNotNull($result);
 
         // There should be one error.
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
 
         // Test: $result should have no visible.
-        $this->assertFalse(isset($result->visible));
+        $this->assertFalse((bool)isset($result->visible));
 
         // Test: $result should have no id.
-        $this->assertFalse(isset($result->id));
+        $this->assertFalse((bool)isset($result->id));
     }
 
     public function test_parse_no_state_appliestoactivity() {
@@ -122,10 +122,10 @@ class test_block_workflow_command_setcoursevisibility extends block_workflow_tes
         $this->assertNotNull($result);
 
         // There should be one error.
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
 
         // Test: $result should have no id.
-        $this->assertFalse(isset($result->id));
+        $this->assertFalse((bool)isset($result->id));
     }
 
     public function test_parse_with_state_hidden() {
@@ -144,13 +144,13 @@ class test_block_workflow_command_setcoursevisibility extends block_workflow_tes
         $this->assertNotNull($result);
 
         // There should be no errors.
-        $this->assertEqual(count($result->errors), 0);
+        $this->assertEquals(count($result->errors), 0);
 
         // Test: $result should have a visible state of 0.
-        $this->assertEqual($result->visible, 0);
+        $this->assertEquals($result->visible, 0);
 
         // Test: $result should have an id of the context's instanceid ($this->courseid).
-        $this->assertEqual($result->id, $this->courseid);
+        $this->assertEquals($result->id, $this->courseid);
     }
 
     public function test_parse_with_state_visible() {
@@ -169,13 +169,13 @@ class test_block_workflow_command_setcoursevisibility extends block_workflow_tes
         $this->assertNotNull($result);
 
         // There should be no errors.
-        $this->assertEqual(count($result->errors), 0);
+        $this->assertEquals(count($result->errors), 0);
 
         // Test: $result should have a visible state of 0.
-        $this->assertEqual($result->visible, 1);
+        $this->assertEquals($result->visible, 1);
 
         // Test: $result should have an id of the context's instanceid ($this->courseid).
-        $this->assertEqual($result->id, $this->courseid);
+        $this->assertEquals($result->id, $this->courseid);
     }
 
     public function test_parse_with_state_invalid_state() {
@@ -194,13 +194,13 @@ class test_block_workflow_command_setcoursevisibility extends block_workflow_tes
         $this->assertNotNull($result);
 
         // There should be one error.
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
 
         // Test: $result should have no visible.
-        $this->assertFalse(isset($result->visible));
+        $this->assertFalse((bool)isset($result->visible));
 
         // Test: $result should have an id of the context's instanceid ($this->courseid).
-        $this->assertEqual($result->id, $this->courseid);
+        $this->assertEquals($result->id, $this->courseid);
     }
 
     public function test_parse_with_state_appliestoactivity() {
@@ -219,10 +219,11 @@ class test_block_workflow_command_setcoursevisibility extends block_workflow_tes
         $this->assertNotNull($result);
 
         // There should be one error.
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
     }
 
     public function test_execute_hidden() {
+        global $DB;
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -231,15 +232,15 @@ class test_block_workflow_command_setcoursevisibility extends block_workflow_tes
         $args = 'hidden';
 
         // Check that the course visibility is currently visible.
-        $check = $this->testdb->get_record('course', array('id' => $this->courseid));
-        $this->assertEqual($check->visible, 1);
+        $check = $DB->get_record('course', array('id' => $this->courseid));
+        $this->assertEquals($check->visible, 1);
 
         // Try parsing without a context.
         $class = block_workflow_command::create('block_workflow_command_setcoursevisibility');
         $class->execute($args, $state);
 
         // Check that the course visibility is now hidden.
-        $check = $this->testdb->get_record('course', array('id' => $this->courseid));
-        $this->assertEqual($check->visible, 0);
+        $check = $DB->get_record('course', array('id' => $this->courseid));
+        $this->assertEquals($check->visible, 0);
     }
 }

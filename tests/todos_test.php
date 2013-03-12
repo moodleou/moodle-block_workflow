@@ -17,19 +17,19 @@
 /**
  * Workflow block test unit for todo class.
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group block_workflow
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// Include our test library so that we can use the same mocking system for
-// all tests.
+// Include our test library so that we can use the same mocking system for all tests.
+global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class test_block_workflow_todos extends block_workflow_testlib {
+class block_workflow_todos_test extends block_workflow_testlib {
     public function test_todo_validation() {
         // Create a new workflow.
         $workflow = $this->create_workflow();
@@ -64,6 +64,19 @@ class test_block_workflow_todos extends block_workflow_testlib {
 
         // Give an obsolete value of obsolete which we'll check in a minute.
         $data->obsolete = BLOCK_WORKFLOW_OBSOLETE;
+    }
+
+    public function test_todo_create() {
+        // Create a new workflow.
+        $workflow = $this->create_workflow();
+
+        // And add a step to that workflow.
+        $step = $this->create_step($workflow);
+
+        $todo = new block_workflow_todo();
+        $data = new stdClass();
+        $data->stepid = $step->id;
+        $data->task = 'TASK-ONE';
 
         // Successful creation.
         $todo->create_todo($data);
@@ -72,7 +85,7 @@ class test_block_workflow_todos extends block_workflow_testlib {
         $this->compare_todo($data, $todo);
 
         // Check that the obsolete value is set to enabled for creation.
-        $this->assertEqual($todo->obsolete, BLOCK_WORKFLOW_ENABLED);
+        $this->assertEquals($todo->obsolete, BLOCK_WORKFLOW_ENABLED);
 
         // Update the todo.
         $data = new stdClass();
@@ -88,9 +101,25 @@ class test_block_workflow_todos extends block_workflow_testlib {
         $this->expect_exception_without_halting('block_workflow_invalid_todo_exception',
                 $todo, 'update_todo', $data);
         unset($data->badfield);
+    }
 
-        // Attempt to use the same stepid.
+    public function test_todo_update() {
+        // Create a new workflow.
+        $workflow = $this->create_workflow();
+
+        // And add a step to that workflow.
+        $step = $this->create_step($workflow);
+
+        $todo = new block_workflow_todo();
+        $data = new stdClass();
         $data->stepid = $step->id;
+        $data->task = 'TASK-ONE';
+
+        // Successful creation.
+        $todo->create_todo($data);
+
+        // Check that what we created matches.
+        $this->compare_todo($data, $todo);
 
         // Set an obsolete value too.
         $data->obsolete = BLOCK_WORKFLOW_OBSOLETE;
@@ -140,15 +169,15 @@ class test_block_workflow_todos extends block_workflow_testlib {
         $clone = $todo->clone_todo($todo->id);
 
         $this->compare_todo($todo, $clone, array('id'));
-        $this->assertNotEqual($todo->id, $clone->id);
+        $this->assertNotEquals($todo->id, $clone->id);
 
         // Add a second step and clone the task from the first step.
         $newstep = $this->create_step($workflow);
         $clone = $todo->clone_todo($todo->id, $newstep->id);
         $this->compare_todo($todo, $clone, array('id', 'stepid'));
-        $this->assertNotEqual($todo->id,        $clone->id);
-        $this->assertNotEqual($todo->stepid,    $clone->stepid);
-        $this->assertEqual($clone->stepid,      $newstep->id);
+        $this->assertNotEquals($todo->id,        $clone->id);
+        $this->assertNotEquals($todo->stepid,    $clone->stepid);
+        $this->assertEquals($clone->stepid,      $newstep->id);
     }
 
     public function test_todo_delete() {
@@ -182,28 +211,28 @@ class test_block_workflow_todos extends block_workflow_testlib {
 
         // Check the toggle function.
         // At creation, todos are created enabled.
-        $this->assertEqual($todo->obsolete, BLOCK_WORKFLOW_ENABLED);
+        $this->assertEquals($todo->obsolete, BLOCK_WORKFLOW_ENABLED);
 
         // Toggling should disable.
         $todo->toggle();
-        $this->assertEqual($todo->obsolete, BLOCK_WORKFLOW_OBSOLETE);
+        $this->assertEquals($todo->obsolete, BLOCK_WORKFLOW_OBSOLETE);
 
         // And again should re-enable.
         $todo->toggle();
-        $this->assertEqual($todo->obsolete, BLOCK_WORKFLOW_ENABLED);
+        $this->assertEquals($todo->obsolete, BLOCK_WORKFLOW_ENABLED);
 
         // It should be possible to call in a static context
         // toggle returns a $todo too, so we should check what's returned.
         // First to disable.
         $return = block_workflow_todo::toggle_task($todo->id);
         $check  = new block_workflow_todo($todo->id);
-        $this->assertEqual($check->obsolete, BLOCK_WORKFLOW_OBSOLETE);
+        $this->assertEquals($check->obsolete, BLOCK_WORKFLOW_OBSOLETE);
         $this->compare_todo($return, $check, array());
 
         // And also to re-enable.
         $return = block_workflow_todo::toggle_task($todo->id);
         $check  = new block_workflow_todo($todo->id);
-        $this->assertEqual($check->obsolete, BLOCK_WORKFLOW_ENABLED);
+        $this->assertEquals($check->obsolete, BLOCK_WORKFLOW_ENABLED);
         $this->compare_todo($return, $check, array());
     }
 

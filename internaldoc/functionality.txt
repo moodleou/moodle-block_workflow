@@ -1,0 +1,112 @@
+Workflow
+===============
+This document assumes that the reader knows how workflow system works, how to
+create workflows and workflow steps, and how to setup email notifications based
+on configurable templates.
+
+
+Finishing steps automatically
+-----------------------------
+We needed to find a way to automatically notify module teams, 5 days before an
+iCMA close date, to go and check the iCMA statistics, and sign-off that the
+grading is OK. Then we decided that the best way to do this was to extend the
+workflow system so that particular workflow steps can be set up to be automatically
+marked as finished.
+
+The advantage of enhancing the workflow system for finishing steps automatically
+--------------------------------------------------------------------------------
+a. The workflow system is already capable of sending email messages to the
+right people based on configurable templates.
+b. It will be easy to tell, from the currently active step in the the workflow,
+whether the email has been sent or not.
+c. To send the email early for any reason (e.g. bank holiday weekend coming up)
+an admin can manually go in and finish the step. Similarly, the step can be skipped
+if necessary using the Jump feature.
+d. This functionality can be useful in other workflows, e.g. doing something
+automatically around the time a course start-date. Or if we decided to apply a
+workflow to other activities such as wiki, blog, etc, the functionality is
+already in place and with a very minor modification can be serving other activities.
+
+How does it work
+----------------
+On the setp form on 'Automatically finish' there are two select menus,
+
+First one with the options:
+
+10 days before
+9 days before
+.............
+1 day before
+do not set (default)
+1 day after
+...........
+9 days after
+10 days after
+
+The options of the second select menu depends on the deployment of the workflow.
+
+If the workflow applies to a course, the options are:
+
+Do not automatically finish (default)
+the course start date
+
+If the workflow applies to a quiz, the options are:
+
+Do not automatically finish (default)
+the quiz open date
+the quiz close date
+
+The default setting is:
+Automatically finish 'do not set' 'Do not automatically finish'
+
+A typical setting might be:
+Automatically finish '5 days before' 'the quiz close date'
+
+Obviously the effect is based on the setting of both select nenus.
+NB: If the first select menu is set to 'do not set', the second select menu is
+automatically disabled (That is the dafault and means we do not want finish the
+current step automatically. In other words, if the first select menu is set to
+'n days before' or 'n days after', the second select menu must be set to an option
+which has association with some sort of time stamp such as 'the course start date'
+or ' the quiz close date'.
+
+How to setup an step to be finished automatically
+------------------------------------------------
+Under Side administration -> Plugins ->blocks -> workflows
+go to the list of workflows (assuming there is at least one workflow on the list)
+and choose a workflow by clicking on the view/edit icon which takes you to your
+chosen workflow where you can see the workflow settings and the workflow steps.
+click on edit step icon to modify a step. In order to automatically finish
+the step and set the desired condition as described above.
+
+How does the automatically finish step work
+-------------------------------------------------
+A cron job will take care of that. I.e. at the site level, the cron functionality
+ will check on daily basis whether there are any active steps that are set to
+ be finished automatically and if the conditions are met, the steps are automatically
+ finished and set to 'completed' and a comment is added to each step indicating
+ that this particular step has been completed by the system including date and
+ time of finishing the step.
+
+How to run the cron
+-------------------
+On the acceptance or live server, the cron will be running regularly. The cron
+for workflow-automatic-step-finisher is set to run on daily basis between 1 AM
+and 7 AM. In other words, if the condition is met and some active steps are
+ready to be finished automatically, the action of automatic completion happens
+on daily basis.
+
+For testing purposes a functionality has been incorporated to allow users running
+the cron at any time, providing the debugging is set. On icmatest server, for
+instance, we need to check under
+
+Site administration -> Development -> Debugging
+
+that Debug messages are set to
+'DEVELOPER extra Moodle debug messages for developers'.
+
+Then we can run the cron job by going to:
+https://icmatest.vledev2.open.ac.uk/vle/admin/cron.php
+
+NB: When going to the above URL, all cron jobs will be executed depending
+on their conditions.

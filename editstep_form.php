@@ -17,10 +17,9 @@
 /**
  * Form for editing steps
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
@@ -29,9 +28,11 @@ require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/formslib.php');
 
 class step_edit extends moodleform {
+
+    const MAX_DAYS = 10;
+
     protected function definition() {
         $mform = $this->_form;
-        $state = $this->_customdata['state'];
 
         $mform->addElement('header', 'general', get_string('stepsettings', 'block_workflow'));
 
@@ -63,6 +64,42 @@ class step_edit extends moodleform {
         // Before or after.
         $mform->addElement('hidden', 'beforeafter');
         $mform->setType('beforeafter', PARAM_INT);
+
+        // Automatically finish.
+        $days = array();
+        $secondsinday = 24*60*60;
+        for ($count = -self::MAX_DAYS; $count <= self::MAX_DAYS; $count++) {
+            if ($count < 0) {
+                $days[$count * $secondsinday] = abs($count) . ' days before';
+            }
+            if ($count == 0) {
+                $days[$count * $secondsinday] = 'do not set';
+            }
+            if ($count > 0) {
+                $days[$count * $secondsinday] = $count . ' days after';
+            }
+        }
+        $appliesto = $this->_customdata['appliesto'];
+        $options = array('' => get_string('donotautomaticallyfinish', 'block_workflow'));
+
+        if ($appliesto === 'course') {
+            // The string is stored in the dtabase in the following format.
+            // {database table name}_{field name with value as timestamp}.
+            // For instance, course_startdate, quiz_timeopen, quiz_timeclose.
+            $options['course_startdate'] = get_string('coursestartdate', 'block_workflow');
+        } else {
+            $options['quiz_timeopen'] = get_string('quizopendate', 'block_workflow');
+            $options['quiz_timeclose'] = get_string('quizclosedate', 'block_workflow');
+        }
+        $autofinish = array();
+        $autofinish[] = $mform->createElement('select', 'autofinishoffset', null, $days);
+        $autofinish[] = $mform->createElement('select', 'autofinish', null, $options);
+        $mform->addGroup($autofinish, null, get_string('automaticallyfinish', 'block_workflow'), ' ', true);
+
+        $mform->setDefault('autofinishoffset', 0);
+        $mform->setDefault('autofinish', '');
+
+        $mform->disabledIf('autofinish', 'autofinishoffset', 'eq', 0);
 
         $this->add_action_buttons();
     }

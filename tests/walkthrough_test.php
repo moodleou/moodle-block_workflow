@@ -18,18 +18,17 @@
  * Test the workflow by creating a course and a workflow, stepping through
  * the steps, and checking that the righ things happen.
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 The Open University
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 The Open University
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group block_workflow
  */
 
 
 defined('MOODLE_INTERNAL') || die();
 
-// Include our test library so that we can use the same mocking system for
-// all tests.
-require_once(dirname(__FILE__) . '/lib.php');
+global $CFG;
+require_once(dirname(__FILE__) . '/../locallib.php');
 
 
 /**
@@ -39,8 +38,7 @@ require_once(dirname(__FILE__) . '/lib.php');
  * @copyright  2011 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class test_block_workflow_walkthrough extends block_workflow_testlib {
-    public static $includecoverage = array('blocks/workflow/locallib.php');
+class block_workflow_walkthrough_test extends advanced_testcase {
 
     /**
      * Test some of the basic workflow actions including:
@@ -52,6 +50,22 @@ class test_block_workflow_walkthrough extends block_workflow_testlib {
      */
     public function test_course_workflow() {
         global $DB;
+        $this->resetAfterTest(true);
+
+        $roleids = $DB->get_records_menu('role', null, '', 'shortname,id');
+
+        // Create a course ready to test with.
+        $generator = $this->getDataGenerator();
+        $egstudent = $generator->create_user(array('username' => 'egstudent'));
+        $u2 = $generator->create_user(array('username' => 'u2'));
+
+        $course = $generator->create_course(array('shortname' => 'X943-12K'));
+        $coursecontext = context_course::instance($course->id);
+
+        $manualenrol = enrol_get_plugin('manual');
+        $manualenrol->add_default_instance($course);
+        $instance1 = $DB->get_record('enrol', array('enrol'=>'manual', 'courseid'=>$course->id));
+        $manualenrol->enrol_user($instance1, $egstudent->id, $roleids['student']);
 
         // Create a new workflow object.
         $workflow = new block_workflow_workflow();
@@ -91,95 +105,96 @@ class test_block_workflow_walkthrough extends block_workflow_testlib {
         $step2 = $newstep->create_step($nsdata);
 
         // Add the workflow to our course (returns the block_workflow_step_state).
-        $state = $workflow->add_to_context($this->contextid);
+        $this->setUser($egstudent);
+        $state = $workflow->add_to_context($coursecontext->id);
 
         // Check the right step is active.
-        $this->assertEqual($step1->id, $state->stepid);
-        $this->assertEqual(BLOCK_WORKFLOW_STATE_ACTIVE, $state->state);
+        $this->assertEquals($step1->id, $state->stepid);
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $state->state);
 
         // Verify that student is now a teacher - i.e. that step 1's onactivescript ran.
         $this->assertTrue($DB->record_exists('role_assignments', array(
-                    'userid' => $this->users['egstudent'],
-                    'roleid' => $this->roles['teacher'],
-                    'contextid' => $this->contextid,
+                    'userid' => $egstudent->id,
+                    'roleid' => $roleids['teacher'],
+                    'contextid' => $coursecontext->id,
                     'component' => 'block_workflow',
                 )));
 
         // Hide the course, so we can test if the onactivescript runs.
-        $DB->set_field('course', 'visible', '0', array('id' => $this->courseid));
+        $DB->set_field('course', 'visible', '0', array('id' => $course->id));
 
         // Finish the first step.
         $state2 = $state->finish_step('Comment on task 1', FORMAT_PLAIN);
 
         // Verify step 1 is complete.
-        $this->assertEqual($step1->id, $state->stepid);
-        $this->assertEqual(BLOCK_WORKFLOW_STATE_COMPLETED, $state->state);
+        $this->assertEquals($step1->id, $state->stepid);
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_COMPLETED, $state->state);
 
         // Verify step 2 is active.
-        $this->assertEqual($step2->id, $state2->stepid);
-        $this->assertEqual(BLOCK_WORKFLOW_STATE_ACTIVE, $state2->state);
+        $this->assertEquals($step2->id, $state2->stepid);
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $state2->state);
 
         // Verify the role assignment from task 1 was removed.
         $this->assertFalse($DB->record_exists('role_assignments', array(
-                    'userid' => $this->users['egstudent'],
-                    'roleid' => $this->roles['teacher'],
-                    'contextid' => $this->contextid,
+                    'userid' => $egstudent->id,
+                    'roleid' => $roleids['teacher'],
+                    'contextid' => $coursecontext->id,
                     'component' => 'block_workflow',
                 )));
 
         // Verify the start script from task 2 ran.
-        $this->assertTrue($DB->get_field('course', 'visible', array('id' => $this->courseid)));
+        $this->assertTrue((bool) $DB->get_field('course', 'visible', array('id' => $course->id)));
         // The next line is redundant unless the previous assert failed, which
         // was the case at one time.
-        $DB->set_field('course', 'visible', 1, array('id' => $this->courseid));
+        $DB->set_field('course', 'visible', 1, array('id' => $course->id));
 
         // Jump back to step 1.
         $state1again = $state2->jump_to_step(null, $step1->id);
 
         // Verify step 2 is active.
-        $this->assertEqual($step2->id, $state2->stepid);
-        $this->assertEqual(BLOCK_WORKFLOW_STATE_ABORTED, $state2->state);
+        $this->assertEquals($step2->id, $state2->stepid);
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_ABORTED, $state2->state);
 
         // Check the right step is active.
-        $this->assertEqual($step->id, $state1again->stepid);
-        $this->assertEqual(BLOCK_WORKFLOW_STATE_ACTIVE, $state1again->state);
+        $this->assertEquals($step->id, $state1again->stepid);
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $state1again->state);
 
         // Verify that student is now a teacher - i.e. that step 1's onactivescript ran.
         $this->assertTrue($DB->record_exists('role_assignments', array(
-                    'userid' => $this->users['egstudent'],
-                    'roleid' => $this->roles['teacher'],
-                    'contextid' => $this->contextid,
+                    'userid' => $egstudent->id,
+                    'roleid' => $roleids['teacher'],
+                    'contextid' => $coursecontext->id,
                     'component' => 'block_workflow',
                 )));
 
         // Verify that step 2's oncomplete script did not run.
-        $this->assertTrue($DB->get_field('course', 'visible', array('id' => $this->courseid)));
+        $this->assertTrue((bool) $DB->get_field('course', 'visible', array('id' => $course->id)));
 
         // Now hide the course so we can tell if the onactive scripts runs in a minute.
-        $DB->set_field('course', 'visible', 0, array('id' => $this->courseid));
+        $DB->set_field('course', 'visible', 0, array('id' => $course->id));
 
         // Finish both steps, and hence the workflow.
         $state2again = $state1again->finish_step('Updated comment on task 1', FORMAT_PLAIN);
 
         // Verify that step 2's onactive script ran.
-        $this->assertTrue($DB->get_field('course', 'visible', array('id' => $this->courseid)));
+        $this->assertTrue((bool) $DB->get_field('course', 'visible', array('id' => $course->id)));
 
         $results = $state2again->finish_step('Comment on task 2', FORMAT_PLAIN);
 
         // Check no active step was returned.
-        $this->assertIdentical(false, $results);
+        $this->assertSame(false, $results);
 
         // Check that step 2's oncomplete script ran.
-        $this->assertFalse($DB->get_field('course', 'visible', array('id' => $this->courseid)));
+        $this->assertFalse((bool) $DB->get_field('course', 'visible', array('id' => $course->id)));
 
         // Start the workflow yet again.
-        $state = $workflow->add_to_context($this->contextid);
+        $state = $workflow->add_to_context($coursecontext->id);
 
         // Verify that student is now a teacher - i.e. that step 1's onactivescript ran.
         $this->assertTrue($DB->record_exists('role_assignments', array(
-                    'userid' => $this->users['egstudent'],
-                    'roleid' => $this->roles['teacher'],
-                    'contextid' => $this->contextid,
+                    'userid' => $egstudent->id,
+                    'roleid' => $roleids['teacher'],
+                    'contextid' => $coursecontext->id,
                     'component' => 'block_workflow',
                 )));
     }

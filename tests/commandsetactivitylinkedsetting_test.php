@@ -20,12 +20,13 @@
  * @package   block_workflow
  * @copyright 2012 the Open University.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group block_workflow
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// Include our test library so that we can use the same mocking system for
-// all tests.
+// Include our test library so that we can use the same mocking system for all tests.
+global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
 /**
@@ -37,10 +38,10 @@ require_once(dirname(__FILE__) . '/lib.php');
  * @copyright 2012 the Open University.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class test_block_workflow_command_setactivitylinkedsetting extends block_workflow_testlib {
+class block_workflow_command_setactivitylinkedsetting_test extends block_workflow_testlib {
     public function test_setcoursevisibility() {
         $command = $this->make_command();
-        $this->assertIsA($command, 'block_workflow_command');
+        $this->assertInstanceOf('block_workflow_command', $command);
     }
 
     protected function make_command() {
@@ -55,10 +56,10 @@ class test_block_workflow_command_setactivitylinkedsetting extends block_workflo
 
         // Verify.
         $this->assertNotNull($result);
-        $this->assertEqual(count($result->errors), 0);
-        $this->assertEqual($result->table, 'block_workflow_steps');
-        $this->assertEqual($result->fkcolumn, 'workflowid');
-        $this->assertEqual($result->action, block_workflow_command_setactivitylinkedsetting::CLEAR);
+        $this->assertEquals(count($result->errors), 0);
+        $this->assertEquals($result->table, 'block_workflow_steps');
+        $this->assertEquals($result->fkcolumn, 'workflowid');
+        $this->assertEquals($result->action, block_workflow_command_setactivitylinkedsetting::CLEAR);
     }
 
     public function test_parse_set() {
@@ -67,11 +68,11 @@ class test_block_workflow_command_setactivitylinkedsetting extends block_workflo
 
         // Verify.
         $this->assertNotNull($result);
-        $this->assertEqual(count($result->errors), 0);
-        $this->assertEqual($result->table, 'block_workflow_steps');
-        $this->assertEqual($result->fkcolumn, 'workflowid');
-        $this->assertEqual($result->action, block_workflow_command_setactivitylinkedsetting::SET);
-        $this->assertEqual($result->toset, array('stepno' => '1', 'name' => 'Fred'));
+        $this->assertEquals(count($result->errors), 0);
+        $this->assertEquals($result->table, 'block_workflow_steps');
+        $this->assertEquals($result->fkcolumn, 'workflowid');
+        $this->assertEquals($result->action, block_workflow_command_setactivitylinkedsetting::SET);
+        $this->assertEquals($result->toset, array('stepno' => '1', 'name' => 'Fred'));
     }
 
     public function test_parse_missing_by() {
@@ -80,7 +81,7 @@ class test_block_workflow_command_setactivitylinkedsetting extends block_workflo
 
         // Verify.
         $this->assertNotNull($result);
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
     }
 
     public function test_parse_missing_clear() {
@@ -89,7 +90,7 @@ class test_block_workflow_command_setactivitylinkedsetting extends block_workflo
 
         // Verify.
         $this->assertNotNull($result);
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
     }
 
     public function test_parse_missing_neither_clear_nor_set() {
@@ -98,7 +99,7 @@ class test_block_workflow_command_setactivitylinkedsetting extends block_workflo
 
         // Verify.
         $this->assertNotNull($result);
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
     }
 
     public function test_parse_junk_after_clear() {
@@ -107,7 +108,7 @@ class test_block_workflow_command_setactivitylinkedsetting extends block_workflo
 
         // Verify.
         $this->assertNotNull($result);
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
     }
 
     public function test_parse_cols_values_mismatched() {
@@ -116,7 +117,7 @@ class test_block_workflow_command_setactivitylinkedsetting extends block_workflo
 
         // Verify.
         $this->assertNotNull($result);
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
     }
 
     public function test_parse_unknown_table() {
@@ -125,7 +126,7 @@ class test_block_workflow_command_setactivitylinkedsetting extends block_workflo
 
         // Verify.
         $this->assertNotNull($result);
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
     }
 
     public function test_parse_unknown_fk_column() {
@@ -134,7 +135,7 @@ class test_block_workflow_command_setactivitylinkedsetting extends block_workflo
 
         // Verify.
         $this->assertNotNull($result);
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
     }
 
     public function test_parse_unknown_set_column() {
@@ -143,6 +144,6 @@ class test_block_workflow_command_setactivitylinkedsetting extends block_workflo
 
         // Verify.
         $this->assertNotNull($result);
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
     }
 }

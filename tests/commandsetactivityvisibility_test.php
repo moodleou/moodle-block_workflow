@@ -17,22 +17,22 @@
 /**
  * Workflow block tests
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group block_workflow
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// Include our test library so that we can use the same mocking system for
-// all tests.
+// Include our test library so that we can use the same mocking system for all tests.
+global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class test_block_workflow_command_setactivityvisibility extends block_workflow_testlib {
+class block_workflow_command_setactivityvisibility_test extends block_workflow_testlib {
     public function test_setactivityvisibility() {
         $command = new block_workflow_command_setactivityvisibility();
-        $this->assertIsA($command, 'block_workflow_command');
+        $this->assertInstanceOf('block_workflow_command', $command);
     }
 
     public function test_parse_no_state_hidden() {
@@ -50,10 +50,10 @@ class test_block_workflow_command_setactivityvisibility extends block_workflow_t
         $this->assertNotNull($result);
 
         // There should be no errors.
-        $this->assertEqual(count($result->errors), 0);
+        $this->assertEquals(count($result->errors), 0);
 
         // Test: $result should have a visibility state of 0.
-        $this->assertEqual($result->visibility, 0);
+        $this->assertEquals($result->visibility, 0);
 
         // Test: $result should have no id.
         $this->assertFalse(isset($result->id));
@@ -74,10 +74,10 @@ class test_block_workflow_command_setactivityvisibility extends block_workflow_t
         $this->assertNotNull($result);
 
         // There should be no errors.
-        $this->assertEqual(count($result->errors), 0);
+        $this->assertEquals(count($result->errors), 0);
 
         // Test: $result should have a visibility state of 0.
-        $this->assertEqual($result->visibility, 1);
+        $this->assertEquals($result->visibility, 1);
 
         // Test: $result should have no id.
         $this->assertFalse(isset($result->id));
@@ -98,7 +98,7 @@ class test_block_workflow_command_setactivityvisibility extends block_workflow_t
         $this->assertNotNull($result);
 
         // There should be one error.
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
 
         // Test: $result should have no visible.
         $this->assertFalse(isset($result->visibility));
@@ -122,7 +122,7 @@ class test_block_workflow_command_setactivityvisibility extends block_workflow_t
         $this->assertNotNull($result);
 
         // There should be one error.
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
 
         // Test: $result should have no id.
         $this->assertFalse(isset($result->id));
@@ -144,10 +144,10 @@ class test_block_workflow_command_setactivityvisibility extends block_workflow_t
         $this->assertNotNull($result);
 
         // There should be no errors.
-        $this->assertEqual(count($result->errors), 0);
+        $this->assertEquals(count($result->errors), 0);
 
         // Test: $result should have a visibility state of 0.
-        $this->assertEqual($result->visibility, 0);
+        $this->assertEquals($result->visibility, 0);
 
         // Test: $result should have a context, step, workflow and cm.
         $this->assertNotNull($result->context);
@@ -172,10 +172,10 @@ class test_block_workflow_command_setactivityvisibility extends block_workflow_t
         $this->assertNotNull($result);
 
         // There should be no errors.
-        $this->assertEqual(count($result->errors), 0);
+        $this->assertEquals(count($result->errors), 0);
 
         // Test: $result should have a visibility state of 0.
-        $this->assertEqual($result->visibility, 1);
+        $this->assertEquals($result->visibility, 1);
 
         // Test: $result should have a context, step, workflow and cm.
         $this->assertNotNull($result->context);
@@ -200,7 +200,7 @@ class test_block_workflow_command_setactivityvisibility extends block_workflow_t
         $this->assertNotNull($result);
 
         // There should be one error.
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
 
         // Test: $result should have no visibility.
         $this->assertFalse(isset($result->visibility));
@@ -228,10 +228,11 @@ class test_block_workflow_command_setactivityvisibility extends block_workflow_t
         $this->assertNotNull($result);
 
         // There should be one error.
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
     }
 
     public function test_execute_hidden() {
+        global $DB;
         $workflow = $this->create_activity_workflow('quiz', false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -240,8 +241,8 @@ class test_block_workflow_command_setactivityvisibility extends block_workflow_t
         $args = 'hidden';
 
         // Check that the parent course is visible.
-        $check = $this->testdb->get_record('course', array('id' => $this->courseid));
-        $this->assertEqual($check->visible, 1);
+        $check = $DB->get_record('course', array('id' => $this->courseid));
+        $this->assertEquals($check->visible, 1);
 
         $module = $workflow->appliesto;
         $sql = "SELECT cm.id
@@ -250,22 +251,22 @@ class test_block_workflow_command_setactivityvisibility extends block_workflow_t
                 INNER JOIN {context} AS c ON c.instanceid = cm.id
                 INNER JOIN {modules} AS md ON md.id = cm.module
                 WHERE md.name = ? AND cm.course = ? LIMIT 1";
-        $instance = $this->testdb->get_record_sql($sql, array($module, $this->courseid));
+        $instance = $DB->get_record_sql($sql, array($module, $this->courseid));
 
         // Check that the activity visibility is currently visible.
-        $check = $this->testdb->get_record('course_modules', array('id' => $instance->id));
-        $this->assertEqual($check->visible, 1);
+        $check = $DB->get_record('course_modules', array('id' => $instance->id));
+        $this->assertEquals($check->visible, 1);
 
         // Execute.
         $class = block_workflow_command::create('block_workflow_command_setactivityvisibility');
         $class->execute($args, $state);
 
         // Check that the activity visibility is now hidden.
-        $check = $this->testdb->get_record('course_modules', array('id' => $instance->id));
-        $this->assertEqual($check->visible, 0);
+        $check = $DB->get_record('course_modules', array('id' => $instance->id));
+        $this->assertEquals($check->visible, 0);
 
         // This should not have affected the parent courses visibility.
-        $check = $this->testdb->get_record('course', array('id' => $this->courseid));
-        $this->assertEqual($check->visible, 1);
+        $check = $DB->get_record('course', array('id' => $this->courseid));
+        $this->assertEquals($check->visible, 1);
     }
 }

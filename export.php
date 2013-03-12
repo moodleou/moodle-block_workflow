@@ -17,10 +17,9 @@
 /**
  * Workflow XML export.
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
@@ -73,6 +72,8 @@ foreach ($workflow->steps() as $step) {
             block_workflow_editor_format($step->instructionsformat));
     $stepx->addChild('onactivescript',      check_output_text($step->onactivescript));
     $stepx->addChild('oncompletescript',    check_output_text($step->oncompletescript));
+    $stepx->addChild('autofinish',          check_output_text($step->autofinish));
+    $stepx->addChild('autofinishoffset',    $step->autofinishoffset);
 
     // Add the roles for this step.
     foreach ($step->roles() as $role) {

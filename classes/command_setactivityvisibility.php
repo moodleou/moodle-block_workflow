@@ -42,6 +42,7 @@ class block_workflow_command_setactivityvisibility extends block_workflow_comman
         // Check that this step workflow relatees to an activity.
         if (!parent::is_activity($step->workflow())) {
             $data->errors[] = get_string('notanactivity', 'block_workflow', 'setactivityvisibility');
+            return $data;
         }
 
         // Check for the correct visibility option.

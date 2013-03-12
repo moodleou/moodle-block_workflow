@@ -17,10 +17,9 @@
 /**
  * Script to create or update an existing step
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
@@ -52,6 +51,8 @@ if ($stepid) {
     // Add the breadcrumbs.
     $PAGE->navbar->add($step->workflow()->name, $returnurl);
     $PAGE->navbar->add(get_string('editstep', 'block_workflow'));
+
+    $appliesto = $DB->get_field('block_workflow_workflows', 'appliesto', array('id' => $step->workflowid));
 } else {
     // We're creating a new step.
     $workflowid  = required_param('workflowid', PARAM_INT);
@@ -64,6 +65,8 @@ if ($stepid) {
     // Add the breadcrumbs.
     $PAGE->navbar->add($workflow->name, $returnurl);
     $PAGE->navbar->add(get_string('createstep', 'block_workflow'));
+
+    $appliesto = $workflow->appliesto;
 }
 
 // Set various page settings.
@@ -71,7 +74,7 @@ $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
 // Moodle form to create/edit step.
-$step_edit = new step_edit();
+$step_edit = new step_edit('editstep.php', array('appliesto' => $appliesto));
 
 if ($step_edit->is_cancelled()) {
     // Form was cancelled.
@@ -85,6 +88,8 @@ if ($step_edit->is_cancelled()) {
     $formdata->instructionsformat   = $data->instructions_editor['format'];
     $formdata->onactivescript       = $data->onactivescript;
     $formdata->oncompletescript     = $data->oncompletescript;
+    $formdata->autofinish           = $data->autofinish;
+    $formdata->autofinishoffset     = $data->autofinishoffset;
 
     if (isset($step)) {
         // We're editing an existing step.
@@ -111,10 +116,13 @@ if (isset($step)) {
     // Retrieve the current step data for the form.
     $data->stepid               = $step->id;
     $data->name                 = $step->name;
-    $data->instructions         = clean_text($step->instructions, $step->instructionsformat);
+    $data->instructions         = $step->instructions;
+    $data->instructionsformat   = $step->instructionsformat;
     $data->onactivescript       = $step->onactivescript;
     $data->oncompletescript     = $step->oncompletescript;
-    $data = file_prepare_standard_editor($data, 'instructions', array());
+    $data->autofinish           = $step->autofinish;
+    $data->autofinishoffset     = $step->autofinishoffset;
+    $data = file_prepare_standard_editor($data, 'instructions', array('noclean' => true));
     $step_edit->set_data($data);
 } else {
     // Otherwise, this is a new step belonging to $workflowid.

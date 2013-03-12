@@ -42,7 +42,9 @@
         <FIELD NAME="instructions" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Instructions to tell people what to do in this step" PREVIOUS="name" NEXT="instructionsformat"/>
         <FIELD NAME="instructionsformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The format of instructions" PREVIOUS="instructions" NEXT="onactivescript"/>
         <FIELD NAME="onactivescript" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Actions performed when this step becomes active" PREVIOUS="instructionsformat" NEXT="oncompletescript"/>
-        <FIELD NAME="oncompletescript" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Actions performed when this step is completed" PREVIOUS="onactivescript"/>
+        <FIELD NAME="oncompletescript" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Actions performed when this step is completed" PREVIOUS="onactivescript" NEXT="autofinish"/>
+        <FIELD NAME="autofinish" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="Containing a string like after_quiz_timeopen, before_course_startdate" PREVIOUS="oncompletescript" NEXT="autofinishoffset"/>
+        <FIELD NAME="autofinishoffset" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" COMMENT="Containing durations in seconds" PREVIOUS="autofinish"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="workflowsteps"/>

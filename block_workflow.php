@@ -17,10 +17,9 @@
 /**
  * Workflow block
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 global $CFG;
@@ -117,7 +116,7 @@ class block_workflow extends block_base {
             // Retrieve the list of workflows and display.
             $workflows = new block_workflow_workflow();
             $this->content->text = $renderer->assign_workflow($this->instance->parentcontextid,
-                    $workflows->available_workflows($appliesto),
+                    block_workflow_workflow::available_workflows($appliesto),
                     $workflows->load_context_workflows($this->instance->parentcontextid));
         }
 
@@ -149,5 +148,18 @@ class block_workflow extends block_base {
      */
     public function has_config() {
         return true;
+    }
+
+    /**
+     * Standard blocks api cron function, called every time cron runs.
+     */
+    public function cron() {
+        global $CFG;
+        // Call the workflow automatic step finisher.
+        require_once(dirname(__FILE__) . '/cronlib.php');
+        $bwfasf = new block_workflow_automatic_step_finisher();
+
+        // Rund the cron and finish the steps.
+        $bwfasf->cron();
     }
 }

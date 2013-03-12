@@ -17,10 +17,9 @@
 /**
  * Server-side script for all ajax request for workflow API
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define('AJAX_SCRIPT', true);
@@ -83,7 +82,7 @@ switch ($action) {
             // Last step has been reached, if permitted retrieve the list of workflows.
             $workflows = new block_workflow_workflow();
             $appliesto = $state->step()->workflow()->appliesto;
-            $options = $workflows->available_workflows($appliesto);
+            $options = block_workflow_workflow::available_workflows($appliesto);
             // Retrieve previous uses.
             $previous = $workflows->load_context_workflows($state->contextid);
             // Display.

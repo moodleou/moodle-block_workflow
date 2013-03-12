@@ -41,6 +41,8 @@ defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
  * @property-read int       $instructionsformat The format of the instructions field
  * @property-read string    $onactivescript     The script for processing when the step is made active
  * @property-read string    $oncompletescript   The script for processing when the step is made complete
+ * @property-read string    $autofinish         The string for processing when the step is finished automatically.
+ * @property-read int       $autofinishoffset   The duration in seconds relative to $autofinish
  */
 class block_workflow_step {
     private $step       = null;
@@ -55,6 +57,8 @@ class block_workflow_step {
     public $instructionsformat;
     public $onactivescript;
     public $oncompletescript;
+    public $autofinish;
+    public $autofinishoffset;
 
     /**
      * Constructor to obtain a step
@@ -88,6 +92,8 @@ class block_workflow_step {
         $this->instructionsformat   = $step->instructionsformat;
         $this->onactivescript       = $step->onactivescript;
         $this->oncompletescript     = $step->oncompletescript;
+        $this->autofinish           = $step->autofinish;
+        $this->autofinishoffset     = $step->autofinishoffset;
         return $this;
     }
 
@@ -105,7 +111,9 @@ class block_workflow_step {
             'instructions',
             'instructionsformat',
             'onactivescript',
-            'oncompletescript'
+            'oncompletescript',
+            'autofinish',
+            'autofinishoffset'
         );
     }
 
@@ -173,6 +181,14 @@ class block_workflow_step {
         // Set the default instructionsformat.
         if (!isset($step->instructionsformat)) {
             $step->instructionsformat = FORMAT_PLAIN;
+        }
+
+        // Set the default autofinish and autofinishoffset.
+        if (!isset($step->autofinish)) {
+            $step->autofinish = '';
+        }
+        if (!isset($step->autofinishoffset)) {
+            $step->autofinishoffset = 0;
         }
 
         $transaction = $DB->start_delegated_transaction();
@@ -453,25 +469,28 @@ class block_workflow_step {
     /**
      * Determine whether the step is currently in use
      *
-     * @param   int $id The ID of the step if the function is
-     *          called in a static context
+     * @param   int $id The ID of the step.
      * @return  int The number of times the step is in use
      */
-    public function in_use($stepid = null) {
+    public static function is_step_in_use($stepid) {
         global $DB;
-        if (!$stepid) {
-            $stepid = $this->id;
-        }
-
-        // Determine how many states the step is active in.
         return $DB->count_records('block_workflow_step_states',
                 array('stepid' => $stepid, 'state' => BLOCK_WORKFLOW_STATE_ACTIVE));
     }
 
     /**
+     * Determine whether this step is currently in use
+     *
+     * @return  int The number of times the step is in use
+     */
+    public function in_use() {
+        return self::is_step_in_use($this->id);
+    }
+
+    /**
      * Determine whether the currently loaded step is in use or not, and thus whether it can be removed.
      *
-     * A step may not be removed if it is currently in use, and active. A step may only be removed 
+     * A step may not be removed if it is currently in use, and active. A step may only be removed
      * if it is not the only step in the workflow.
      *
      * @return  boolean Whether the step may be deleted or not

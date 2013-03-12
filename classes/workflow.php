@@ -17,9 +17,9 @@
 /**
  * Defines the class representing a workflow.
  *
- * @package    block_workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
@@ -138,20 +138,22 @@ class block_workflow_workflow {
     }
 
     /**
-     * Load all workflows associated with the context ID
+     * Load all workflows associated with a context.
      *
-     * @param   int $contextid The ID of the context to load workflows
-     *          for
-     * @return  An array of stdClasses as returned by the database
+     * @param   int $contextid The ID of the context to load workflows for.
+     * @return  array of stdClasses as returned by the database, most recent first.
+     *           Each object has a single field id. This is also the array keys.
      * abstraction layer
      */
     public function load_context_workflows($contextid) {
         global $DB;
-        $sql = "SELECT DISTINCT workflows.id
+        $sql = "SELECT workflows.id
             FROM {block_workflow_step_states} states
             INNER JOIN {block_workflow_steps} steps ON steps.id = states.stepid
             INNER JOIN {block_workflow_workflows} workflows ON workflows.id = steps.workflowid
-            WHERE states.contextid = ?";
+            WHERE states.contextid = ?
+            GROUP BY workflows.id
+            ORDER BY MAX(states.timemodified) DESC";
         $workflows = $DB->get_records_sql($sql, array($contextid));
         return $workflows;
     }
@@ -390,7 +392,7 @@ class block_workflow_workflow {
      * @return  Array of stdClass objects as returned by the database
      *          abstraction layer
      */
-    public function available_workflows($for) {
+    public static function available_workflows($for) {
         global $DB;
         $workflows = $DB->get_records('block_workflow_workflows',
                 array('appliesto' => $for, 'obsolete' => 0), 'shortname');

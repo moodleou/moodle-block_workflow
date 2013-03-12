@@ -17,10 +17,9 @@
 /**
  * Workflow block libraries
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -587,7 +586,7 @@ class block_workflow_renderer extends plugin_renderer_base {
             )));
 
         // Can't be removed if this is the only step or in use.
-        if ($info->stepcount != 1 && !block_workflow_step::in_use($step->id)) {
+        if ($info->stepcount != 1 && !block_workflow_step::is_step_in_use($step->id)) {
             $url = new moodle_url('/blocks/workflow/deletestep.php', array('stepid' => $step->id));
             $actions[] = html_writer::link($url, html_writer::empty_tag('img', array(
                     'src' => $this->output->pix_url('t/delete'),
@@ -1175,6 +1174,7 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         return $row;
     }
+
     private function workflow_overview_step_history($stateid) {
         $history = array();
         foreach (block_workflow_step_state::state_changes($stateid) as $change) {

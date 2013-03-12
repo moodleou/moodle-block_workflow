@@ -17,19 +17,19 @@
 /**
  * Workflow block test unit for locallib.php
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group block_workflow
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// Include our test library so that we can use the same mocking system for
-// all tests.
+// Include our test library so that we can use the same mocking system for all tests.
+global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class test_block_workflow_lib extends block_workflow_testlib {
+class block_workflow_lib_test extends block_workflow_testlib {
 
     /**
      * Test that each of the defined variables are set correctly
@@ -40,11 +40,11 @@ class test_block_workflow_lib extends block_workflow_testlib {
      * - BLOCK_WORKFLOW_OBSOLETE
      */
     public function test_defines() {
-        $this->assertEqual(BLOCK_WORKFLOW_STATE_ACTIVE,     'active');
-        $this->assertEqual(BLOCK_WORKFLOW_STATE_COMPLETED,  'completed');
-        $this->assertEqual(BLOCK_WORKFLOW_STATE_ABORTED,    'aborted');
-        $this->assertEqual(BLOCK_WORKFLOW_ENABLED,          0);
-        $this->assertEqual(BLOCK_WORKFLOW_OBSOLETE,         1);
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE,     'active');
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_COMPLETED,  'completed');
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_ABORTED,    'aborted');
+        $this->assertEquals(BLOCK_WORKFLOW_ENABLED,          0);
+        $this->assertEquals(BLOCK_WORKFLOW_OBSOLETE,         1);
     }
 
     public function test_workflow_validation() {
@@ -84,9 +84,19 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $data->badfield             = 'baddata';
         $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
                 $workflow, 'create_workflow', $data);
+    }
+
+    public function test_workflow_validation2() {
+        // Create a new workflow.
+        $data = new stdClass();
+        $workflow = new block_workflow_workflow();
+
+        $data->shortname            = 'courseworkflow';
+        $data->name                 = 'First Course Workflow';
+        $data->appliesto            = 'course';
+        $data->obsolete             = 0;
 
         // It should now create.
-        unset($data->badfield);
         $workflow->create_workflow($data);
         $this->compare_workflow($data, $workflow);
 
@@ -109,14 +119,25 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $data->name                 = 'First Course Workflow';
         $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
                 $workflow, 'create_workflow', $data);
+    }
 
-        // And try to make the names unique.
+    public function test_workflow_validation3() {
+        // Create a new workflow.
+        $data = new stdClass();
+        $workflow = new block_workflow_workflow();
+
         $data->shortname            = 'courseworkflow';
+        $data->name                 = 'First Course Workflow';
+        $data->appliesto            = 'course';
+        $data->obsolete             = 0;
+        $workflow->create_workflow($data);
+
+        // And try to make a duplicate. The names should be automatically updated.
         $workflow->create_workflow($data, true, true);
 
         // Verify that they have 1 appended.
-        $this->assertEqual($workflow->shortname, 'courseworkflow1');
-        $this->assertEqual($workflow->name, 'First Course Workflow1');
+        $this->assertEquals($workflow->shortname, 'courseworkflow1');
+        $this->assertEquals($workflow->name, 'First Course Workflow1');
 
         // And try again with an incremented number.
         $data->shortname            = $workflow->shortname;
@@ -124,15 +145,19 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $workflow->create_workflow($data, true, true);
 
         // Verify that they're different.
-        $this->assertEqual($workflow->shortname, 'courseworkflow2');
-        $this->assertEqual($workflow->name, 'First Course Workflow2');
+        $this->assertEquals($workflow->shortname, 'courseworkflow2');
+        $this->assertEquals($workflow->name, 'First Course Workflow2');
 
         // Test update_workflow.
         // We're testing on courseworkflow2.
         $data = new stdClass();
 
+        // Update with the same shortname works.
+        $data->shortname = 'courseworkflow2';
+        $workflow->update($data);
+
         // Check with a used shortname.
-        $data->shortname = 'courseworkflow1';
+        $data->shortname = 'courseworkflow';
         $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
                 $workflow, 'update', $data);
         unset($data->shortname);
@@ -160,10 +185,6 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
                 $workflow, 'update', $data);
         unset($data->badfield);
-
-        // Update with the same shortname works.
-        $data->shortname = 'courseworkflow2';
-        $workflow->update($data);
     }
 
     /**
@@ -196,10 +217,10 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $return = $workflow->create_workflow($data);
 
         // Test that we still have a block_workflow_workflow.
-        $this->assertIsA($workflow, 'block_workflow_workflow');
+        $this->assertInstanceOf('block_workflow_workflow', $workflow);
 
         // The create function should also reload the object into $email too.
-        $this->assertIdentical($return, $workflow);
+        $this->assertSame($return, $workflow);
 
         // Check that we have an id.
         $this->assertNotNull($workflow->id);
@@ -209,7 +230,7 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $workflow = new block_workflow_workflow($workflow->id);
 
         // Test that we still have a block_workflow_workflow.
-        $this->assertIsA($workflow, 'block_workflow_workflow');
+        $this->assertInstanceOf('block_workflow_workflow', $workflow);
 
         // Check that an exception is thrown when trying to load an invalid
         // workflow by id.
@@ -225,36 +246,52 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $return = $workflow->load_workflow_from_shortname($data->shortname);
 
         // Test that we still have a block_workflow_workflow.
-        $this->assertIsA($return, 'block_workflow_workflow');
+        $this->assertInstanceOf('block_workflow_workflow', $return);
 
         // The create function should also reload the object into $email too.
-        $this->assertIdentical($return, $workflow);
+        $this->assertSame($return, $workflow);
         // Check that each field is equal.
-        $this->assertEqual($workflow->shortname,            $data->shortname);
-        $this->assertEqual($workflow->name,                 $data->name);
-        $this->assertEqual($workflow->description,          $data->description);
-        $this->assertEqual($workflow->descriptionformat,    $data->descriptionformat);
-        $this->assertEqual($workflow->obsolete,             $data->obsolete);
-        $this->assertEqual($workflow->appliesto,            $data->appliesto);
+        $this->assertEquals($workflow->shortname,            $data->shortname);
+        $this->assertEquals($workflow->name,                 $data->name);
+        $this->assertEquals($workflow->description,          $data->description);
+        $this->assertEquals($workflow->descriptionformat,    $data->descriptionformat);
+        $this->assertEquals($workflow->obsolete,             $data->obsolete);
+        $this->assertEquals($workflow->appliesto,            $data->appliesto);
 
         // Check that attempts to create another object with the same
         // shortname throw an error.
         $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception', $workflow, 'create_workflow', $data);
 
+    }
+    public function test_workflow_toggle() {
+        $workflow = new block_workflow_workflow();
+
+        // Create a new workflow.
+        $data = new stdClass();
+        $data->shortname            = 'courseworkflow';
+        $data->name                 = 'First Course Workflow';
+        $data->appliesto            = 'course';
+        $data->obsolete             = 0;
+        $data->description          = 'This is a test workflow applying to a course for the unit test';
+        $data->descriptionformat    = FORMAT_PLAIN;
+
+        // The method create_workflow will return a completed workflow object.
+        $return = $workflow->create_workflow($data);
+
         // Toggle the obsolete flag.
         // First confirm that the flag is currently set to ENABLED.
-        $this->assertEqual($workflow->obsolete, BLOCK_WORKFLOW_ENABLED);
+        $this->assertEquals($workflow->obsolete, BLOCK_WORKFLOW_ENABLED);
 
         // Toggle it and confirm.
         $workflow->toggle();
-        $this->assertEqual($workflow->obsolete, BLOCK_WORKFLOW_OBSOLETE);
+        $this->assertEquals($workflow->obsolete, BLOCK_WORKFLOW_OBSOLETE);
 
         // Toggle it and confirm.
         $workflow->toggle();
-        $this->assertEqual($workflow->obsolete, BLOCK_WORKFLOW_ENABLED);
+        $this->assertEquals($workflow->obsolete, BLOCK_WORKFLOW_ENABLED);
 
         // Check that the context is correct (CONTEXT_COURSE).
-        $this->assertEqual($workflow->context(), CONTEXT_COURSE);
+        $this->assertEquals($workflow->context(), CONTEXT_COURSE);
     }
 
     public function test_workflow_steps() {
@@ -275,25 +312,25 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $steps  = $workflow->steps();
 
         // Check that we only have one step at this point.
-        $this->assertEqual(count($steps), 1);
+        $this->assertEquals(count($steps), 1);
 
         // Retrieve the first step, and check that it isn't just a null value.
         $step = array_pop($steps);
         $this->assertNotNull($step);
 
         // Test that we have a stdClass.
-        $this->assertIsA($step, 'stdClass');
+        $this->assertInstanceOf('stdClass', $step);
 
         // Check that we have an id.
         $this->assertNotNull($step->id);
 
         // And check that the values are acceptable.
-        $this->assertEqual($step->name,                 get_string('defaultstepname',           'block_workflow'));
-        $this->assertEqual($step->instructions,         get_string('defaultstepinstructions',   'block_workflow'));
-        $this->assertEqual($step->instructionsformat,   FORMAT_PLAIN);
-        $this->assertEqual($step->stepno,               1);
-        $this->assertEqual($step->onactivescript,       get_string('defaultonactivescript',     'block_workflow'));
-        $this->assertEqual($step->oncompletescript,     get_string('defaultoncompletescript',   'block_workflow'));
+        $this->assertEquals($step->name,                 get_string('defaultstepname',           'block_workflow'));
+        $this->assertEquals($step->instructions,         get_string('defaultstepinstructions',   'block_workflow'));
+        $this->assertEquals($step->instructionsformat,   FORMAT_PLAIN);
+        $this->assertEquals($step->stepno,               1);
+        $this->assertEquals($step->onactivescript,       get_string('defaultonactivescript',     'block_workflow'));
+        $this->assertEquals($step->oncompletescript,     get_string('defaultoncompletescript',   'block_workflow'));
 
         // Create a new step in the workflow.
         $nsdata = new stdClass();
@@ -308,31 +345,31 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $return = $newstep->create_step($nsdata);
 
         // The create function should also reload the object into $email too.
-        $this->assertIdentical($return, $newstep);
+        $this->assertSame($return, $newstep);
 
         // The new step should have a stepno of 2 automatically provisioned.
-        $this->assertEqual($newstep->stepno, 2);
+        $this->assertEquals($newstep->stepno, 2);
         $this->compare_step($nsdata, $newstep);
 
         // Clone another step from the second step.
         $clone = $newstep->clone_step($newstep->id);
-        $this->assertEqual($clone->stepno, 3);
+        $this->assertEquals($clone->stepno, 3);
         $this->compare_step($nsdata, $clone);
 
         // Check that we now have three steps.
-        $this->assertEqual(count($workflow->steps()), 3);
+        $this->assertEquals(count($workflow->steps()), 3);
 
         // Swap the orders of steps one and two.
         $step = new block_workflow_step($step->id);
         $return = $newstep->swap_step_with($step);
-        $this->assertIdentical($return, $newstep);
+        $this->assertSame($return, $newstep);
 
         // The returned step should now be stepno 1.
-        $this->assertEqual($newstep->stepno, 1);
+        $this->assertSame((int)$newstep->stepno, 1);
 
         // Reload the step we've swapped with, and check that it's stepno 2.
         $step = new block_workflow_step($step->id);
-        $this->assertEqual($step->stepno, 2);
+        $this->assertEquals($step->stepno, 2);
 
         // Change the stepno that the workflow loops back to at the end.
         // First to something invalid.
@@ -340,9 +377,77 @@ class test_block_workflow_lib extends block_workflow_testlib {
                 $workflow, 'atendgobacktostep', -1);
         // Confirm that it's still set to null.
         $this->assertNull($workflow->atendgobacktostep);
+    }
+
+    public function test_workflow_steps_2() {
+        // Create a new workflow.
+        $data = new stdClass();
+        $data->shortname            = 'courseworkflow';
+        $data->name                 = 'First Course Workflow';
+        $data->description          = 'This is a test workflow applying to a course for the unit test';
+
+        // Create a new workflow object.
+        $workflow = new block_workflow_workflow();
+
+        // The method create_workflow will return a completed workflow object.
+        $workflow->create_workflow($data);
+
+        // When creating a workflow, the initial step will have automatically been created.
+        // Retrieve the list of steps.
+        $steps  = $workflow->steps();
+
+        // Check that we only have one step at this point.
+        $this->assertEquals(count($steps), 1);
+
+        // Retrieve the first step, and check that it isn't just a null value.
+        $step = array_pop($steps);
+        $this->assertNotNull($step);
+
+        // Test that we have a stdClass.
+        $this->assertInstanceOf('stdClass', $step);
+
+        // Create a new step in the workflow.
+        $nsdata = new stdClass();
+        $nsdata->workflowid         = $workflow->id;
+        $nsdata->name               = 'Second Step';
+        $nsdata->instructions       = 'New Instructions';
+        $nsdata->instructionsformat = FORMAT_PLAIN;
+        $nsdata->onactivescript     = '';
+        $nsdata->oncompletescript   = '';
+
+        $newstep = new block_workflow_step();
+        $return = $newstep->create_step($nsdata);
+
+        // The create function should also reload the object into $email too.
+        $this->assertSame($return, $newstep);
+
+        // The new step should have a stepno of 2 automatically provisioned.
+        $this->assertEquals($newstep->stepno, 2);
+        $this->compare_step($nsdata, $newstep);
+
+        // Clone another step from the second step.
+        $clone = $newstep->clone_step($newstep->id);
+        $this->assertEquals($clone->stepno, 3);
+        $this->compare_step($nsdata, $clone);
+
+        // Check that we now have three steps.
+        $this->assertEquals(count($workflow->steps()), 3);
+
+        // Swap the orders of steps one and two.
+        $step = new block_workflow_step($step->id);
+        $return = $newstep->swap_step_with($step);
+        $this->assertSame($return, $newstep);
+
+        // The returned step should now be stepno 1.
+        $this->assertSame((int)$newstep->stepno, 1);
+
+        // Reload the step we've swapped with, and check that it's stepno 2.
+        $step = new block_workflow_step($step->id);
+        $this->assertEquals($step->stepno, 2);
+
         // Then to something valid.
         $workflow->atendgobacktostep(2);
-        $this->assertEqual($workflow->atendgobacktostep, 2);
+        $this->assertEquals($workflow->atendgobacktostep, 2);
 
         // And then to null again.
         $workflow->atendgobacktostep(null);
@@ -350,7 +455,7 @@ class test_block_workflow_lib extends block_workflow_testlib {
 
         // Check whether we can get the next stepid.
         $next = $step->get_next_step();
-        $this->assertEqual($next->stepno, $step->stepno + 1);
+        $this->assertEquals($next->stepno, $step->stepno + 1);
 
         // The field atendgobacktostep is set to null, so $next should assert false.
         $final = $next->get_next_step();
@@ -363,7 +468,7 @@ class test_block_workflow_lib extends block_workflow_testlib {
         // Confirm that the steps are now 1, 2, 3.
         $i = 1;
         foreach ($workflow->steps() as $s) {
-            $this->assertEqual($s->stepno, $i++);
+            $this->assertEquals($s->stepno, $i++);
         }
 
         // Break the numbering and renumber again by using higher numbers.
@@ -375,7 +480,7 @@ class test_block_workflow_lib extends block_workflow_testlib {
         // Confirm that the steps are now 1, 2, 3 again.
         $i = 1;
         foreach ($workflow->steps() as $s) {
-            $this->assertEqual($s->stepno, $i++);
+            $this->assertEquals($s->stepno, $i++);
         }
 
         // Clone a step again.
@@ -399,7 +504,7 @@ class test_block_workflow_lib extends block_workflow_testlib {
                 $step, 'load_workflow_stepno', -1, -1);
     }
 
-    public function test_workflow_extended() {
+    public function test_workflow_extended_exception() {
         // Create a new workflow.
         $data = new stdClass();
         $data->shortname            = 'courseworkflow';
@@ -417,7 +522,7 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $steps  = $workflow->steps();
 
         // Check that we only have one step at this point.
-        $this->assertEqual(count($steps), 1);
+        $this->assertEquals(count($steps), 1);
 
         // Grab the first step.
         $s1 = array_shift($steps);
@@ -455,6 +560,37 @@ class test_block_workflow_lib extends block_workflow_testlib {
         // Now we're missing instructions.
         $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
                 $newstep, 'create_step', $nsdata);
+    }
+    public function test_workflow_extended() {
+        // Create a new workflow.
+        $data = new stdClass();
+        $data->shortname            = 'courseworkflow';
+        $data->name                 = 'First Course Workflow';
+        $data->description          = 'This is a test workflow applying to a course for the unit test';
+
+        // Create a new workflow object.
+        $workflow = new block_workflow_workflow();
+
+        // The method create_workflow will return a completed workflow object.
+        $workflow->create_workflow($data);
+
+        $steps  = $workflow->steps();
+
+        // Check that we only have one step at this point.
+        $this->assertEquals(count($steps), 1);
+
+        // Grab the first step.
+        $s1 = array_shift($steps);
+
+        // And load the step properly.
+        $step = new block_workflow_step($s1->id);
+
+        // Create a new step in the workflow.
+        $newstep = new block_workflow_step();
+
+        $nsdata = new stdClass();
+        $nsdata->workflowid         = $workflow->id;
+        $nsdata->name               = 'Second Step';
 
         $nsdata->instructions       = 'New Instructions';
         $nsdata->instructionsformat = FORMAT_PLAIN;
@@ -465,13 +601,51 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $newstep->create_step($nsdata);
 
         // The new step should have a stepno of 2 automatically provisioned.
-        $this->assertEqual($newstep->stepno, 2);
+        $this->assertEquals($newstep->stepno, 2);
 
         // And compare the rest of the step.
         $this->compare_step($nsdata, $newstep);
 
         // Lets remove the first step -- this will now work.
         $step->delete();
+    }
+
+    public function test_workflow_clone_exception() {
+        // Create a new workflow.
+        $data = new stdClass();
+        $data->shortname            = 'courseworkflow';
+        $data->name                 = 'First Course Workflow';
+        $data->description          = 'This is a test workflow applying to a course for the unit test';
+
+        // Create a new workflow object.
+        $workflow = new block_workflow_workflow();
+
+        // The method create_workflow will return a completed workflow object.
+        $workflow->create_workflow($data);
+
+        // When creating a workflow, the initial step will have automatically been created.
+        // Retrieve the list of steps.
+        $steps  = $workflow->steps();
+
+        // Check that we only have one step at this point.
+        $this->assertEquals(count($steps), 1);
+
+        // Create a new step in the workflow.
+        $nsdata = new stdClass();
+        $nsdata->workflowid         = $workflow->id;
+        $nsdata->name               = 'Second Step';
+        $nsdata->instructions       = 'New Instructions';
+        $nsdata->instructionsformat = FORMAT_PLAIN;
+        $nsdata->onactivescript     = '';
+        $nsdata->oncompletescript   = '';
+
+        $newstep = new block_workflow_step();
+        $return = $newstep->create_step($nsdata);
+
+        // Now we'll try cloning the workflow - first with no changes.
+        $newdata = new stdClass();
+        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
+                'block_workflow_workflow', 'clone_workflow', $workflow->id, $newdata);
     }
 
     public function test_workflow_clone() {
@@ -492,7 +666,7 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $steps  = $workflow->steps();
 
         // Check that we only have one step at this point.
-        $this->assertEqual(count($steps), 1);
+        $this->assertEquals(count($steps), 1);
 
         // Create a new step in the workflow.
         $nsdata = new stdClass();
@@ -506,12 +680,8 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $newstep = new block_workflow_step();
         $return = $newstep->create_step($nsdata);
 
-        // Now we'll try cloning the workflow - first with no changes.
-        $newdata = new stdClass();
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                'block_workflow_workflow', 'clone_workflow', $workflow->id, $newdata);
-
         // And then changing the shortname.
+        $newdata = new stdClass();
         $newdata->shortname         = 'clone';
         $clone = block_workflow_workflow::clone_workflow($workflow->id, $newdata);
         $cloneid = $clone->id;
@@ -540,30 +710,56 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $workflow = $this->create_workflow();
 
         // Retrieve a list of all workflows available to courses.
-        $list = $workflow->available_workflows('course');
+        $list = block_workflow_workflow::available_workflows('course');
 
         // We should have one workflow available.
-        $this->assertEqual(count($list), 1);
+        $this->assertEquals(count($list), 1);
 
         // And that available workflow should match our the workflow we've just created.
         $first = array_shift($list);
-        $this->assertEqual($workflow->id, $first->id);
-        $this->assertEqual($workflow->shortname, $first->shortname);
-        $this->assertEqual($workflow->name, $first->name);
-        $this->assertEqual($workflow->description, $first->description);
-        $this->assertEqual($workflow->descriptionformat, $first->descriptionformat);
-        $this->assertEqual($workflow->appliesto, $first->appliesto);
-        $this->assertEqual($workflow->atendgobacktostep, $first->atendgobacktostep);
-        $this->assertEqual($workflow->obsolete, $first->obsolete);
+        $this->assertEquals($workflow->id, $first->id);
+        $this->assertEquals($workflow->shortname, $first->shortname);
+        $this->assertEquals($workflow->name, $first->name);
+        $this->assertEquals($workflow->description, $first->description);
+        $this->assertEquals($workflow->descriptionformat, $first->descriptionformat);
+        $this->assertEquals($workflow->appliesto, $first->appliesto);
+        $this->assertEquals($workflow->atendgobacktostep, $first->atendgobacktostep);
+        $this->assertEquals($workflow->obsolete, $first->obsolete);
 
         // Attempt to assign this workflow to our course
         // add_to_context returns a block_workflow_step_state.
         $state = $workflow->add_to_context($this->contextid);
-        $this->assertIsA($state, 'block_workflow_step_state');
+        $this->assertInstanceOf('block_workflow_step_state', $state);
 
         // Trying to add it again will throw a block_workflow_exception.
         $this->expect_exception_without_halting('block_workflow_exception',
                 $workflow, 'add_to_context', $this->contextid);
+    }
+
+    public function test_course_workflow_2() {
+        $workflow = $this->create_workflow();
+
+        // Retrieve a list of all workflows available to courses.
+        $list = block_workflow_workflow::available_workflows('course');
+
+        // We should have one workflow available.
+        $this->assertEquals(count($list), 1);
+
+        // And that available workflow should match our the workflow we've just created.
+        $first = array_shift($list);
+        $this->assertEquals($workflow->id, $first->id);
+        $this->assertEquals($workflow->shortname, $first->shortname);
+        $this->assertEquals($workflow->name, $first->name);
+        $this->assertEquals($workflow->description, $first->description);
+        $this->assertEquals($workflow->descriptionformat, $first->descriptionformat);
+        $this->assertEquals($workflow->appliesto, $first->appliesto);
+        $this->assertEquals($workflow->atendgobacktostep, $first->atendgobacktostep);
+        $this->assertEquals($workflow->obsolete, $first->obsolete);
+
+        // Attempt to assign this workflow to our course
+        // add_to_context returns a block_workflow_step_state.
+        $state = $workflow->add_to_context($this->contextid);
+        $this->assertInstanceOf('block_workflow_step_state', $state);
 
         // Jump to no step at all (to abort the workflow).
         $state->jump_to_step();
@@ -571,59 +767,59 @@ class test_block_workflow_lib extends block_workflow_testlib {
         // And check that we don't get an active step.
         $step = new block_workflow_step();
         $this->expect_exception_without_halting('block_workflow_not_assigned_exception',
-                $step, 'load_active_step', $this->contextid);
+                    $step, 'load_active_step', $this->contextid);
 
         // And we should now be able to add it back.
-        $state = $workflow->add_to_context($this->contextid);
-        $this->assertIsA($state, 'block_workflow_step_state');
+            $state = $workflow->add_to_context($this->contextid);
+            $this->assertInstanceOf('block_workflow_step_state', $state);
 
-        // It should be returned when loading contexts.
-        $clist = $workflow->load_context_workflows($this->contextid);
-        $this->assertEqual(count($clist), 1);
+            // It should be returned when loading contexts.
+            $clist = $workflow->load_context_workflows($this->contextid);
+            $this->assertEquals(count($clist), 1);
 
-        // And the workflow should be in use once.
-        $inusetimes = block_workflow_workflow::in_use_by($workflow->id);
-        $this->assertEqual($inusetimes, 1);
+            // And the workflow should be in use once.
+            $inusetimes = block_workflow_workflow::in_use_by($workflow->id);
+            $this->assertEquals($inusetimes, 1);
 
-        // And active once too.
-        $inusetimes = block_workflow_workflow::in_use_by($workflow->id, true);
-        $this->assertEqual($inusetimes, 1);
+            // And active once too.
+            $inusetimes = block_workflow_workflow::in_use_by($workflow->id, true);
+            $this->assertEquals($inusetimes, 1);
 
-        // We should be able to grab a list of step_states for this context too.
-        $step_states = $workflow->step_states($this->contextid);
+            // We should be able to grab a list of step_states for this context too.
+            $step_states = $workflow->step_states($this->contextid);
 
-        // And this has one record -- only one step.
-        $this->assertEqual(count($step_states), 1);
+            // And this has one record -- only one step.
+            $this->assertEquals(count($step_states), 1);
 
-        // Grab the active step.
-        $state = new block_workflow_step_state();
-        $state->load_active_state($this->contextid);
+            // Grab the active step.
+            $state = new block_workflow_step_state();
+            $state->load_active_state($this->contextid);
 
-        // Update the comment on it.
-        $state->update_comment('Sample Comment');
+            // Update the comment on it.
+            $state->update_comment('Sample Comment');
 
-        // Verify our comment updated.
-        $this->assertEqual($state->comment, 'Sample Comment');
+            // Verify our comment updated.
+            $this->assertEquals($state->comment, 'Sample Comment');
 
-        // And we can't delete it.
-        $deletable = $workflow->is_deletable();
-        $this->assertFalse($deletable);
+            // And we can't delete it.
+            $deletable = $workflow->is_deletable();
+            $this->assertFalse($deletable);
 
-        // The method require_deletable should throw an exception.
-        $this->expect_exception_without_halting('block_workflow_exception',
-                $workflow, 'require_deletable');
+            // The method require_deletable should throw an exception.
+            $this->expect_exception_without_halting('block_workflow_exception',
+                    $workflow, 'require_deletable');
 
-        // We should be able to remove the workflow from the context.
-        $workflow->remove_workflow($this->contextid);
+            // We should be able to remove the workflow from the context.
+            $workflow->remove_workflow($this->contextid);
 
-        // And confirm again.
-        $step = new block_workflow_step();
-        $this->expect_exception_without_halting('block_workflow_not_assigned_exception',
-                $step, 'load_active_step', $this->contextid);
+            // And confirm again.
+            $step = new block_workflow_step();
+            $this->expect_exception_without_halting('block_workflow_not_assigned_exception',
+                    $step, 'load_active_step', $this->contextid);
 
-        // We can't remove it again -- it's not in use.
-        $this->expect_exception_without_halting('block_workflow_not_assigned_exception',
-                $workflow, 'remove_workflow', $this->contextid);
+            // We can't remove it again -- it's not in use.
+            $this->expect_exception_without_halting('block_workflow_not_assigned_exception',
+                    $workflow, 'remove_workflow', $this->contextid);
     }
 
     public function test_activity_workflow() {
@@ -644,36 +840,35 @@ class test_block_workflow_lib extends block_workflow_testlib {
         $this->compare_workflow($data, $workflow);
 
         // And check the return for $workflow->context() == CONTEXT_MODULE.
-        $this->assertEqual($workflow->context(), CONTEXT_MODULE);
+        $this->assertEquals($workflow->context(), CONTEXT_MODULE);
     }
 
     public function test_appliesto_list() {
         $list = block_workflow_appliesto_list();
-        $this->assertIsA($list, 'array');
-        $this->assertNotEqual(count($list), 0);
+        $this->assertEquals('array', gettype($list));
+        $this->assertNotEquals(count($list), 0);
     }
 
     public function test_editor_options() {
         $format = block_workflow_editor_options();
-        $this->assertEqual($format['maxfiles'], 0);
+        $this->assertEquals($format['maxfiles'], 0);
     }
 
     public function test_editor_format() {
-        $this->assertEqual(block_workflow_editor_format(FORMAT_HTML),   get_string('format_html', 'block_workflow'));
-        $this->assertEqual(block_workflow_editor_format(FORMAT_PLAIN),  get_string('format_plain', 'block_workflow'));
-        $this->assertEqual(block_workflow_editor_format(-1),            get_string('format_unknown', 'block_workflow'));
+        $this->assertEquals(block_workflow_editor_format(FORMAT_HTML),   get_string('format_html', 'block_workflow'));
+        $this->assertEquals(block_workflow_editor_format(FORMAT_PLAIN),  get_string('format_plain', 'block_workflow'));
+        $this->assertEquals(block_workflow_editor_format(-1),            get_string('format_unknown', 'block_workflow'));
 
         // Check the editor_format used for imports.
-        $this->assertEqual(block_workflow_convert_editor_format(block_workflow_editor_format(FORMAT_HTML)), FORMAT_HTML);
-        $this->assertEqual(block_workflow_convert_editor_format(block_workflow_editor_format(FORMAT_PLAIN)), FORMAT_PLAIN);
+        $this->assertEquals(block_workflow_convert_editor_format(block_workflow_editor_format(FORMAT_HTML)), FORMAT_HTML);
+        $this->assertEquals(block_workflow_convert_editor_format(block_workflow_editor_format(FORMAT_PLAIN)), FORMAT_PLAIN);
         $this->expect_exception_without_halting('block_workflow_exception',
                 null, 'block_workflow_convert_editor_format', 'baddata');
-
     }
 
     public function test_appliesto_string() {
         // Test that we get the correct strings from block_workflow_appliesto for both of it's routes.
-        $this->assertEqual(block_workflow_appliesto('course'), get_string('course'));
-        $this->assertEqual(block_workflow_appliesto('quiz'), get_string('pluginname', 'mod_quiz'));
+        $this->assertEquals(block_workflow_appliesto('course'), get_string('course'));
+        $this->assertEquals(block_workflow_appliesto('quiz'), get_string('pluginname', 'mod_quiz'));
     }
 }

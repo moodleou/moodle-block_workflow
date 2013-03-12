@@ -17,10 +17,9 @@
 /**
  * Workflow Import
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
@@ -144,6 +143,8 @@ if ($importform->is_cancelled()) {
         $stepx->instructionsformat = block_workflow_convert_editor_format((string)$instructionsattrs['format']);
         $stepx->onactivescript = clean_and_check_field_validity('onactivescript', $importedstep, false);
         $stepx->oncompletescript = clean_and_check_field_validity('oncompletescript', $importedstep, false);
+        $stepx->autofinish = clean_and_check_field_validity('autofinish', $importedstep, false);
+        $stepx->autofinishoffset = clean_and_check_field_validity('autofinishoffset', $importedstep, false);
         $stepx->workflowid = $workflow->id;
 
         // Create the step.
@@ -209,17 +210,19 @@ echo $OUTPUT->footer();
  * @param   bool   $cleanhtml  Clean html (decode entities and remove CDATA)
  * @return  string      The checked and (potentially) modified text
  */
-function clean_and_check_field_validity($fieldname, $xml, $noempty = true, $cleanhtml = false) {
+function clean_and_check_field_validity($fieldname, $xml, $noempty = true, $html = false) {
     if (!isset($xml->$fieldname)) {
         throw new block_workflow_invalid_import_exception(
                 get_string('missingfield', 'block_workflow', $fieldname));
     }
 
-    $field = clean_param(trim((string) $xml->$fieldname), PARAM_CLEANHTML);;
-
-    if ($cleanhtml) {
-        $field = preg_replace('/(\<\!\[CDATA\[)|(\]\]\>)/', '', $field);
+    if ($html) {
+        $field = preg_replace('/(\<\!\[CDATA\[)|(\]\]\>)/', '', trim((string) $xml->$fieldname));
         $field = html_entity_decode($field, ENT_QUOTES, 'UTF-8');
+        $field = clean_param($field, PARAM_RAW);
+    } else {
+        $field = clean_param(trim((string) $xml->$fieldname), PARAM_CLEANHTML); // Not a great param type.
+        
     }
 
     if ($noempty && strlen($field) < 1) {

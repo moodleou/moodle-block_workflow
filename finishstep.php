@@ -17,10 +17,9 @@
 /**
  * Script to confirm a step is complete
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
@@ -80,7 +79,8 @@ if ($mform->is_cancelled()) {
 
 // Retrieve the current state data for the form.
 $data = new stdClass();
-$data->comment      = clean_text($state->comment, $state->commentformat);
+$data->comment      = $state->comment;
+$data->commentformat = $state->commentformat;
 $data->stateid      = $state->id;
 $data->workflowname = $state->step()->workflow()->name;
 $data->stepname     = $state->step()->name;

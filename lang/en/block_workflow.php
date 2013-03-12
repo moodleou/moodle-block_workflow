@@ -17,10 +17,9 @@
 /**
  * Workflow block english language strings
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 // Core strings.
@@ -41,6 +40,8 @@ $string['atendgobacktostep']            = 'At the end of step {$a}';
 $string['atendgobacktostepinfo']        = 'After step {$a->stepcount}, go back to step number {$a->atendgobacktostep}.';
 $string['atendgobacktostepno']          = 'go back to step {$a->stepno} ({$a->name})';
 $string['atendstop']                    = 'After step {$a->stepcount}, this workflow will end.';
+$string['automaticallyfinish']          = 'Automatically finish';
+
 $string['cannotdeleteworkflowinuseby']  = 'Cannot delete, this workflow is used in {$a} places.';
 $string['cannotremoveemailinuse']       = 'Unable to remove e-mail template -- this template is currently in use';
 $string['cannotremoveonlystep']         = 'Unable to remove step. This is the only workflow in the step';
@@ -60,6 +61,7 @@ $string['confirmjumptostep']            = 'Are you sure that you want to jump to
 $string['confirmstepdeletetitle']       = 'Delete step \'{$a}\'?';
 $string['confirmworkflowdeletetitle']   = 'Delete workflow \'{$a}\'?';
 $string['contexthasactiveworkflow']     = 'This context already has an active workflow.';
+$string['coursestartdate']              = 'the course start date';
 $string['create']                       = 'Create';
 $string['createemail']                  = 'Create new e-mail template';
 $string['createstep']                   = 'Create step';
@@ -69,6 +71,8 @@ $string['createtask']                   = 'Creating new task for step {$a}';
 $string['createtemplate']               = 'Create template';
 $string['createworkflow']               = 'Create new workflow';
 $string['currentlyinuseby']             = 'This workflow is currently in use by';
+
+$string['days']                         = 'Days';
 $string['defaultonactivescript']        = '# You may place a set of actions to complete when marking this step active here';
 $string['defaultoncompletescript']      = '# You may place a set of actions to complete when marking this step finished here';
 $string['defaultstepdescription']       = 'A description for this step should go here';
@@ -91,6 +95,8 @@ $string['disabled']                     = 'Disabled';
 $string['disableworkflow']              = 'Disable workflow';
 $string['doerstitle']                   = 'Roles responsible for this step';
 $string['doertitle']                    = 'Roles responsible for this step';
+$string['donotautomaticallyfinish']     = 'Do not automatically finish';
+
 $string['edit']                         = 'Edit';
 $string['editcomments']                 = 'Edit comments';
 $string['editemail']                    = 'Edit e-mail template \'{$a}\'';
@@ -117,14 +123,19 @@ $string['enabledworkflow']              = 'Enabled';
 $string['enableworkflow']               = 'Enable workflow';
 $string['export']                       = 'Export';
 $string['exportworkflow']               = 'Export workflow';
+
 $string['finishstep']                   = 'Finish step';
+$string['finishstepautomatically']      = 'This step was automatically finished by workflow system at {$a}.';
 $string['finishstepfor']                = 'Finish step \'{$a->stepname}\' on {$a->contextname}';
 $string['finishstepinstructions']       = 'You are about to mark this step as complete, and move to the next step in the workflow. A summary of the step is shown below -- you may wish to update the comment below.';
 $string['format_html']                  = 'html';
 $string['format_plain']                 = 'plain';
 $string['format_unknown']               = 'unknown';
+
 $string['general']                      = 'General';
+
 $string['hidetask']                     = 'Disable task';
+
 $string['importfile']                   = 'File';
 $string['importsuccess']                = 'Importing was sucessful. You will be redirected to workflow editing page shortly.';
 $string['importworkflow']               = 'Import workflow';
@@ -165,13 +176,16 @@ $string['invalidworkflow']              = 'Invalid workflow specified.';
 $string['invalidworkflowid']            = 'An invalid workflow was specified';
 $string['invalidworkflowname']          = 'An invalid workflow name was specified';
 $string['invalidworkflowstepno']        = 'The specified step number could not be found in this workflow';
+
 $string['jumpstep']                     =' Jump to step';
 $string['jumptostep']                   = 'Jump to Step';
 $string['jumptostepcheck']              = 'Are you sure you wish to jump from step \'{$a->fromstep}\' to step \'{$a->tostep}\' for the workflow on {$a->workflowon}?';
 $string['jumptostepcommentaddition']    = '<p>[Note: the workflow just jumped from step \'{$a->fromstep}\'. This comment may seem out-of-context.]</p>{$a->comment}';
 $string['jumptostepon']                 = 'Jump to step \'{$a->stepname}\' on {$a->contextname}';
 $string['jumptosteptitle']              = 'Jump to step \'{$a->tostep}\' for \'{$a->workflowon}\' confirmation';
+
 $string['lastmodified']                 = 'Last modified';
+
 $string['managedescription']            = 'Description for the manageworkflows page.';
 $string['manageemails']                 = 'Manage e-mail templates';
 $string['manageworkflows']              = 'Manage Workflows';
@@ -179,6 +193,7 @@ $string['messageprovider:notification'] = 'Workflow notifications and alerts';
 $string['missingfield']                 = 'The required field is missing: {$a}';
 $string['movedown']                     = 'Move down';
 $string['moveup']                       = 'Move up';
+
 $string['name']                         = 'Name';
 $string['nameinuse']                    = 'The name specified is already in use. Names must be unique';
 $string['nameshortname']                = '{$a->name} ({$a->shortname})';
@@ -197,13 +212,19 @@ $string['notuniquestep']                = 'Step {$a} is not unique';
 $string['notutfencoding']               = 'This file is not UTF-8 encoded';
 $string['noworkflow']                   = 'There is currently no workflow assigned for this page';
 $string['noworkflows']                  = 'There are currently no available workflows';
+
 $string['obsoleteworkflow']             = 'Obsoleted';
 $string['onactivescript']               = 'On step activation';
 $string['oncompletescript']             = 'On step completion';
 $string['overview']                     = 'Overview';
 $string['overviewtitle']                = 'Overview of {$a->workflowname} workflow on {$a->contexttitle}';
+
 $string['percentcomplete']              = '{$a}% complete';
 $string['previousworkflow']             = 'The workflow on this {$a->contexttype} is now complete.<br/> You can still <a href="{$a->overviewurl}">see the overview</a> of this workflow, or add a new workflow to this {$a->contexttype}.';
+
+$string['quizopendate']                 = 'the quiz open date';
+$string['quizclosedate']                = 'the quiz close date';
+
 $string['remove']                       = 'Remove';
 $string['removerolefromstep']           = 'Remove role from step';
 $string['removestep']                   = 'Remove Step';
@@ -212,6 +233,7 @@ $string['removeworkflow']               = 'Remove workflow';
 $string['removeworkflowcheck']          = 'Are you sure that you wish to remove the workflow \'{$a->workflowname}\' from {$a->contexttitle}? This action removes all associated data, and cannot be reversed!';
 $string['removeworkflowfromcontext']    = 'Remove workflow \'{$a->workflowname}\' from {$a->contexttitle}?';
 $string['roles']                        = 'Roles';
+
 $string['shortname']                    = 'Shortname';
 $string['shortnameinuse']               = 'The shortname specified is already in use. Shortnames must be unique';
 $string['shortnametaken']               = 'This short name is already in use by another workflow ({$a})';
@@ -236,6 +258,7 @@ $string['stepno']                       = 'Step No.';
 $string['stepnotexist']                 = 'Step to go at the end does not exist in the imported data: {$a}';
 $string['steps']                        = 'Steps';
 $string['stepsettings']                 = 'Step settings';
+
 $string['task']                         = 'Task';
 $string['taskcomplete']                 = 'Task complete';
 $string['tasknotspecified']             = 'No task was specified';
@@ -247,9 +270,12 @@ $string['todolisttitle']                = 'Tasks for completion';
 $string['todotask']                     = 'Task';
 $string['todotitle']                    = 'Items to complete for this step';
 $string['todoundone']                   = 'Marked {$a} as incomplete';
+
 $string['updatecomment']                = 'Update comment';
+
 $string['vieweditemail']                = 'View/Edit email';
 $string['vieweditworkflow']             = 'View/Edit Workflow';
+
 $string['workflow:dostep']              = 'Permission to perform a step';
 $string['workflow:editdefinitions']     = 'Permission to edit workflow details';
 $string['workflow:manage']              = 'Permission to manage workflows';
@@ -268,6 +294,8 @@ $string['workflowsettings']             = 'Workflow Settings';
 $string['workflowstatus']               = 'Workflow status';
 $string['workflowsteps']                = 'Workflow Steps';
 $string['workflowusage']                = 'Workflow Usage';
+
 $string['xmlloadfailed']                = 'Failed loading XML with following problems:';
+
 $string['youandanyother']               = 'You, or any other ';
 $string['youor']                        = ', or ';

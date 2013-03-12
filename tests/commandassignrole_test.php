@@ -17,22 +17,23 @@
 /**
  * Workflow block tests
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group block_workflow
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// Include our test library so that we can use the same mocking system for
-// all tests.
+// Include our test library so that we can use the same mocking system for all tests.
+global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class test_block_workflow_command_assignrole extends block_workflow_testlib {
+class block_workflow_command_assignrole_test extends block_workflow_testlib {
+
     public function test_assignrole() {
         $command = new block_workflow_command_assignrole();
-        $this->assertIsA($command, 'block_workflow_command');
+        $this->assertInstanceOf('block_workflow_command', $command);
     }
 
     public function test_parse_no_state() {
@@ -47,24 +48,24 @@ class test_block_workflow_command_assignrole extends block_workflow_testlib {
         $result = $class->parse($args, $step);
 
         // Test: $result should have data.
-        $this->assertNotNull($result);
+        $this->assertNotEmpty($result);
 
         // There should be no errors.
-        $this->assertEqual(count($result->errors), 0);
+        $this->assertEquals(count($result->errors), 0);
 
         // Test: $result should have a newrole of editingteacher.
-        $this->assertEqual($result->newrole->name, 'editingteacher');
+        $this->assertEquals($result->newrole->shortname, 'editingteacher');
 
         // Test: $result should have a list of roles containing 'teacher' and 'student'.
-        $this->assertIsA($result->roles, 'array');
-        $this->assertEqual(count($result->roles), 2);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "manager");'))), 0);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "teacher");'))), 1);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "student");'))), 1);
+        $this->assertEquals('array', gettype($result->roles));
+        $this->assertEquals(count($result->roles), 2);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "manager");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "teacher");'))), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "student");'))), 1);
 
         // No $state was given so $result->users should be an empty array.
-        $this->assertIsA($result->users, 'array');
-        $this->assertEqual(count($result->users), 0);
+        $this->assertEquals('array', gettype($result->users));
+        $this->assertEquals(count($result->users), 0);
     }
 
     public function test_parse_no_state_invalid_newrole() {
@@ -82,21 +83,21 @@ class test_block_workflow_command_assignrole extends block_workflow_testlib {
         $this->assertNotNull($result);
 
         // There should be one error.
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
 
         // Test: $result should have no newrole.
         $this->assertFalse($result->newrole);
 
         // Test: $result should have a list of roles containing 'teacher' and 'student'.
-        $this->assertIsA($result->roles, 'array');
-        $this->assertEqual(count($result->roles), 2);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "manager");'))), 0);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "teacher");'))), 1);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "student");'))), 1);
+        $this->assertEquals('array', gettype($result->roles));
+        $this->assertEquals(count($result->roles), 2);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "manager");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "teacher");'))), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "student");'))), 1);
 
         // No $state was given so $result->users should be an empty array.
-        $this->assertIsA($result->users, 'array');
-        $this->assertEqual(count($result->users), 0);
+        $this->assertEquals('array', gettype($result->users));
+        $this->assertEquals(count($result->users), 0);
     }
 
     public function test_parse_no_state_invalid_targetrole() {
@@ -114,21 +115,21 @@ class test_block_workflow_command_assignrole extends block_workflow_testlib {
         $this->assertNotNull($result);
 
         // There should be one error for the invalid role.
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
 
         // Test: $result should have a newrole of editingteacher.
-        $this->assertEqual($result->newrole->name, 'editingteacher');
+        $this->assertEquals($result->newrole->shortname, 'editingteacher');
 
         // Test: $result should have a list of roles containing 'student'.
-        $this->assertIsA($result->roles, 'array');
-        $this->assertEqual(count($result->roles), 1);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "manager");'))), 0);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "teacher");'))), 0);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "student");'))), 1);
+        $this->assertEquals('array', gettype($result->roles));
+        $this->assertEquals(count($result->roles), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "manager");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "teacher");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "student");'))), 1);
 
         // No $state was given so $result->users should be an empty array.
-        $this->assertIsA($result->users, 'array');
-        $this->assertEqual(count($result->users), 0);
+        $this->assertEquals('array', gettype($result->users));
+        $this->assertEquals(count($result->users), 0);
     }
 
     public function test_parse_with_state() {
@@ -147,23 +148,23 @@ class test_block_workflow_command_assignrole extends block_workflow_testlib {
         $this->assertNotNull($result);
 
         // There should be no errors.
-        $this->assertEqual(count($result->errors), 0);
+        $this->assertEquals(count($result->errors), 0);
 
         // Test: $result should have a newrole of editingteacher.
-        $this->assertEqual($result->newrole->name, 'editingteacher');
+        $this->assertEquals($result->newrole->shortname, 'editingteacher');
 
         // Test: $result should have a list of roles containing 'teacher' and 'student'.
-        $this->assertIsA($result->roles, 'array');
-        $this->assertEqual(count($result->roles), 2);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "manager");'))), 0);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "teacher");'))), 1);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "student");'))), 1);
+        $this->assertEquals('array', gettype($result->roles));
+        $this->assertEquals(count($result->roles), 2);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "manager");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "teacher");'))), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "student");'))), 1);
 
         // A $state was given so $result->users should be an empty array.
-        $this->assertIsA($result->users, 'array');
+        $this->assertEquals('array', gettype($result->users));
 
         // There is one person in each role, and we're assigning two roles.
-        $this->assertEqual(count($result->users), 2);
+        $this->assertEquals(count($result->users), 2);
     }
 
     public function test_parse_with_state_invalid_newrole() {
@@ -182,23 +183,23 @@ class test_block_workflow_command_assignrole extends block_workflow_testlib {
         $this->assertNotNull($result);
 
         // There should be one error.
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
 
         // Test: $result should have no newrole.
         $this->assertFalse($result->newrole);
 
         // Test: $result should have a list of roles containing 'teacher' and 'student'.
-        $this->assertIsA($result->roles, 'array');
-        $this->assertEqual(count($result->roles), 2);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "manager");'))), 0);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "teacher");'))), 1);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "student");'))), 1);
+        $this->assertEquals('array', gettype($result->roles));
+        $this->assertEquals(count($result->roles), 2);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "manager");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "teacher");'))), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "student");'))), 1);
 
         // A $state was given so $result->users should be an empty array.
-        $this->assertIsA($result->users, 'array');
+        $this->assertEquals('array', gettype($result->users));
 
         // There is one person in each role, and we're assigning two roles.
-        $this->assertEqual(count($result->users), 2);
+        $this->assertEquals(count($result->users), 2);
     }
 
     public function test_parse_with_state_invalid_targetrole() {
@@ -217,26 +218,27 @@ class test_block_workflow_command_assignrole extends block_workflow_testlib {
         $this->assertNotNull($result);
 
         // There should be one error for the invalid role.
-        $this->assertEqual(count($result->errors), 1);
+        $this->assertEquals(count($result->errors), 1);
 
         // Test: $result should have a newrole of editingteacher.
-        $this->assertEqual($result->newrole->name, 'editingteacher');
+        $this->assertEquals($result->newrole->shortname, 'editingteacher');
 
         // Test: $result should have a list of roles containing 'student'.
-        $this->assertIsA($result->roles, 'array');
-        $this->assertEqual(count($result->roles), 1);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "manager");'))), 0);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "teacher");'))), 0);
-        $this->assertEqual(count(array_filter($result->roles, create_function('$r', 'return ($r->name == "student");'))), 1);
+        $this->assertEquals('array', gettype($result->roles));
+        $this->assertEquals(count($result->roles), 1);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "manager");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "teacher");'))), 0);
+        $this->assertEquals(count(array_filter($result->roles, create_function('$r', 'return ($r->shortname == "student");'))), 1);
 
         // A $state was given so $result->users should be an empty array.
-        $this->assertIsA($result->users, 'array');
+        $this->assertEquals('array', gettype($result->users));
 
         // There is one person in each role, and we're assigning one valid role.
-        $this->assertEqual(count($result->users), 1);
+        $this->assertEquals(count($result->users), 1);
     }
 
     public function test_execute() {
+        global $DB;
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -250,10 +252,10 @@ class test_block_workflow_command_assignrole extends block_workflow_testlib {
 
         // Check the current assignments.
         foreach ($result->users as $user) {
-            $assignments = $this->testdb->get_records('role_assignments', array('roleid' => $result->newrole->id,
+            $assignments = $DB->get_records('role_assignments', array('roleid' => $result->newrole->id,
                     'contextid' => $result->context->id, 'userid' => $user->id, 'component' => 'block_workflow',
                     'itemid' => $state->id));
-            $this->assertEqual(count($assignments), 0);
+            $this->assertEquals(count($assignments), 0);
         }
 
         // Execute.
@@ -262,11 +264,10 @@ class test_block_workflow_command_assignrole extends block_workflow_testlib {
 
         // Check the new assignments.
         foreach ($result->users as $user) {
-            $assignments = $this->testdb->get_records('role_assignments', array('roleid' => $result->newrole->id,
+            $assignments = $DB->get_records('role_assignments', array('roleid' => $result->newrole->id,
                     'contextid' => $result->context->id, 'userid' => $user->id, 'component' => 'block_workflow',
                     'itemid' => $state->id));
-            $this->assertEqual(count($assignments), 1);
+            $this->assertEquals(count($assignments), 1);
         }
-
     }
 }

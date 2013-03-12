@@ -17,19 +17,20 @@
 /**
  * Workflow block unit tests
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group block_workflow
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// Include our test library so that we can use the same mocking system for
-// all tests.
+global $CFG;
+require_once(dirname(__FILE__) . '/../locallib.php');
 require_once(dirname(__FILE__) . '/lib.php');
 
-class test_block_workflow_command extends block_workflow_testlib {
+
+class block_workflow_command_test extends block_workflow_testlib {
 
     /**
      * Test the role_exists function
@@ -39,12 +40,12 @@ class test_block_workflow_command extends block_workflow_testlib {
     public function test_role_exists() {
         // First test that a known good role works.
         $result = block_workflow_command::role_exists('manager');
-        $this->assertIsA($result, 'stdClass');
+        $this->assertInstanceOf('stdClass', $result);
 
         $errors = array();
         $result = block_workflow_command::require_role_exists('manager', $errors);
-        $this->assertIsA($result, 'stdClass');
-        $this->assertEqual(count($errors), 0);
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals(count($errors), 0);
 
         // And test that a known bad role doesn't work.
         $result = block_workflow_command::role_exists('invalidrole');
@@ -52,7 +53,7 @@ class test_block_workflow_command extends block_workflow_testlib {
 
         $errors = array();
         $result = block_workflow_command::require_role_exists('invalidrole', $errors);
-        $this->assertEqual(count($errors), 1);
+        $this->assertEquals(count($errors), 1);
     }
 
     /**
@@ -61,6 +62,9 @@ class test_block_workflow_command extends block_workflow_testlib {
      * - Negative test for an activity (activity == false)
      */
     public function test_is_activity() {
+
+        $this->resetAfterTest(true);
+
         // Create a new workflow.
         $data = new stdClass();
         $data->shortname            = 'sampleworkflow';

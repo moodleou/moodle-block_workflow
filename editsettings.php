@@ -17,10 +17,9 @@
 /**
  * Script to allow creation or updating of basic workflow settings
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
@@ -119,11 +118,12 @@ if ($workflow->id) {
     $data->workflowid           = $workflow->id;
     $data->shortname            = $workflow->shortname;
     $data->name                 = $workflow->name;
-    $data->description          = clean_text($workflow->description, $workflow->descriptionformat);
+    $data->description          = $workflow->description;
+    $data->descriptionformat    = $workflow->descriptionformat;
     $data->obsolete             = $workflow->obsolete;
     $data->appliesto            = $workflow->appliesto;
     $data->atendgobacktostep    = $workflow->atendgobacktostep;
-    $data = file_prepare_standard_editor($data, 'description', array());
+    $data = file_prepare_standard_editor($data, 'description', array('noclean' => true));
     $editform->set_data($data);
 }
 

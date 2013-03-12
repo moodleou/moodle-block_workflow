@@ -17,19 +17,19 @@
 /**
  * Workflow block test unit for the email class.
  *
- * @package    block
- * @subpackage workflow
- * @copyright  2011 Lancaster University Network Services Limited
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_workflow
+ * @copyright 2011 Lancaster University Network Services Limited
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @group block_workflow
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// Include our test library so that we can use the same mocking system for
-// all tests.
+// Include our test library so that we can use the same mocking system for all tests.
+global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class test_block_workflow_emails extends block_workflow_testlib {
+class block_workflow_emails_test extends block_workflow_testlib {
     public function test_email_validation() {
         $data  = new stdClass();
         $email = new block_workflow_email();
@@ -60,6 +60,15 @@ class test_block_workflow_emails extends block_workflow_testlib {
         $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
                 $email, 'create', $data);
         unset($data->badfield);
+    }
+
+    public function test_email_create() {
+        $data  = new stdClass();
+        $data->shortname    = 'shortname';
+        $data->subject      = 'Example Subject';
+        $data->message      = 'Example Message';
+
+        $email = new block_workflow_email();
 
         // It should now work.
         $return = $email->create($data);
@@ -68,10 +77,10 @@ class test_block_workflow_emails extends block_workflow_testlib {
         $this->compare_email($data, $email, array('id'));
 
         // Check that the return value is also a block_workflow_email.
-        $this->assertIsA($return, 'block_workflow_email');
+        $this->assertInstanceOf('block_workflow_email', $return);
 
         // The create function should also reload the object into $email too.
-        $this->assertIsA($email, 'block_workflow_email');
+        $this->assertInstanceOf('block_workflow_email', $email);
 
         // And the two should match.
         $this->compare_email($data, $email, array());
@@ -92,18 +101,43 @@ class test_block_workflow_emails extends block_workflow_testlib {
         // Remove the badfield and give it a new shortname.
         unset($data->badfield);
         $data->shortname = 'newshortname';
-        $updated = $email->update($data);
+    }
 
-        $this->assertEqual($updated->shortname, 'newshortname');
+    public function test_email_update() {
+        $data  = new stdClass();
+        $data->shortname    = 'shortname';
+        $data->subject      = 'Example Subject';
+        $data->message      = 'Example Message';
+
+        $email = new block_workflow_email();
+
+        // It should now work.
+        $return = $email->create($data);
+
+        // The variable $email should match the entered data.
+        $this->compare_email($data, $email, array('id'));
+
+        // Check that the return value is also a block_workflow_email.
+        $this->assertInstanceOf('block_workflow_email', $return);
+
+        // The create function should also reload the object into $email too.
+        $this->assertInstanceOf('block_workflow_email', $email);
+
+        // And the two should match.
+        $this->compare_email($data, $email, array());
+
+        // Check validation on e-mail updates.
+        $data->shortname = 'newshortname';
+        $updated = $email->update($data);
+        $this->assertEquals($updated->shortname, 'newshortname');
 
         // And swap it back.
         $data->shortname = 'shortname';
         $updated = $email->update($data);
-        $this->assertEqual($updated->shortname, 'shortname');
-
+        $this->assertEquals($updated->shortname, 'shortname');
     }
 
-    public function test_email_update_validation() {
+    public function test_email_update_validation_exception() {
         $email = $this->create_email();
         $data  = new stdClass();
 
@@ -112,14 +146,18 @@ class test_block_workflow_emails extends block_workflow_testlib {
         $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
                 $email, 'update', $data);
         unset($data->badfield);
+    }
 
+    public function test_email_update_validation() {
+        $email = $this->create_email();
+        $data  = new stdClass();
         // And change the shortname.
         $data->shortname = 'newshortname';
         $email->update($data);
         $this->compare_email($data, $email);
     }
 
-    public function test_email_duplicate_shortnames() {
+    public function test_email_duplicate_shortnames_exception() {
         // Create an e-mail with shortname 'shortname'.
         $this->create_email('shortname');
         $email = new block_workflow_email();
@@ -132,8 +170,17 @@ class test_block_workflow_emails extends block_workflow_testlib {
 
         $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
                 $email, 'create', $data);
+    }
 
-        // And change the shortname so that it works.
+    public function test_email_duplicate_shortnames() {
+        // Create an e-mail with shortname 'shortname'.
+        $this->create_email('shortname');
+        $email = new block_workflow_email();
+
+        // Create an object for the insert -- this shares the same shortname.
+        $data = new StdClass();
+        $data->subject   = 'subject';
+        $data->message   = 'message';
         $data->shortname = 'newshortname';
         $email->create($data);
 
@@ -157,10 +204,10 @@ class test_block_workflow_emails extends block_workflow_testlib {
 
         // And the shortname.
         $result = $reloader->load_email_shortname($email->shortname);
-        $this->assertIsA($result, 'block_workflow_email');
+        $this->assertInstanceOf('block_workflow_email', $result);
 
         $result = $reloader->require_email_shortname($email->shortname);
-        $this->assertIsA($result, 'block_workflow_email');
+        $this->assertInstanceOf('block_workflow_email', $result);
 
         // And with bad data.
         $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
@@ -170,7 +217,7 @@ class test_block_workflow_emails extends block_workflow_testlib {
                 $reloader, 'load_email_id', -1);
 
         $result = $reloader->load_email_shortname('invalidshortname');
-        $this->assertFalse($result);
+        $this->assertFalse((bool)$result);
         $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
                 $reloader, 'require_email_shortname', 'invalidshortname');
 
@@ -179,28 +226,28 @@ class test_block_workflow_emails extends block_workflow_testlib {
     public function test_email_listing() {
         // Initially we should have no emails.
         $list = block_workflow_email::load_emails();
-        $this->assertEqual(count($list), 0);
+        $this->assertEquals(count($list), 0);
 
         // Create a new e-mail.
         $emailone = $this->create_email('shortname');
 
         // Now 1.
         $list = block_workflow_email::load_emails();
-        $this->assertEqual(count($list), 1);
+        $this->assertEquals(count($list), 1);
 
         // Create another new e-mail.
         $emailtwo = $this->create_email('inewshortname');
 
         // Now 2.
         $list = block_workflow_email::load_emails();
-        $this->assertEqual(count($list), 2);
+        $this->assertEquals(count($list), 2);
 
         // And deleting the e-mail should give us one again.
         $emailone->delete();
 
         // Now 1.
         $list = block_workflow_email::load_emails();
-        $this->assertEqual(count($list), 1);
+        $this->assertEquals(count($list), 1);
     }
 
     public function test_email_not_used() {
@@ -209,12 +256,12 @@ class test_block_workflow_emails extends block_workflow_testlib {
 
         // Check that we get that e-mail back.
         $list = block_workflow_email::load_emails();
-        $this->assertEqual(count($list), 1);
+        $this->assertEquals(count($list), 1);
 
         // The template should not be in use.
         $check = array_shift($list);
-        $this->assertEqual($check->activecount, 0);
-        $this->assertEqual($check->completecount, 0);
+        $this->assertEquals($check->activecount, 0);
+        $this->assertEquals($check->completecount, 0);
 
         // We'll add this to a workflow so grab one, and a step.
         $workflow   = $this->create_workflow();
@@ -230,16 +277,16 @@ class test_block_workflow_emails extends block_workflow_testlib {
         // Check that it's marked as used.
         $list = block_workflow_email::load_emails();
         $check = array_shift($list);
-        $this->assertEqual($check->activecount, 1);
-        $this->assertEqual($check->completecount, 0);
+        $this->assertEquals($check->activecount, 1);
+        $this->assertEquals($check->completecount, 0);
 
         // The used_count (accurate count) should be 1.
         $count = $email->used_count();
-        $this->assertEqual($count, 1);
+        $this->assertEquals($count, 1);
 
         // This shouldn't be deletable.
         $deletable = $email->is_deletable();
-        $this->assertFalse($deletable);
+        $this->assertFalse((bool)$deletable);
 
         // Check that we throw an exception.
         $this->expect_exception_without_halting('block_workflow_exception',
@@ -258,16 +305,16 @@ class test_block_workflow_emails extends block_workflow_testlib {
         // Check that it's marked as used.
         $list = block_workflow_email::load_emails();
         $check = array_shift($list);
-        $this->assertEqual($check->activecount, 0);
-        $this->assertEqual($check->completecount, 1);
+        $this->assertEquals($check->activecount, 0);
+        $this->assertEquals($check->completecount, 1);
 
         // The used_count (accurate count) should be 1.
         $count = $email->used_count();
-        $this->assertEqual($count, 1);
+        $this->assertEquals($count, 1);
 
         // This shouldn't be deletable.
         $deletable = $email->is_deletable();
-        $this->assertFalse($deletable);
+        $this->assertFalse((bool)$deletable);
 
         // Check that we throw an exception.
         $this->expect_exception_without_halting('block_workflow_exception',
@@ -286,16 +333,16 @@ class test_block_workflow_emails extends block_workflow_testlib {
         // Check that it's marked as used.
         $list = block_workflow_email::load_emails();
         $check = array_shift($list);
-        $this->assertEqual($check->activecount, 1);
-        $this->assertEqual($check->completecount, 1);
+        $this->assertEquals($check->activecount, 1);
+        $this->assertEquals($check->completecount, 1);
 
         // The used_count (accurate count) should be 1.
         $count = $email->used_count();
-        $this->assertEqual($count, 2);
+        $this->assertEquals($count, 2);
 
         // This shouldn't be deletable.
         $deletable = $email->is_deletable();
-        $this->assertFalse($deletable);
+        $this->assertFalse((bool)$deletable);
 
         // Check that we throw an exception.
         $this->expect_exception_without_halting('block_workflow_exception',
@@ -314,12 +361,12 @@ class test_block_workflow_emails extends block_workflow_testlib {
         // Check that it's marked as used.
         $list = block_workflow_email::load_emails();
         $check = array_shift($list);
-        $this->assertEqual($check->activecount,   0);
-        $this->assertEqual($check->completecount, 0);
+        $this->assertEquals($check->activecount,   0);
+        $this->assertEquals($check->completecount, 0);
 
         // The used_count (accurate count) should be 0.
         $count = $email->used_count();
-        $this->assertEqual($count, 0);
+        $this->assertEquals($count, 0);
 
         // This shouldn't be deletable.
         $this->assertTrue($email->is_deletable());

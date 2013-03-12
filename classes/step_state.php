@@ -432,19 +432,16 @@ class block_workflow_step_state {
     /**
      * Return a set of changes for the specified or current state
      *
-     * @return  mixed               The database results, or null if no result was found
+     * @return  mixed
+     * The database results, or null if no result was found
      */
-    public function state_changes($stateid = null) {
-        if (!$stateid) {
-            $stateid = $this->id;
-        }
+    public static function state_changes($stateid) {
         global $DB;
         $sql = 'SELECT changes.*, ' . $DB->sql_fullname('u.firstname', 'u.lastname') . ' AS username
                 FROM {block_workflow_state_changes} AS changes
                 INNER JOIN {user} AS u ON u.id = changes.userid
                 WHERE changes.stepstateid = ?
                 ORDER BY changes.timestamp DESC';
-        return $DB->get_records_sql($sql,
-                array($stateid));
+        return $DB->get_records_sql($sql, array($stateid));
     }
 }
