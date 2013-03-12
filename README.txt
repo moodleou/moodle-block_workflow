@@ -17,4 +17,4 @@ complete the installation.
 If you are using this plugin, then you probably also want to install the workflow report:
 https://github.com/moodleou/moodle-report_workflow
 
-For more documentation, see http://docs.moodle.org/23/en/The_OU_workflow_system.
+For more documentation, see http://docs.moodle.org/24/en/The_OU_workflow_system.

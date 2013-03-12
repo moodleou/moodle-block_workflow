@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2013030400;
+$plugin->version   = 2013031200;
 $plugin->requires  = 2011120500;
 $plugin->cron      = 60;
 $plugin->component = 'block_workflow';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'v1';
+$plugin->release   = 'v1.1 for Moodle 2.2+';
