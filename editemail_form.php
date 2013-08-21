@@ -31,10 +31,10 @@ class email_edit extends moodleform {
     protected function definition() {
         $mform = $this->_form;
         $state = $this->_customdata['state'];
-
         $mform->addElement('header', 'general', get_string('emailsettings', 'block_workflow'));
 
-        $textoptions    = array('cols' => 80, 'rows' => 8);
+        $editoroptions = $this->_customdata['editoroptions'];
+
         // Template data.
         $mform->addElement('text',      'shortname',    get_string('shortname', 'block_workflow'));
         $mform->setType('shortname', PARAM_TEXT);
@@ -46,12 +46,13 @@ class email_edit extends moodleform {
         $mform->setType('subject', PARAM_TEXT);
         $mform->addRule('subject', null, 'required', null, 'client');
 
-        $mform->addElement('textarea',  'message',      get_string('emailmessage', 'block_workflow'), $textoptions);
-        $mform->setType('message', PARAM_TEXT);
+        $mform->addElement('editor',  'message', get_string('emailmessage', 'block_workflow'),
+                block_workflow_editor_options());
         $mform->addRule('message', null, 'required', null, 'client');
+        $mform->setType('message', PARAM_RAW);
 
-        $mform->addElement('hidden',    'emailid');
-        $mform->setType('id', PARAM_INT);
+        $mform->addElement('hidden', 'emailid');
+        $mform->setType('emailid', PARAM_INT);
         $this->add_action_buttons();
     }
 

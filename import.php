@@ -222,7 +222,7 @@ function clean_and_check_field_validity($fieldname, $xml, $noempty = true, $html
         $field = clean_param($field, PARAM_RAW);
     } else {
         $field = clean_param(trim((string) $xml->$fieldname), PARAM_CLEANHTML); // Not a great param type.
-        
+
     }
 
     if ($noempty && strlen($field) < 1) {

@@ -110,7 +110,8 @@ class block_workflow_automatic_step_finisher {
         $sql = "SELECT state.id AS stateid, state.stepid,
                         wf.id AS workflowid, wf.appliesto,
                         step.name AS stepname, step.autofinish, step.autofinishoffset,
-                        c.id AS courseid, cm.instance AS moduleid
+                        c.id AS courseid, c.shortname AS courseshortname,
+                        cm.instance AS moduleid
                 FROM {block_workflow_step_states} state
                 LEFT JOIN {block_workflow_steps} step ON step.id = state.stepid
                 LEFT JOIN {block_workflow_workflows} wf ON wf.id = step.workflowid
@@ -144,9 +145,15 @@ class block_workflow_automatic_step_finisher {
             $now = time();
             foreach ($activesteps as $key => $activestep) {
 
-                // If the step is not ready to be finished automayically, move to the next active step.
-                if ($this->is_ready_for_autofinish($activestep, $now)) {
-                    $readyautofinishsteps[$key] = $activestep;
+                try {
+                    // If the step is not ready to be finished automayically, move to the next active step.
+                    if ($this->is_ready_for_autofinish($activestep, $now)) {
+                        $readyautofinishsteps[$key] = $activestep;
+                    }
+                } catch(Exception $e) {
+                    mtrace('Workflow: Automatic step finisher failed to check if step should be finished. ' .
+                            'Step state id: ' . $activestep->stateid);
+                    mtrace($e->getMessage());
                 }
             }
         }
@@ -161,15 +168,24 @@ class block_workflow_automatic_step_finisher {
      */
     protected function is_ready_for_autofinish($activestep, $now) {
         global $DB;
-        list($dbtable, $dbfield) = explode('_', $activestep->autofinish);
 
-        // Set variable to the course id or module id.
-        if ($dbtable === 'course') {
+        list($dbtable, $dbfield) = explode(';', $activestep->autofinish);
+        if ($dbtable === 'vl_v_crs_version_pres') {
+            $relevantdate = $this->get_relevant_date_field($courseshortname, $dbfield);
+            if (!$relevantdate) {
+                return false;
+            }
+            $field = $relevantdate;
+        } else if ($dbtable === 'course') {
             $id = $activestep->courseid;
-        } else {
+            $field = $DB->get_field($dbtable, $dbfield, array('id' => $id));
+        } else if ($dbtable === 'quiz') {
             $id = $activestep->moduleid;
+            $field = $DB->get_field($dbtable, $dbfield, array('id' => $id));
+        } else {
+            throw new coding_exception('Unrecognised table name in auto-finish condition ' .
+                    $activestep->autofinish);
         }
-        $field = $DB->get_field($dbtable, $dbfield, array('id' => $id));
 
         $finishtime = $field + $activestep->autofinishoffset;
 
@@ -208,6 +224,22 @@ class block_workflow_automatic_step_finisher {
             $trace .= "The step '$activestep->stepname' with id=$activestep->stepid is now completed.\n";
         }
         return $trace;
+    }
+
+    /**
+     * Get the date in the relevant field and and convert it to timestamp
+     * @param string $courseshortname
+     * @param string $field, any date field 'yyyy-mm-dd' format
+     * @return int, if found timestamp (converted from the field), else 0
+     */
+    protected function get_relevant_date_field($courseshortname, $field) {
+        global $DB;
+        if ($rowofdata = $DB->get_record_sql(
+                'SELECT * FROM vl_v_crs_version_pres ' .
+                'WHERE vle_course_short_name =?', array($courseshortname), MUST_EXIST)) {
+            return strtotime($rowofdata->$field);
+        }
+        return 0;
     }
 
 }

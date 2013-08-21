@@ -82,6 +82,7 @@ class block_workflow_email {
         return array(
             'id',
             'message',
+            'messageformat',
             'shortname',
             'subject'
         );

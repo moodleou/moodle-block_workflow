@@ -45,6 +45,11 @@ defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
  * @property-read int       $autofinishoffset   The duration in seconds relative to $autofinish
  */
 class block_workflow_step {
+    const DAYS_BEFORE_QUIZ = -10;
+    const DAYS_AFTER_QUIZ = 10;
+    const DAYS_BEFORE_COURSE = -120;
+    const DAYS_AFTER_COURSE = 30;
+
     private $step       = null;
     private $workflow   = null;
     private $todos      = null;
@@ -95,6 +100,17 @@ class block_workflow_step {
         $this->autofinish           = $step->autofinish;
         $this->autofinishoffset     = $step->autofinishoffset;
         return $this;
+    }
+
+    /**
+     * Create a step object from a raw database row.
+     * @param stdClass $stepdata raw data, as returned by $DB->get_record('block_workflow_steps', ...);
+     * @return block_workflow_step the corresponding object.
+     */
+    public static function make($stepdata) {
+        $step = new block_workflow_step();
+        $step->_load($stepdata);
+        return $step;
     }
 
     /**
@@ -882,5 +898,75 @@ class block_workflow_step {
             $replaces['%%cmid%%'] = $context->instanceid;
         }
         return str_replace(array_keys($replaces), array_values($replaces), $this->instructions);
+    }
+
+    public static function get_autofinish_options($appliesto) {
+        global $DB;
+
+        $options = array();
+        $options['donotautomaticallyfinish'] = get_string('donotautomaticallyfinish', 'block_workflow');
+        if ($appliesto === 'course') {
+            // The string is stored in the database in the following format.
+            // {database table name};{field name with value as timestamp or
+            // date-string which can be converted to timestamp}.
+            // For instance, course;startdate, quiz;timeopen, quiz;timeclose
+            // 'vl_v_crs_version_pres;vle_student_open_date'.
+            $days = self::get_list_of_days(self::DAYS_BEFORE_COURSE, self::DAYS_AFTER_COURSE);
+
+            $options['course;startdate'] = get_string('coursestartdate', 'block_workflow');
+
+            // Check whether vl_v_crs_version_pres table exists.
+            $sql = "SELECT table_name FROM information_schema.tables
+                    WHERE table_name = 'vl_v_crs_version_pres'";
+            if ($DB->get_record_sql($sql)) {
+                $options['vl_v_crs_version_pres;vle_student_open_date'] = get_string('coursestudentopen', 'block_workflow');
+                $options['vl_v_crs_version_pres;vle_student_close_date'] = get_string('coursestudentclose', 'block_workflow');
+                $options['vl_v_crs_version_pres;vle_tutor_open_date'] = get_string('coursetutoropen', 'block_workflow');
+                $options['vl_v_crs_version_pres;vle_tutor_close_date'] = get_string('coursetutorclose', 'block_workflow');
+            }
+        } else {
+            $days = self::get_list_of_days(self::DAYS_BEFORE_QUIZ, self::DAYS_AFTER_QUIZ);
+
+            $options['quiz;timeopen'] = get_string('quizopendate', 'block_workflow');
+            $options['quiz;timeclose'] = get_string('quizclosedate', 'block_workflow');
+        }
+        return array($options, $days);
+    }
+
+    /**
+     * Returns an array of strings which starts from the maximum number of days before,
+     * which is a negative number. This increments by 1 until maximum number of days after
+     * has been reached. Each number is translated into a string. Negative numbers shows
+     * as 'N days before', 0 translated to 'same day as' and positive numbers are
+     * ranslated as 'N days after', whereby, singular and plural presentation of
+     * day (dys vs daY) is taken into account.
+     *
+     * @param int $daysbefore
+     * @param int $daysafter
+     * @return object $days, array of strings
+     */
+    private static function get_list_of_days($daysbefore, $dayafter) {
+        $days = array();
+        $secondsinday = 24*60*60;
+        for ($count = $daysbefore; $count <= $dayafter; $count++) {
+            if ($count < 0) {
+                $daysbefore = 'daysbefore';
+                if ($count === -1) {
+                    $daysbefore = 'daybefore';
+                }
+                $days[$count * $secondsinday] = get_string($daysbefore, 'block_workflow', abs($count));
+            }
+            if ($count == 0) {
+                $days[$count * $secondsinday] = get_string('dayas', 'block_workflow');
+            }
+            if ($count > 0) {
+                $daysafter = 'daysafter';
+                if ($count === 1) {
+                    $daysafter = 'dayafter';
+                }
+                $days[$count * $secondsinday] = get_string($daysafter, 'block_workflow', $count);
+            }
+        }
+        return $days;
     }
 }

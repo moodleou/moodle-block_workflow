@@ -70,9 +70,10 @@ if ($emailform->is_cancelled()) {
 } else if ($formdata = $emailform->get_data()) {
     // Form has been submitted.
     $data = new stdClass();
-    $data->shortname    = $formdata->shortname;
-    $data->subject      = $formdata->subject;
-    $data->message      = $formdata->message;
+    $data->shortname        = $formdata->shortname;
+    $data->subject          = $formdata->subject;
+    $data->message          = $formdata->message['text'];
+    $data->messageformat    = $formdata->message['format'];
 
     if ($formdata->emailid) {
         // Email id specified, so we're updating.
@@ -85,8 +86,13 @@ if ($emailform->is_cancelled()) {
 }
 
 // Set the form defaults.
-$email->emailid = $email->id;
-$emailform->set_data($email);
+ $email->emailid = $email->id;
+ $message = $email->message;
+ $email->message = array();
+ $email->message['text'] = $message;
+ $email->message['format'] = FORMAT_HTML;
+
+ $emailform->set_data($email);
 
 // Grab the renderer.
 $renderer = $PAGE->get_renderer('block_workflow');

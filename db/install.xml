@@ -9,7 +9,8 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="shortname"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Email shortname - for easy reference" PREVIOUS="id" NEXT="subject"/>
         <FIELD NAME="subject" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="The message subject" PREVIOUS="shortname" NEXT="message"/>
-        <FIELD NAME="message" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Message to be sent" PREVIOUS="subject"/>
+        <FIELD NAME="message" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Message to be sent" PREVIOUS="subject" NEXT="messageformat"/>
+        <FIELD NAME="messageformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Workflow email message text format." PREVIOUS="message"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="shortname"/>

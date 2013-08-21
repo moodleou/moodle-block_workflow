@@ -271,5 +271,5 @@ YUI.add('moodle-block_workflow-comments', function(Y) {
     }
 
 }, '@VERSION@', {
-    requires:['base','overlay', 'moodle-enrol-notification']
+    requires:['base','overlay', 'moodle-core-notification']
 });

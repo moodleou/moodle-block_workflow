@@ -300,7 +300,7 @@ class block_workflow_todo {
      * @return  An update block_workflow_todo record as returned by {@link load_todo}.
      */
     public static function toggle_task($todoid) {
-        $todo = new block_workflow_todo($todoid);;
+        $todo = new block_workflow_todo($todoid);
         return $todo->toggle();
     }
 

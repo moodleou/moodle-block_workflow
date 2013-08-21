@@ -160,8 +160,8 @@ class block_workflow_command_email extends block_workflow_command {
         $eventdata->userfrom    = get_admin();
         $eventdata->subject     = $email->email->subject;
         $eventdata->fullmessage = $email->email->message;
-        $eventdata->fullmessageformat   = FORMAT_PLAIN;
-        $eventdata->fullmessagehtml     = '';
+        $eventdata->fullmessageformat   = FORMAT_HTML;
+        $eventdata->fullmessagehtml     = $email->email->message;
         $eventdata->smallmessage        = $eventdata->fullmessage;
         $eventdata->contexturl          = get_context_url($email->context);
         $eventdata->contexturlname      = print_context_name($email->context, false, true);
@@ -223,22 +223,18 @@ class block_workflow_command_email extends block_workflow_command {
         $workflow = $step->workflow();
 
         // Replace %%workflowname%%.
-        $string  = str_replace('%%workflowname%%', $workflow->name, $string);
-        $subject = str_replace('%%workflowname%%', $workflow->name, $subject);
+        list($string, $subject) = $this->replace('%%workflowname%%', $workflow->name, $string, $subject);
 
         // Replace %%stepname%%.
-        $string  = str_replace('%%stepname%%', $step->name, $string);
-        $subject = str_replace('%%stepname%%', $step->name, $subject);
+        list($string, $subject) = $this->replace('%%stepname%%', $step->name, $string, $subject);
 
         // Replace %%contextname%%.
         $contextname = print_context_name($email->context, false, true);
-        $string  = str_replace('%%contextname%%', $contextname, $string);
-        $subject = str_replace('%%contextname%%', $contextname, $subject);
+        list($string, $subject) = $this->replace('%%contextname%%', $contextname, $string, $subject);
 
         // Replace %%contexturl%%.
         $contexturl = get_context_url($email->context);
-        $string  = str_replace('%%contexturl%%', $contexturl, $string);
-        $subject = str_replace('%%contexturl%%', $contexturl, $subject);
+        list($string, $subject) = $this->replace('%%contexturl%%', $contexturl, $string, $subject);
 
         // Replace %%coursename%%.
         if ($email->context->contextlevel == CONTEXT_COURSE) {
@@ -247,43 +243,55 @@ class block_workflow_command_email extends block_workflow_command {
             $parentcontextid = get_parent_contextid($email->context);
             $coursename = print_context_name(get_context_instance_by_id($parentcontextid), false, true);
         }
-        $string  = str_replace('%%coursename%%', $coursename, $string);
-        $subject = str_replace('%%coursename%%', $coursename, $subject);
+        list($string, $subject) = $this->replace('%%coursename%%', $coursename, $string, $subject);
 
         // Replace %%usernames%%.
         $usernames = array_map(create_function('$a', 'return fullname($a);'), $email->users);
-        $string  = str_replace('%%usernames%%', implode(', ', $usernames), $string);
-        $subject = str_replace('%%usernames%%', implode(', ', $usernames), $subject);
+        list($string, $subject) = $this->replace('%%usernames%%', implode(', ', $usernames), $string, $subject);
 
         // Replace %%currentusername%%.
         $currentusername = fullname($USER);
-        $string  = str_replace('%%currentusername%%', $currentusername, $string);
-        $subject = str_replace('%%currentusername%%', $currentusername, $subject);
+        list($string, $subject) = $this->replace('%%currentusername%%', $currentusername, $string, $subject);
 
         // Replace %%instructions%%.
-        $instructions = html_to_text($step->format_instructions($email->context), 0, false);
-        $string  = str_replace('%%instructions%%', $instructions, $string);
-        $subject = str_replace('%%instructions%%', $instructions, $subject);
+        $instructions = $step->format_instructions($email->context);
+        list($string, $subject) = $this->replace('%%instructions%%', $instructions, $string, $subject);
 
         // Replace %%tasks%%.
         $tasks   = array_map(create_function('$a', 'return $a->task;'), $step->todos());
-        $string  = str_replace('%%tasks%%', implode(', ', $tasks), $string);
-        $subject = str_replace('%%tasks%%', implode(', ', $tasks), $subject);
+        list($string, $subject) = $this->replace('%%tasks%%', implode(', ', $tasks), $string, $subject);
 
         // Replace %%comment%%.
         if ($state->state != BLOCK_WORKFLOW_STATE_ACTIVE) {
-            $comment = html_to_text($state->comment, 0, false);
+            $comment = $state->comment;
         } else if (!empty($state->previouscomment)) {
-            $comment = html_to_text($state->previouscomment, 0, false);
+            $comment = $state->previouscomment;
         } else {
             $comment = '';
         }
-        $string  = str_replace('%%comment%%', $comment, $string);
-        $subject = str_replace('%%comment%%', $comment, $subject);
+        list($string, $subject) = $this->replace('%%comment%%', $comment, $string, $subject);
 
         // Re-assign the message.
         $email->email->message = $string;
         $email->email->subject = $subject;
+    }
+
+    /**
+     * Replace placeholders within strings with a given value.
+     *
+     * @param string $placeholder the placeholder to replace.
+     * @param string $value the value to replace it with.
+     * @param string $string  message body in HTML format.
+     * @param string $subject message subject (plain text).
+     * @return array update $string and $subject.
+     */
+    private function replace($placeholder, $value, $string, $subject) {
+        // We assume that the $string (the email body) is in HTML format
+        // and therefore, we need to pass this through s() function.
+        return array(
+            str_replace($placeholder, s($value), $string),
+            str_replace($placeholder, $value, $subject)
+        );
     }
 
     /**

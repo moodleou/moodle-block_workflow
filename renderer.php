@@ -499,6 +499,8 @@ class block_workflow_renderer extends plugin_renderer_base {
         $table->head[] = get_string('stepno', 'block_workflow');
         $table->head[] = get_string('stepname', 'block_workflow');
         $table->head[] = get_string('stepinstructions', 'block_workflow');
+        $table->head[] = get_string('finish', 'block_workflow');
+        $table->head[] = get_string('doerstitle', 'block_workflow');
         $table->head[] = '';
 
         // Retrieve a list of steps etc.
@@ -506,6 +508,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         $info = new stdClass();
         $info->stepcount    = count($steps);
         $info->workflowid   = $workflow->id;
+        $info->appliesto    = $workflow->appliesto;
 
         // The image to add a new step.
         $add = html_writer::empty_tag('img', array('src'   => $this->output->pix_url('t/add'),
@@ -516,7 +519,7 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // Add a step to the beginning.
         $addempty = new html_table_cell();
-        $addempty->colspan = 3;
+        $addempty->colspan = 5;
         $addcell = new html_table_cell(html_writer::link(new moodle_url('/blocks/workflow/editstep.php',
                 array('workflowid' => $workflow->id, 'beforeafter' => -1)), $add));
         $addcell->attributes['class'] = 'mdl-align';
@@ -533,7 +536,7 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // Add option to add a new step.
         $infocell  = new html_table_cell($this->atendgobackto($workflow));
-        $infocell->colspan = 3;
+        $infocell->colspan = 5;
         $infocell->attributes['class'] = 'mdl-align';
 
         $url = new moodle_url('/blocks/workflow/editstep.php', array('workflowid' => $workflow->id));
@@ -564,6 +567,14 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // Instructions.
         $cell = new html_table_cell(trim(format_text($step->instructions, $step->instructionsformat)));
+        $row->cells[] = $cell;
+
+        // Automatically finish.
+        $cell = new html_table_cell($this->workflow_step_auto_finish($step, $info->appliesto));
+        $row->cells[] = $cell;
+
+        // Roles reponsible for this step.
+        $cell = new html_table_cell($this->workflow_step_doers($step));
         $row->cells[] = $cell;
 
         // Modification.
@@ -620,10 +631,67 @@ class block_workflow_renderer extends plugin_renderer_base {
                 )));
         }
 
+        
         $cell = new html_table_cell(implode(' ', $actions));
         $row->cells[] = $cell;
 
         return $row;
+    }
+
+    /**
+     * Return a sting that indicates whether a given step is set to be finish automatically
+     * @param object $stepdata raw data about the step, loaded from the DB.
+     * @return string textual description of the settings.
+     */
+    protected function workflow_step_auto_finish($step, $appliesto) {
+        // Do not finish this step automatically.
+        if (!$step->autofinish || $step->autofinish == 'donotautomaticallyfinish') {
+            return get_string('donotautomaticallyfinish', 'block_workflow');
+        }
+
+        list($options, $days) = block_workflow_step::get_autofinish_options($appliesto);
+
+        // Days after certain condition.
+        if ($step->autofinishoffset > 0) {
+            $days = $step->autofinishoffset / (24 * 60 * 60);
+            if ($days == 1) {
+                $daysstring = get_string('dayafter', 'block_workflow', $days);
+            } else {
+                $daysstring = get_string('daysafter', 'block_workflow', $days);
+            }
+        // Days before certain condition.
+        } else if ($step->autofinishoffset < 0) {
+            $days = abs($step->autofinishoffset) / (24 * 60 * 60);
+            if ($days == 1) {
+                $daysstring = get_string('daybefore', 'block_workflow', $days);
+            } else {
+                $daysstring = get_string('daysbefore', 'block_workflow', $days);
+            }
+        // Same day as certain condition.
+        } else {
+            $daysstring = get_string('dayas', 'block_workflow');
+        }
+
+        list($table, $field) = explode(';', $step->autofinish);
+        $key = $table . ';' . $field;
+        if (array_key_exists($key, $options)) {
+            return $daysstring . ' ' . $options[$key];
+        }
+        return '';
+    }
+
+    /**
+     * Get all roles that are doers of a given step
+     * @param object $stepdata raw data about the step, loaded from the DB.
+     * @return string comma-separated list of role names.
+     */
+    protected function workflow_step_doers($stepdata) {
+        $step = block_workflow_step::make($stepdata);
+        $doernames = array();
+        foreach ($step->roles() as $doer) {
+            $doernames[] = $doer->name;
+        }
+        return implode(', ', $doernames);
     }
 
     protected function workflow_information($workflow) {
@@ -1270,5 +1338,4 @@ class block_workflow_renderer extends plugin_renderer_base {
         $output .= $this->output->container(get_string('finishstepinstructions', 'block_workflow'));
         return $output;
     }
-
 }

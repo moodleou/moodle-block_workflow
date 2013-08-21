@@ -23,6 +23,7 @@
  */
 
 // Core strings.
+$string['workflow:addinstance'] = 'Add a new workflow block';
 $string['pluginname']                   = 'Workflows';
 $string['workflow']                     = 'Workflow';
 
@@ -61,6 +62,10 @@ $string['confirmjumptostep']            = 'Are you sure that you want to jump to
 $string['confirmstepdeletetitle']       = 'Delete step \'{$a}\'?';
 $string['confirmworkflowdeletetitle']   = 'Delete workflow \'{$a}\'?';
 $string['contexthasactiveworkflow']     = 'This context already has an active workflow.';
+$string['coursestudentclose']           = 'the course is closed to students';
+$string['coursestudentopen']            = 'the course is opened to students';
+$string['coursetutorclose']             = 'the course is closed to tutors';
+$string['coursetutoropen']              = 'the course is opened to tutors';
 $string['coursestartdate']              = 'the course start date';
 $string['create']                       = 'Create';
 $string['createemail']                  = 'Create new e-mail template';
@@ -73,6 +78,11 @@ $string['createworkflow']               = 'Create new workflow';
 $string['currentlyinuseby']             = 'This workflow is currently in use by';
 
 $string['days']                         = 'Days';
+$string['dayas']                        = 'same day as';
+$string['dayafter']                     = '{$a} day after';
+$string['daysafter']                    = '{$a} days after';
+$string['daybefore']                    = '{$a} day before';
+$string['daysbefore']                   = '{$a} days before';
 $string['defaultonactivescript']        = '# You may place a set of actions to complete when marking this step active here';
 $string['defaultoncompletescript']      = '# You may place a set of actions to complete when marking this step finished here';
 $string['defaultstepdescription']       = 'A description for this step should go here';
@@ -93,7 +103,7 @@ $string['deleteworkflowcheck']          = 'Are you absolutely sure that you want
 $string['description']                  = 'Description';
 $string['disabled']                     = 'Disabled';
 $string['disableworkflow']              = 'Disable workflow';
-$string['doerstitle']                   = 'Roles responsible for this step';
+$string['doerstitle']                   = 'Roles';
 $string['doertitle']                    = 'Roles responsible for this step';
 $string['donotautomaticallyfinish']     = 'Do not automatically finish';
 
@@ -124,6 +134,7 @@ $string['enableworkflow']               = 'Enable workflow';
 $string['export']                       = 'Export';
 $string['exportworkflow']               = 'Export workflow';
 
+$string['finish']                       = 'Finish';
 $string['finishstep']                   = 'Finish step';
 $string['finishstepautomatically']      = 'This step was automatically finished by workflow system at {$a}.';
 $string['finishstepfor']                = 'Finish step \'{$a->stepname}\' on {$a->contextname}';

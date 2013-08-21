@@ -48,6 +48,10 @@ class auto_finish_steps_test extends block_workflow_automatic_step_finisher {
     public function finish_steps_automatically($readyautofinishsteps) {
         return parent::finish_steps_automatically($readyautofinishsteps);
     }
+    public function get_relevant_date_field($courseshortname, $field) {
+        return parent::get_relevant_date_field($courseshortname, $field);
+    }
+
 }
 
 class block_workflow_automatic_step_finisher_test extends advanced_testcase {
@@ -75,7 +79,7 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
      * @param string $appliesto
      */
     private function create_a_workflow_with_one_step($autofinishoffset,
-                            $autofinish = 'course_startdate', $appliesto = 'course') {
+                            $autofinish = 'course;startdate', $appliesto = 'course') {
         // Create a new workflow object.
         $workflow = new block_workflow_workflow();
         $data = new stdClass();
@@ -118,6 +122,7 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
                         'autofinish' => $step->autofinish,
                         'autofinishoffset' => $step->autofinishoffset,
                         'courseid' => $course->id,
+                        'courseshortname' => $course->shortname,
                         'moduleid' => $cmid)
                     );
     }
@@ -146,12 +151,31 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $course2 = $generator->create_course(array('shortname' => 'K123-12J', 'startdate' => $timestamp1));
         $coursecontext2 = context_course::instance($course2->id);
 
+        // Cerate an vl_v_crs_version_pres table
+         $DB->execute("CREATE TABLE vl_c_crs_version_pres_a " .
+                 "(vle_course_short_name VARCHAR, vle_student_open_date DATE)");
+         $DB->execute("CREATE TABLE vl_c_crs_version_pres_b " .
+                 "(vle_course_short_name VARCHAR, vle_student_open_date DATE)");
+         $DB->execute("CREATE OR REPLACE VIEW vl_v_crs_version_pres AS
+                 SELECT * FROM vl_c_crs_version_pres_a");
+
+        // Insert data to the above table
+        $courseshortname = 'M123-12J';
+        $studentopendate = '2013-04-11';
+         $DB->execute("INSERT INTO vl_c_crs_version_pres_a (vle_course_short_name, vle_student_open_date) " .
+                 "VALUES ('$courseshortname', '$studentopendate')");
+
+        $courseondataloadtable = $DB->get_record_sql(
+                'SELECT * FROM vl_v_crs_version_pres ' .
+                'WHERE vle_course_short_name =?', array($courseshortname), MUST_EXIST);
+
         // Create a new workflow object which applies to course.
         list($courseworkflow, $step1) = $this->create_a_workflow_with_one_step($after5days);
 
         // Required DB tables are not populated and therefore following methods return empty arrays.
         $activesteps = $this->stepfinisher->get_all_active_steps();
         $readysteps = $this->stepfinisher->get_ready_autofinish_steps($activesteps);
+
         $this->assertEmpty($activesteps);
         $this->assertEmpty($readysteps);
 
@@ -167,7 +191,8 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         // Get all active steps. We have populated.
         $readysteps = $this->stepfinisher->get_ready_autofinish_steps($activesteps);
         $this->assertNotEmpty($activesteps);
-        $this->assertEmpty($readysteps);
+
+        $course1->vle_student_open_date = strtotime($courseondataloadtable->vle_student_open_date);
 
         // Create expected objects for active steps and test them against the actual objects.
         $expectedactivesteps = $this->get_expected_active_step($state1, $step1, 'course', $course1);
@@ -187,7 +212,7 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $this->assertEquals($expectedactivesteps, $activesteps);
 
         // Create a new workflow object which applies to quiz.
-        list($quizworkflow, $step1q) = $this->create_a_workflow_with_one_step($before5days, 'quiz_timeopen', 'quiz');
+        list($quizworkflow, $step1q) = $this->create_a_workflow_with_one_step($before5days, 'quiz;timeopen', 'quiz');
 
         // Add to context and check if the step is active.
         $state1q = $quizworkflow->add_to_context($quizcontext1->id);
@@ -220,5 +245,10 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $this->assertEquals(1, count($newactivesteps));
         $readysteps = $this->stepfinisher->get_ready_autofinish_steps($newactivesteps);
         $this->assertEmpty($readysteps);
+
+        // Check that we get the relevant date field.
+        // Check that we convert the date format to timestamp correctly.
+        $datafield = $this->stepfinisher->get_relevant_date_field($course1->shortname, 'vle_student_open_date');
+        $this->assertEquals(strtotime('2013-04-11'), $datafield);
     }
 }
