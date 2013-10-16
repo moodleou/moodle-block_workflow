@@ -131,13 +131,14 @@ function block_workflow_appliesto($appliesto) {
  */
 function block_workflow_contextlevel_roles($contextlevel) {
     global $DB;
+
     $sql = "SELECT DISTINCT roles.*
             FROM {role_context_levels} cl
             INNER JOIN {role} roles ON roles.id = cl.roleid
             WHERE cl.contextlevel = ?
             ORDER BY roles.sortorder ASC
             ";
-    return $DB->get_records_sql($sql, array($contextlevel));
+    return role_fix_names($DB->get_records_sql($sql, array($contextlevel)));
 }
 
 /**

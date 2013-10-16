@@ -863,13 +863,13 @@ class block_workflow_step {
         // Retrieve a list of the roles in use.
         // We join to the role table here to retrieve the role name data to
         // avoid additional queries later.
-        $sql = 'SELECT *
+        $sql = 'SELECT r.*
                 FROM {block_workflow_step_doers} d
                 INNER JOIN {role} r ON r.id = d.roleid
                 WHERE d.stepid = ?
                 ORDER BY r.shortname ASC';
 
-        return $DB->get_records_sql($sql, array($stepid));
+        return role_fix_names($DB->get_records_sql($sql, array($stepid)));
     }
 
     /**
@@ -897,7 +897,9 @@ class block_workflow_step {
         if ($context->contextlevel == CONTEXT_MODULE) {
             $replaces['%%cmid%%'] = $context->instanceid;
         }
-        return str_replace(array_keys($replaces), array_values($replaces), $this->instructions);
+        $instructions = str_replace(array_keys($replaces), array_values($replaces), $this->instructions);
+        return format_text($instructions, $this->instructionsformat,
+                array('noclean' => true, 'context' => $context));
     }
 
     public static function get_autofinish_options($appliesto) {

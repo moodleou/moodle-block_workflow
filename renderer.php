@@ -51,7 +51,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         // Create the title.
         $output .= html_writer::tag('h3', get_string('activetasktitle', 'block_workflow'));
 
-        $output .= html_writer::tag('p', $state->step()->name);
+        $output .= html_writer::tag('p', format_string($state->step()->name));
 
         // Roles overview.
         if ($roles = $state->step()->roles()) {
@@ -66,7 +66,7 @@ class block_workflow_renderer extends plugin_renderer_base {
                 if (user_has_role_assignment($USER->id, $role->id, $context->id)) {
                     $who = get_string('youandanyother', 'block_workflow');
                 }
-                $whoelse[] = $role->name;
+                $whoelse[] = $role->localname;
             }
 
             if (empty($who)) {
@@ -99,7 +99,9 @@ class block_workflow_renderer extends plugin_renderer_base {
         // Comments.
         $output .= html_writer::tag('h3', get_string('comments', 'block_workflow'));
         $commentsblock = html_writer::start_tag('div', array('class' => 'block_workflow_comments'));
-        if ($commenttext = shorten_text($state->comment, BLOCK_WORKFLOW_MAX_COMMENT_LENGTH)) {
+        $commenttext = shorten_text(format_text($state->comment, $state->commentformat,
+                array('context' => $state->context())), BLOCK_WORKFLOW_MAX_COMMENT_LENGTH);
+        if ($commenttext) {
             $commentsblock .= $commenttext;
         } else {
             $commentsblock .= get_string('nocomments', 'block_workflow');
@@ -160,7 +162,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         $todoattribs = array();
 
         // The contents of the list item.
-        $text = $todo->task;
+        $text = format_string($todo->task);
 
         // Determine whether the task has been completed.
         if ($todo->userid) {
@@ -217,14 +219,14 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // The manage workflows section.
         $output .= $this->box_start('generalbox boxwidthwide boxaligncenter', 'manage');
-        $output .= $this->output->heading(format_string(get_string('manageworkflows', 'block_workflow')));
+        $output .= $this->output->heading(get_string('manageworkflows', 'block_workflow'));
         $output .= html_writer::tag('p', get_string('managedescription', 'block_workflow'), array('class' => 'mdl-align'));
         $output .= $this->list_workflows($workflows);
         $output .= $this->box_end();
 
         // The manage workflows section.
         $output .= $this->box_start('generalbox boxwidthwide boxaligncenter', 'manage');
-        $output .= $this->output->heading(format_string(get_string('manageemails', 'block_workflow')));
+        $output .= $this->output->heading(get_string('manageemails', 'block_workflow'));
         $output .= html_writer::tag('p', get_string('emaildescription', 'block_workflow'), array('class' => 'mdl-align'));
         $output .= $this->list_emails($emails);
 
@@ -261,7 +263,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         }
 
         // Create a new workflow.
-        $emptycell  = new html_table_cell();
+        $emptycell = new html_table_cell();
         $emptycell->colspan = 3;
         $actions = array();
         $add = html_writer::empty_tag('img', array('src'   => $this->output->pix_url('t/add'),
@@ -299,11 +301,11 @@ class block_workflow_renderer extends plugin_renderer_base {
         $row->attributes['class']   = 'workflow';
 
         // Shortname.
-        $cell = new html_table_cell($workflow->shortname);
+        $cell = new html_table_cell(s($workflow->shortname));
         $row->cells[] = $cell;
 
         // Workflow name.
-        $cell = new html_table_cell($workflow->name);
+        $cell = new html_table_cell(format_string($workflow->name));
         $row->cells[] = $cell;
 
         // Applies to.
@@ -437,11 +439,11 @@ class block_workflow_renderer extends plugin_renderer_base {
         $row->attributes['class']   = 'email';
 
         // Shortname.
-        $cell = new html_table_cell($email->shortname);
+        $cell = new html_table_cell(s($email->shortname));
         $row->cells[] = $cell;
 
         // Subject.
-        $cell = new html_table_cell($email->subject);
+        $cell = new html_table_cell(format_string($email->subject));
         $row->cells[] = $cell;
 
         // View/Edit steps.
@@ -491,7 +493,7 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // List of steps.
         $output .= $this->box_start('generalbox boxwidthwide boxaligncenter', 'manage');
-        $output .= $this->output->heading(format_string(get_string('workflowsteps', 'block_workflow')));
+        $output .= $this->output->heading(get_string('workflowsteps', 'block_workflow'));
 
         // Set up the table and it's headers.
         $table = $this->setup_table();
@@ -566,7 +568,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         $row->cells[] = $cell;
 
         // Instructions.
-        $cell = new html_table_cell(trim(format_text($step->instructions, $step->instructionsformat)));
+        $cell = new html_table_cell(format_text($step->instructions, $step->instructionsformat));
         $row->cells[] = $cell;
 
         // Automatically finish.
@@ -689,7 +691,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         $step = block_workflow_step::make($stepdata);
         $doernames = array();
         foreach ($step->roles() as $doer) {
-            $doernames[] = $doer->name;
+            $doernames[] = $doer->localname;
         }
         return implode(', ', $doernames);
     }
@@ -698,13 +700,13 @@ class block_workflow_renderer extends plugin_renderer_base {
         $output = '';
 
         // Header and general information.
-        $output .= $this->output->heading(format_string(get_string('workflowinformation', 'block_workflow')), 3, 'title header');
+        $output .= $this->output->heading(get_string('workflowinformation', 'block_workflow'), 3, 'title header');
 
         $table = $this->setup_table();
         // Workflow name and shortname.
         $row = new html_table_row(array(get_string('name', 'block_workflow')));
         $cell = new html_table_cell();
-        $data = array('name' => $workflow->name, 'shortname' => $workflow->shortname);
+        $data = array('name' => format_string($workflow->name), 'shortname' => s($workflow->shortname));
         $cell->text = get_string('nameshortname', 'block_workflow', $data);
         $row->cells[] = $cell;
         $table->data[] = $row;
@@ -755,7 +757,7 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // Start the box.
         $output .= $this->box_start('generalbox boxwidthwide boxaligncenter', 'manage');
-        $output .= $this->output->heading(format_string(get_string('workflowsettings', 'block_workflow')));
+        $output .= $this->output->heading(get_string('workflowsettings', 'block_workflow'));
 
         // Setup the table.
         $table = $this->setup_table();
@@ -764,28 +766,28 @@ class block_workflow_renderer extends plugin_renderer_base {
         // Shortname.
         $row = new html_table_row(array(
             get_string('shortname', 'block_workflow'),
-            $workflow->shortname
+            s($workflow->shortname),
         ));
         $table->data[] = $row;
 
         // Name.
         $row = new html_table_row(array(
             get_string('name', 'block_workflow'),
-            $workflow->name
+            format_string($workflow->name),
         ));
         $table->data[] = $row;
 
         // Description.
         $row = new html_table_row(array(
             get_string('description', 'block_workflow'),
-            $workflow->description
+            format_text($workflow->description, $workflow->descriptionformat),
         ));
         $table->data[] = $row;
 
         // Applies to.
         $row = new html_table_row(array(
             get_string('thisworkflowappliesto', 'block_workflow'),
-            block_workflow_appliesto($workflow->appliesto)
+            block_workflow_appliesto($workflow->appliesto),
         ));
         $table->data[] = $row;
 
@@ -852,7 +854,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         $output = '';
 
         // Title area.
-        $output .= $this->output->heading(format_string(get_string('todotitle', 'block_workflow')), 3, 'title header');
+        $output .= $this->output->heading(get_string('todotitle', 'block_workflow'), 3, 'title header');
 
         // The to-do list.
         $table = $this->setup_table();
@@ -884,7 +886,7 @@ class block_workflow_renderer extends plugin_renderer_base {
     }
     protected function step_todolist_item(stdClass $task) {
         $row    = new html_table_row();
-        $name   = new html_table_cell($task->task);
+        $name   = new html_table_cell(format_string($task->task));
         $actions = array();
 
         $url    = new moodle_url('/blocks/workflow/edittask.php', array('id' => $task->id));
@@ -926,18 +928,19 @@ class block_workflow_renderer extends plugin_renderer_base {
         $row    = new html_table_row(array($name, $actions));
         return $row;
     }
+
     public function step_doers($roles, $doers, $stepid) {
         $output = '';
 
         // Title area.
-        $output .= $this->output->heading(format_string(get_string('doertitle', 'block_workflow')), 3, 'title header');
+        $output .= $this->output->heading(get_string('doertitle', 'block_workflow'), 3, 'title header');
 
         // The to-do list.
         $table = $this->setup_table();
         $table->head[] = get_string('roles', 'block_workflow');
         $table->head[] = '';
 
-        $activedoers = array_map(create_function('$a', 'return $a->roleid;'), $doers);
+        $activedoers = array_map(create_function('$a', 'return $a->id;'), $doers);
 
         foreach ($roles as $role) {
             if (in_array($role->id, $activedoers)) {
@@ -955,7 +958,7 @@ class block_workflow_renderer extends plugin_renderer_base {
     }
     protected function step_doer($role, $stepid) {
         $row    = new html_table_row();
-        $name   = new html_table_cell($role->name);
+        $name   = new html_table_cell($role->localname);
 
         $url = new moodle_url('/blocks/workflow/togglerole.php',
                 array('sesskey' => sesskey(), 'roleid' => $role->id, 'stepid' => $stepid));
@@ -1006,7 +1009,7 @@ class block_workflow_renderer extends plugin_renderer_base {
     public function clone_workflow_instructions($workflow) {
         $output = '';
         $output .= $this->output->heading(
-                get_string('cloneworkflowname', 'block_workflow', $workflow->shortname), 1, 'title');
+                get_string('cloneworkflowname', 'block_workflow', s($workflow->shortname)), 1, 'title');
         $output .= $this->output->container(get_string('cloneworkflowinstructions', 'block_workflow'));
         return $output;
     }
@@ -1088,8 +1091,8 @@ class block_workflow_renderer extends plugin_renderer_base {
             $a = array();
             $url = new moodle_url('/blocks/workflow/overview.php',
                     array('contextid' => $parentcontextid, 'workflowid' => $p->id));
-            $a['contexttype']   = get_contextlevel_name($context->contextlevel);
-            $a['overviewurl']   = $url->out();
+            $a['contexttype'] = context_helper::get_level_name($context->contextlevel);
+            $a['overviewurl'] = $url->out();
             $output .= get_string('previousworkflow', 'block_workflow', $a);
         } else {
             // No workflow was previously assigned.
@@ -1117,7 +1120,7 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // Add the box, title and description.
         $output .= $this->box_start('generalbox boxwidthwide boxaligncenter', 'block-workflow-overview');
-        $output .= $this->output->heading(format_string(get_string('overview', 'block_workflow')));
+        $output .= $this->output->heading(get_string('overview', 'block_workflow'));
 
         $table = $this->setup_table();
         $table->attributes['class'] = 'boxaligncenter';
@@ -1188,20 +1191,20 @@ class block_workflow_renderer extends plugin_renderer_base {
         $row->cells[] = $cell;
 
         // Step Name.
-        $cell = new html_table_cell($stepstate->name);
+        $cell = new html_table_cell(format_string($stepstate->name));
         $cell->attributes['class'] = 'mdl-align';
         $row->cells[] = $cell;
 
         // Comments.
         $cell = new html_table_cell();
-        if ($cell->text  = $stepstate->comment) {
-            if ($history = $this->workflow_overview_step_history($stepstate->stateid)) {
-                $cell->text .= print_collapsible_region($history, 'historyinfo',
-                        'history-' . $stepstate->id, get_string('state_history', 'block_workflow'),
-                        '', true, true);
-            }
-        } else {
+        $cell->text = format_text($stepstate->comment, $stepstate->commentformat, array('context' => $context));
+        if (!$cell->text) {
             $cell->text  = get_string('nocomment', 'block_workflow');
+        }
+        if ($history = $this->workflow_overview_step_history($stepstate->stateid)) {
+            $cell->text .= print_collapsible_region($history, 'historyinfo',
+                    'history-' . $stepstate->id, get_string('state_history', 'block_workflow'),
+                    '', true, true);
         }
         $row->cells[] = $cell;
 

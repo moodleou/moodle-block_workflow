@@ -293,6 +293,7 @@ class block_workflow_step_state {
             }
 
             $nextstate->previouscomment = $this->comment; // Hack alert!
+            $nextstate->previouscommentformat = $this->commentformat;
             $nextstate->change_status(BLOCK_WORKFLOW_STATE_ACTIVE);
         }
 
