@@ -171,7 +171,7 @@ class block_workflow_automatic_step_finisher {
 
         list($dbtable, $dbfield) = explode(';', $activestep->autofinish);
         if ($dbtable === 'vl_v_crs_version_pres') {
-            $relevantdate = $this->get_relevant_date_field($courseshortname, $dbfield);
+            $relevantdate = $this->get_relevant_date_field($activestep->courseshortname, $dbfield);
             if (!$relevantdate) {
                 return false;
             }
