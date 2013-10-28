@@ -307,12 +307,12 @@ class block_workflow_steps_test extends block_workflow_testlib {
         $this->assertEquals('array', gettype($return));
 
         // We've only added one role.
-        $this->assertEqualS(count($return), 1);
+        $this->assertEquals(count($return), 1);
 
         // Grab the first (and only entry) and check that it's roleid
         // matches the manager role's id.
         $thisrole = array_shift($return);
-        $this->assertEqualS($thisrole->roleid, $managerid);
+        $this->assertEquals($thisrole->id, $managerid);
 
         // Add a second role.
         $teacherid = $DB->get_field('role', 'id', array('shortname' => 'teacher'));
@@ -342,7 +342,7 @@ class block_workflow_steps_test extends block_workflow_testlib {
         // Grab the first (and only entry) and check that it's now the role
         // matches the teacher role's id.
         $thisrole = array_shift($return);
-        $this->assertEquals($thisrole->roleid, $teacherid);
+        $this->assertEquals($thisrole->id, $teacherid);
 
         // Finally remove the teacher role.
         $return = $step->toggle_role($teacherid);
