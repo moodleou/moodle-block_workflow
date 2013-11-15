@@ -369,6 +369,7 @@ class block_workflow_step_state {
         $a->comment = $state->comment;
         $nextstate->previouscomment =
                 get_string('jumptostepcommentaddition', 'block_workflow', $a); // Hack alert!
+        $nextstate->previouscommentformat = $state->commentformat;
         $nextstate->change_status(BLOCK_WORKFLOW_STATE_ACTIVE);
 
         $transaction->allow_commit();

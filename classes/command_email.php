@@ -285,6 +285,7 @@ class block_workflow_command_email extends block_workflow_command {
             $format = $state->previouscommentformat;
         } else {
             $comment = '';
+            $format = FORMAT_HTML;
         }
         $string = str_replace('%%comment%%', format_text($comment, $format,
                 array('context' => $email->context)), $string);
