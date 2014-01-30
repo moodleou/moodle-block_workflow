@@ -33,7 +33,7 @@ require_login();
 require_sesskey();
 
 // Require the workflow:editdefinitions capability.
-require_capability('block/workflow:editdefinitions', get_context_instance(CONTEXT_SYSTEM));
+require_capability('block/workflow:editdefinitions', context_system::instance());
 
 // Grab the step.
 $step = new block_workflow_step($stepid);

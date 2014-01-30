@@ -29,12 +29,12 @@ require_once($CFG->libdir . '/adminlib.php');
 // This page is part of the workflow block settings system.
 admin_externalpage_setup('blocksettingworkflow');
 
-$PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
+$PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/blocks/workflow/import.php');
 
 require_login();
-require_capability('block/workflow:editdefinitions', get_context_instance(CONTEXT_SYSTEM));
+require_capability('block/workflow:editdefinitions', context_system::instance());
 
 // Moodle form.
 $importform = new import_workflow();

@@ -174,7 +174,7 @@ class block_workflow_step_state {
      * @return Context Object The context that this state is associated with
      */
     public function context() {
-        return get_context_instance_by_id($this->contextid);
+        return context::instance_by_id($this->contextid);
     }
 
     /**

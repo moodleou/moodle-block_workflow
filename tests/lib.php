@@ -180,7 +180,7 @@ class block_workflow_testlib extends advanced_testcase {
             $cm->id         = $DB->insert_record('course_modules', $cm);
 
             // And create a context for it.
-            get_context_instance(CONTEXT_MODULE, $cm->id);
+            context_module::instance($cm->id);
         }
     }
 

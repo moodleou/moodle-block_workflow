@@ -32,13 +32,13 @@ admin_externalpage_setup('blocksettingworkflow');
 require_login();
 
 // Require the workflow:editdefinitions capability.
-require_capability('block/workflow:editdefinitions', get_context_instance(CONTEXT_SYSTEM));
+require_capability('block/workflow:editdefinitions', context_system::instance());
 
 // Page settings.
 $title = get_string('manageworkflows', 'block_workflow');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
-$PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
+$PAGE->set_context(context_system::instance());
 
 // Grab the renderer.
 $renderer       = $PAGE->get_renderer('block_workflow');

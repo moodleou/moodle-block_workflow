@@ -34,10 +34,10 @@ require_login();
 require_sesskey();
 
 // Require the workflow:manage capability.
-require_capability('block/workflow:manage', get_context_instance(CONTEXT_SYSTEM));
+require_capability('block/workflow:manage', context_system::instance());
 
 
-$PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
+$PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/blocks/workflow/movestep.php', array('stepid' => $stepid, 'direction' => $direction));
 

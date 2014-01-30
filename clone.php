@@ -36,7 +36,7 @@ admin_externalpage_setup('blocksettingworkflow');
 require_login();
 
 // Require the workflow:editdefinitions capability.
-require_capability('block/workflow:editdefinitions', get_context_instance(CONTEXT_SYSTEM));
+require_capability('block/workflow:editdefinitions', context_system::instance());
 
 // Grab a workflow object.
 $workflow   = new block_workflow_workflow($workflowid);

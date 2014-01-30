@@ -1083,7 +1083,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         }
 
         $output  = '';
-        $context = get_context_instance_by_id($parentcontextid);
+        $context = context::instance_by_id($parentcontextid);
 
         if ($previous) {
             $p = array_shift($previous);

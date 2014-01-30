@@ -37,7 +37,7 @@ admin_externalpage_setup('blocksettingworkflow');
 require_login();
 
 // Require the workflow:editdefinitions capability.
-require_capability('block/workflow:editdefinitions', get_context_instance(CONTEXT_SYSTEM));
+require_capability('block/workflow:editdefinitions', context_system::instance());
 
 // Set the page and return urls.
 $PAGE->set_url('/blocks/workflow/editemail.php');

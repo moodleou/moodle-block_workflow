@@ -32,7 +32,7 @@ require_login();
 require_sesskey();
 
 // Require the workflow:editdefinitions capability.
-require_capability('block/workflow:editdefinitions', get_context_instance(CONTEXT_SYSTEM));
+require_capability('block/workflow:editdefinitions', context_system::instance());
 
 // Toggle the todo item.
 $task = block_workflow_todo::toggle_task($taskid);
