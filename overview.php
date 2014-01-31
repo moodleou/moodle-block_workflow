@@ -51,7 +51,7 @@ $PAGE->set_course($course);
 // Grab the workflow and states.
 $workflow = new block_workflow_workflow($workflowid);
 $stepstates = $workflow->step_states($contextid, $workflowid);
-$tparams = array('contexttitle' => print_context_name($context), 'workflowname' => $workflow->name);
+$tparams = array('contexttitle' => $context->get_context_name(), 'workflowname' => $workflow->name);
 
 // Check that this workflow is assigned to this context.
 $statelist = array_filter($stepstates, create_function('$a', 'return isset($a->stateid);'));

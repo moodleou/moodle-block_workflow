@@ -157,14 +157,14 @@ class block_workflow_command_email extends block_workflow_command {
         $eventdata = new stdClass();
         $eventdata->component   = 'block_workflow';
         $eventdata->name        = 'notification';
-        $eventdata->userfrom    = get_admin();
+        $eventdata->userfrom    = core_user::get_noreply_user();
         $eventdata->subject     = $email->email->subject;
         $eventdata->fullmessage = $email->email->message;
         $eventdata->fullmessageformat   = FORMAT_HTML;
         $eventdata->fullmessagehtml     = $email->email->message;
         $eventdata->smallmessage        = $eventdata->fullmessage;
-        $eventdata->contexturl          = get_context_url($email->context);
-        $eventdata->contexturlname      = print_context_name($email->context, false, true);
+        $eventdata->contexturl          = (string) $email->context->get_url();
+        $eventdata->contexturlname      = $email->context->get_context_name(false, true);
 
         /*
          * Because of an issue with the message_send function in moodle core whereby it is not
@@ -319,21 +319,12 @@ class block_workflow_command_email extends block_workflow_command {
         }
 
         if (count($mailqueue) > 0 && !$DB->is_transaction_started()) {
-            $fakenoreplyuser = new stdClass();
-            $fakenoreplyuser->firstname = '';
-            $fakenoreplyuser->lastname = get_string('emailfrom', 'block_workflow', $SITE->shortname);
             // Only try to send if we're not in a transaction.
             while ($eventdata = array_shift($mailqueue)) {
-                $result = email_to_user($eventdata->userto, $fakenoreplyuser,
-                        $eventdata->subject, $eventdata->fullmessage, $eventdata->fullmessagehtml,
-                        '', '', false);
-                // Send each message in the array
-                // This is the way it used to work, using the new Moodle messaging API
-                // but that in not capable of sending from a noreply address, so we
-                // reverted to the old email_to_user as above.
-                // if (!message_send($eventdata)) {
-                //     throw new workflow_command_failed_exception(get_string('emailfailed', 'block_workflow'));
-                // }
+                // Send each message in the array.
+                if (!message_send($eventdata)) {
+                    throw new workflow_command_failed_exception(get_string('emailfailed', 'block_workflow'));
+                }
             }
         }
     }

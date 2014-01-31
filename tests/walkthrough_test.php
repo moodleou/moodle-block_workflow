@@ -64,7 +64,7 @@ class block_workflow_walkthrough_test extends advanced_testcase {
 
         $manualenrol = enrol_get_plugin('manual');
         $manualenrol->add_default_instance($course);
-        $instance1 = $DB->get_record('enrol', array('enrol'=>'manual', 'courseid'=>$course->id));
+        $instance1 = $DB->get_record('enrol', array('enrol' => 'manual', 'courseid' => $course->id));
         $manualenrol->enrol_user($instance1, $egstudent->id, $roleids['student']);
 
         // Create a new workflow object.

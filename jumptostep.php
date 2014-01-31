@@ -60,13 +60,13 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_course($course);
 
 // Set the heading and page title.
-$tparams = array('stepname' => $step->name, 'contextname' => print_context_name($context));
+$tparams = array('stepname' => $step->name, 'contextname' => $context->get_context_name());
 $title = get_string('jumptostepon', 'block_workflow', $tparams);
 $PAGE->set_heading($title);
 $PAGE->set_title($title);
 
 // Determine the URL -- we should redirect to the relevant context page.
-$returnurl = get_context_url($context);
+$returnurl = $context->get_url();
 
 // Add the breadcrumbs.
 $PAGE->navbar->add(get_string('blocks'));
@@ -89,7 +89,7 @@ if ($confirm) {
 $strparams = array();
 $strparams['fromstep']   = $state->step()->name;
 $strparams['tostep']     = $step->name;
-$strparams['workflowon'] = print_context_name($context);
+$strparams['workflowon'] = $context->get_context_name();
 
 $PAGE->set_title(get_string('jumptosteptitle', 'block_workflow', $strparams));
 

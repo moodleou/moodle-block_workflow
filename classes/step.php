@@ -625,7 +625,7 @@ class block_workflow_step {
      */
     public function validate_script($script) {
         // Parse the script to retrieve a list of all valid commands.
-        $commands =  self::parse_script($script);
+        $commands = self::parse_script($script);
 
         // Call validate on each command.
         foreach ($commands->commands as $c) {
@@ -713,7 +713,7 @@ class block_workflow_step {
         }
 
         // Parse the script to retrieve a list of all valid commands.
-        $commands =  self::parse_script($script);
+        $commands = self::parse_script($script);
 
         // Check for errors.
         if ($commands->errors) {
@@ -949,7 +949,7 @@ class block_workflow_step {
      */
     private static function get_list_of_days($daysbefore, $dayafter) {
         $days = array();
-        $secondsinday = 24*60*60;
+        $secondsinday = 24 * 60 * 60;
         for ($count = $daysbefore; $count <= $dayafter; $count++) {
             if ($count < 0) {
                 $daysbefore = 'daysbefore';

@@ -135,18 +135,7 @@ class block_workflow_command {
      * @return  Array    A list of users for the specified context and role
      */
     public function role_users($role, $context) {
-        $fields = 'u.id, u.confirmed, u.username, u.firstname, u.lastname, '.
-                  'u.maildisplay, u.mailformat, u.maildigest, '.
-                  // This is just the default list of fields, but adding emailstop,
-                  // which is absolutely vital when sending emails now, but which
-                  // they did not add to the default list of fields. Once MDL-30260
-                  // is fixed, we should be able to once more remove the explicit
-                  // list of fields here.
-                  'u.emailstop, '.
-                                                             'u.email, u.city, '.
-                  'u.country, u.picture, u.idnumber, u.department, u.institution, '.
-                  'u.lang, u.timezone, u.lastaccess, u.mnethostid, r.name AS rolename, r.sortorder';
-        return get_role_users($role->id, $context, false, $fields);
+        return get_role_users($role->id, $context);
     }
 
     /**

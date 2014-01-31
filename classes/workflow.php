@@ -478,8 +478,8 @@ class block_workflow_workflow {
         $transaction = $DB->start_delegated_transaction();
 
         // Grab the current step_states and check that the workflow is assigned to this context.
-        $step_states = $this->step_states($contextid);
-        $used = array_filter($step_states, create_function('$a', 'return isset($a->stateid);'));
+        $stepstates = $this->step_states($contextid);
+        $used = array_filter($stepstates, create_function('$a', 'return isset($a->stateid);'));
         if (count($used) == 0) {
             $transaction->rollback(new block_workflow_not_assigned_exception(
                     get_string('workflownotassigned', 'block_workflow', $this->name)));
@@ -498,7 +498,7 @@ class block_workflow_workflow {
         }
 
         // Retrieve a list of the step_states.
-        $statelist = array_map(create_function('$a', 'return $a->stateid;'), $step_states);
+        $statelist = array_map(create_function('$a', 'return $a->stateid;'), $stepstates);
 
         // Remove all of the state_change history.
         $DB->delete_records_list('block_workflow_state_changes', 'stepstateid', $statelist);

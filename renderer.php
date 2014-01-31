@@ -633,7 +633,6 @@ class block_workflow_renderer extends plugin_renderer_base {
                 )));
         }
 
-        
         $cell = new html_table_cell(implode(' ', $actions));
         $row->cells[] = $cell;
 
@@ -653,24 +652,24 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         list($options, $days) = block_workflow_step::get_autofinish_options($appliesto);
 
-        // Days after certain condition.
         if ($step->autofinishoffset > 0) {
+            // Days after certain condition.
             $days = $step->autofinishoffset / (24 * 60 * 60);
             if ($days == 1) {
                 $daysstring = get_string('dayafter', 'block_workflow', $days);
             } else {
                 $daysstring = get_string('daysafter', 'block_workflow', $days);
             }
-        // Days before certain condition.
         } else if ($step->autofinishoffset < 0) {
+            // Days before certain condition.
             $days = abs($step->autofinishoffset) / (24 * 60 * 60);
             if ($days == 1) {
                 $daysstring = get_string('daybefore', 'block_workflow', $days);
             } else {
                 $daysstring = get_string('daysbefore', 'block_workflow', $days);
             }
-        // Same day as certain condition.
         } else {
+            // Same day as certain condition.
             $daysstring = get_string('dayas', 'block_workflow');
         }
 
@@ -1274,7 +1273,7 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // Step Name.
         $cell = new html_table_cell($this->atendgobackto($workflow));
-        $cell->colspan=2;
+        $cell->colspan = 2;
 
         $row->cells[] = $cell;
 

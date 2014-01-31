@@ -150,7 +150,7 @@ class block_workflow_automatic_step_finisher {
                     if ($this->is_ready_for_autofinish($activestep, $now)) {
                         $readyautofinishsteps[$key] = $activestep;
                     }
-                } catch(Exception $e) {
+                } catch (Exception $e) {
                     mtrace('Workflow: Automatic step finisher failed to check if step should be finished. ' .
                             'Step state id: ' . $activestep->stateid);
                     mtrace($e->getMessage());

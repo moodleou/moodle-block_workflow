@@ -101,7 +101,7 @@ class block_workflow_command_override extends block_workflow_command {
                         $data->contextid = $state->contextid;
                     } else {
                         // Changing the contextid on the workflow's parent context.
-                        $data->contextid = get_parent_contextid($state->context());
+                        $data->contextid = $state->context()->get_parent_context()->id;
                     }
                 }
                 break;

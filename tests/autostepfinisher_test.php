@@ -67,9 +67,9 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
 
     private function get_days($days, $beforeafter = 'after') {
         if ($beforeafter === 'before') {
-            return -($days *24 * 60 *60);
+            return -($days * 24 * 60 * 60);
         }
-        return ($days *24 * 60 *60);
+        return ($days * 24 * 60 * 60);
     }
 
     /**
@@ -151,7 +151,7 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $course2 = $generator->create_course(array('shortname' => 'K123-12J', 'startdate' => $timestamp1));
         $coursecontext2 = context_course::instance($course2->id);
 
-        // Cerate an vl_v_crs_version_pres table
+        // Generate a vl_v_crs_version_pres table.
          $DB->execute("CREATE TABLE vl_c_crs_version_pres_a " .
                  "(vle_course_short_name VARCHAR, vle_student_open_date DATE)");
          $DB->execute("CREATE TABLE vl_c_crs_version_pres_b " .

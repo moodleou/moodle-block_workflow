@@ -93,7 +93,7 @@ class edit_workflow extends moodleform {
             try {
                 $workflow->load_workflow_from_shortname($data['shortname']);
                 if ($workflow->id != $data['workflowid']) {
-                    $errors['shortname']= get_string('shortnametaken', 'block_workflow', $workflow->name);
+                    $errors['shortname'] = get_string('shortnametaken', 'block_workflow', $workflow->name);
                 }
             } catch (block_workflow_invalid_workflow_exception $e) {
                 // Ignore errors here.

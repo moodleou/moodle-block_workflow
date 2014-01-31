@@ -46,7 +46,7 @@ class block_workflow_generator extends phpunit_block_generator {
         $id = $DB->insert_record('block_instances', $record);
         context_block::instance($id);
 
-        $instance = $DB->get_record('block_instances', array('id'=>$id), '*', MUST_EXIST);
+        $instance = $DB->get_record('block_instances', array('id' => $id), '*', MUST_EXIST);
         return $instance;
     }
 

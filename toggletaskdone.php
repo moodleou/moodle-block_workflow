@@ -47,5 +47,5 @@ if ($returnto) {
     redirect(new moodle_url($returnto));
 } else {
     // Redirect to our best guess for the correct page.
-    redirect(get_context_url($context));
+    redirect($context->get_url());
 }

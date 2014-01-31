@@ -74,12 +74,12 @@ $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
 // Moodle form to create/edit step.
-$step_edit = new step_edit('editstep.php', array('appliesto' => $appliesto));
+$stepedit = new step_edit('editstep.php', array('appliesto' => $appliesto));
 
-if ($step_edit->is_cancelled()) {
+if ($stepedit->is_cancelled()) {
     // Form was cancelled.
     redirect($returnurl);
-} else if ($data = $step_edit->get_data()) {
+} else if ($data = $stepedit->get_data()) {
     // Form has been submitted.
     $formdata = new stdClass();
     $formdata->id                   = $data->stepid;
@@ -123,11 +123,11 @@ if (isset($step)) {
     $data->autofinish           = $step->autofinish;
     $data->autofinishoffset     = $step->autofinishoffset;
     $data = file_prepare_standard_editor($data, 'instructions', array('noclean' => true));
-    $step_edit->set_data($data);
+    $stepedit->set_data($data);
 } else {
     // Otherwise, this is a new step belonging to $workflowid.
     $data->workflowid   = $workflow->id;
-    $step_edit->set_data($data);
+    $stepedit->set_data($data);
 }
 
 // Grab the renderer.
@@ -143,7 +143,7 @@ if (isset($step)) {
 }
 
 // The edit step form.
-$step_edit->display();
+$stepedit->display();
 
 if (isset($step)) {
     // The list of to-do actions.

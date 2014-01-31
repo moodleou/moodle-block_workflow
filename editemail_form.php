@@ -63,7 +63,7 @@ class email_edit extends moodleform {
             $email = new block_workflow_email();
             if ($email->load_email_shortname($data['shortname'])) {
                 if ($email->id != $data['emailid']) {
-                    $errors['shortname']= get_string('shortnametakenemail', 'block_workflow', $data['shortname']);
+                    $errors['shortname'] = get_string('shortnametakenemail', 'block_workflow', $data['shortname']);
                 }
             }
         }

@@ -19,7 +19,7 @@ YUI.add('moodle-block_workflow-todolist', function(Y) {
         initializer : function(params) {
             // Take each of the workflow tasks, remove the anchor, and change it to
             // call our update function
-            Y.all('a.'+CSS.BLOCKTODOTASK).each(function(node) {
+            Y.all('a.' + CSS.BLOCKTODOTASK).each(function(node) {
                 node.ancestor('li').on('click', this.toggle, this, node);
                 node.setAttribute('href', '#');
             }, this);
@@ -29,7 +29,7 @@ YUI.add('moodle-block_workflow-todolist', function(Y) {
             e.halt();
 
             // expression to fetch ID
-            var reg = new RegExp(CSS.BLOCKTODOID+"-(\\d{1,})");
+            var reg = new RegExp(CSS.BLOCKTODOID + "-(\\d{1,})");
             // Build the data for submission
             var data = {
                 sesskey : M.cfg.sesskey,

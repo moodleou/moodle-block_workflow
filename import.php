@@ -55,7 +55,7 @@ if ($importform->is_cancelled()) {
     if (!$xml) {
         $errors = get_string('xmlloadfailed', 'block_workflow');
         foreach (libxml_get_errors() as $error) {
-            $errors.= $error->message.', ';
+            $errors .= $error->message.', ';
         }
         throw new block_workflow_invalid_import_exception($errors);
     }

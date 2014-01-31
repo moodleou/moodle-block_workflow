@@ -53,7 +53,7 @@ function xmldb_block_workflow_upgrade($oldversion) {
             $dbman->add_field($table, $field);
             if ($CFG->texteditors !== 'textarea') {
                 $rs = $DB->get_recordset('block_workflow_emails',
-                        array('messageformat'=>FORMAT_MOODLE), '', 'id,message,messageformat');
+                        array('messageformat' => FORMAT_MOODLE), '', 'id,message,messageformat');
                 foreach ($rs as $b) {
                     $b->message = text_to_html($b->message, false, false, true);
                     $b->messageformat = FORMAT_HTML;

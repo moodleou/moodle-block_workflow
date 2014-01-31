@@ -41,19 +41,19 @@ YUI.add('moodle-block_workflow-comments', function(Y) {
 
         initializer : function(params) {
             overlay.hide();
-            this.set(BASE, Y.Node.create('<div class="'+CSS.PANEL+'"></div>')
-                        .append(Y.Node.create('<div class="'+CSS.COMMENTS+'"></div>')
-                            .append(Y.Node.create('<div class="'+CSS.TEXTAREA+'"></div>')
+            this.set(BASE, Y.Node.create('<div class="' + CSS.PANEL + '"></div>')
+                        .append(Y.Node.create('<div class="' + CSS.COMMENTS + '"></div>')
+                            .append(Y.Node.create('<div class="' + CSS.TEXTAREA + '"></div>')
                                 .append(Y.Node.create(this.get(EDITORHTML))))
-                            .append(Y.Node.create('<div class="'+CSS.SUBMIT+'"></div>')
+                            .append(Y.Node.create('<div class="' + CSS.SUBMIT + '"></div>')
                                 .append(Y.Node.create('<input type="button" class="submitbutton"/>')))
                         )
-                        .append(Y.Node.create('<div class="'+CSS.LIGHTBOX+' '+CSS.HIDDEN+'"></div>')
-                            .append(Y.Node.create('<img alt="loading" class="'+CSS.LOADINGICON+'" />')
+                        .append(Y.Node.create('<div class="' + CSS.LIGHTBOX + ' ' + CSS.HIDDEN + '"></div>')
+                            .append(Y.Node.create('<img alt="loading" class="' + CSS.LOADINGICON + '" />')
                                 .setAttribute('src', M.util.image_url('i/loading', 'moodle')))
                             .setStyle('opacity', 0.5)
                         ));
-            this._loadingNode = this.get(BASE).one('.'+CSS.LIGHTBOX);
+            this._loadingNode = this.get(BASE).one('.' + CSS.LIGHTBOX);
 
             // prepare content
             overlay.set('bodyContent', this.get(BASE));
@@ -66,12 +66,12 @@ YUI.add('moodle-block_workflow-comments', function(Y) {
             // Different scenario depending on whether we finishing the step or just editiong the comment
             if (finishstep) {
                 overlay.set('headerContent', M.str.block_workflow.finishstep);
-                this.get(BASE).one('.'+CSS.SUBMIT+' input').set('value', M.str.block_workflow.finishstep);
-                this._formSubmitEvent = Y.one('.'+CSS.SUBMIT+' input').on('click', this.finishstep, this);
+                this.get(BASE).one('.' + CSS.SUBMIT + ' input').set('value', M.str.block_workflow.finishstep);
+                this._formSubmitEvent = Y.one('.' + CSS.SUBMIT + ' input').on('click', this.finishstep, this);
             } else {
                 overlay.set('headerContent', M.str.block_workflow.editcomments);
-                this.get(BASE).one('.'+CSS.SUBMIT+' input').set('value', M.str.moodle.savechanges);
-                this._formSubmitEvent = Y.one('.'+CSS.SUBMIT+' input').on('click', this.save, this);
+                this.get(BASE).one('.' + CSS.SUBMIT + ' input').set('value', M.str.moodle.savechanges);
+                this._formSubmitEvent = Y.one('.' + CSS.SUBMIT + ' input').on('click', this.save, this);
             }
 
             overlay.show(); //show the overlay
@@ -139,14 +139,14 @@ YUI.add('moodle-block_workflow-comments', function(Y) {
         },
         save : function (e) {
             var ed = tinyMCE.get(this.get(EDITORID));
-            var commentsblock = Y.one('.'+CSS.BLOCKWORKFLOW+' .'+CSS.BLOCKCOMMENTS);
+            var commentsblock = Y.one('.' + CSS.BLOCKWORKFLOW + ' .' + CSS.BLOCKCOMMENTS);
             // Build the data for submission
             var data = {
                 sesskey : M.cfg.sesskey,
                 action  : 'savecomment',
                 stateid : this.get(STATEID),
                 text    : ed.getContent(),
-                format  : document.getElementsByName(this.get(EDITORNAME)+'[format]')[0].value
+                format  : document.getElementsByName(this.get(EDITORNAME) + '[format]')[0].value
             };
 
             Y.io(M.cfg.wwwroot + AJAXURL, {
@@ -177,14 +177,14 @@ YUI.add('moodle-block_workflow-comments', function(Y) {
         },
         finishstep : function (e) {
             var ed = tinyMCE.get(this.get(EDITORID));
-            var workflowblock = Y.one('.'+CSS.BLOCKWORKFLOW+' .'+CSS.CONTENT);
+            var workflowblock = Y.one('.' + CSS.BLOCKWORKFLOW + ' .' + CSS.CONTENT);
             // Build the data for submission
             var data = {
                 sesskey : M.cfg.sesskey,
                 action  : 'finishstep',
                 stateid : this.get(STATEID),
                 text    : ed.getContent(),
-                format  : document.getElementsByName(this.get(EDITORNAME)+'[format]')[0].value
+                format  : document.getElementsByName(this.get(EDITORNAME) + '[format]')[0].value
             };
 
             Y.io(M.cfg.wwwroot + AJAXURL, {

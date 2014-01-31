@@ -52,7 +52,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_course($course);
 
 // Set the heading and page title.
-$tparams = array('stepname' => $state->step()->name, 'contextname' => print_context_name($context));
+$tparams = array('stepname' => $state->step()->name, 'contextname' => $context->get_context_name());
 $title = get_string('editingcommentfor', 'block_workflow', $tparams);
 $PAGE->set_heading($title);
 $PAGE->set_title($title);
@@ -66,7 +66,7 @@ $PAGE->navbar->add($state->step()->name);
 $mform = new state_editcomment(null, array('state' => $state));
 
 // Grab a returnurl which relates to the context.
-$returnurl = get_context_url($context);
+$returnurl = $context->get_url();
 
 if ($mform->is_cancelled()) {
     // Form was cancelled.

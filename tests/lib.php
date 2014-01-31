@@ -79,7 +79,7 @@ class block_workflow_testlib extends advanced_testcase {
         $cat->parent        = 0;
         $cat->depth         = 1;
         $cat->coursecount   = 1;
-        $cat->id            =  $DB->insert_record('course_categories', $cat);
+        $cat->id            = $DB->insert_record('course_categories', $cat);
         $cat->path          = '/' . $cat->id;
         $DB->update_record('course_categories', $cat);
 

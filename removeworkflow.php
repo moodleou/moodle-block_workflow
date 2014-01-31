@@ -52,7 +52,7 @@ $PAGE->set_url('/blocks/workflow/removeworkflow.php', array('workflowid' => $wor
 
 // Grab the workflow.
 $workflow = new block_workflow_workflow($workflowid);
-$tparams = array('workflowname' => $workflow->name, 'contexttitle' => print_context_name($context));
+$tparams = array('workflowname' => $workflow->name, 'contexttitle' => $context->get_context_name());
 
 // Check that this workflow is assigned to this context.
 $stepstates = $workflow->step_states($contextid);
@@ -87,7 +87,7 @@ if ($confirm) {
     $workflow->remove_workflow($contextid);
 
     // Redirect.
-    redirect(get_context_url($context));
+    redirect($context->get_url());
 }
 
 // Display the delete confirmation dialogue.

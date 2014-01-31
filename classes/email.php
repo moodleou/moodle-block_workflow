@@ -324,7 +324,7 @@ class block_workflow_email {
         $sql = "SELECT completescripts.oncompletescript AS script
                 FROM {block_workflow_steps} AS completescripts
                 WHERE " . $DB->sql_like('completescripts.oncompletescript', '?', false);
-        $completescripts =  $DB->get_records_sql($sql, array('%email%' . $this->shortname . '%to%'));
+        $completescripts = $DB->get_records_sql($sql, array('%email%' . $this->shortname . '%to%'));
         $count += $this->_used_count($completescripts);
 
         // Return the tital usage count.

@@ -786,10 +786,10 @@ class block_workflow_lib_test extends block_workflow_testlib {
             $this->assertEquals($inusetimes, 1);
 
             // We should be able to grab a list of step_states for this context too.
-            $step_states = $workflow->step_states($this->contextid);
+            $stepstates = $workflow->step_states($this->contextid);
 
             // And this has one record -- only one step.
-            $this->assertEquals(count($step_states), 1);
+            $this->assertEquals(count($stepstates), 1);
 
             // Grab the active step.
             $state = new block_workflow_step_state();

@@ -49,4 +49,4 @@ $workflow = new block_workflow_workflow($workflowid);
 $workflow->add_to_context($contextid);
 
 // Redirect based on the context's URL.
-redirect(get_context_url($context));
+redirect($context->get_url());
