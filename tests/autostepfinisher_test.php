@@ -147,6 +147,10 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $quiz1 = $generator->create_module('quiz', array('course' => $course1->id, 'timeopen' => $timestamp1));
         $quizcontext1 = context_module::instance($quiz1->cmid);
 
+        // Create a externalquiz object.
+        $externalquiz1 = $generator->create_module('externalquiz', array('course' => $course1->id, 'timeopen' => $timestamp1));
+        $externalquizcontext1 = context_module::instance($externalquiz1->cmid);
+
         // Create another course object.
         $course2 = $generator->create_course(array('shortname' => 'K123-12J', 'startdate' => $timestamp1));
         $coursecontext2 = context_course::instance($course2->id);
@@ -195,7 +199,7 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $course1->vle_student_open_date = strtotime($courseondataloadtable->vle_student_open_date);
 
         // Create expected objects for active steps and test them against the actual objects.
-        $expectedactivesteps = $this->get_expected_active_step($state1, $step1, 'course', $course1);
+        $expectedactivesteps = $this->get_expected_active_step($state1, $step1, 'course', $course1, '');
         $this->assertEquals($expectedactivesteps, $activesteps);
 
         // Add to context and check the step is active.
@@ -208,10 +212,10 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $this->assertEquals(2, count($activesteps));
 
         // Create expected objects for active steps and test them against the actual objects.
-        $expectedactivesteps += $this->get_expected_active_step($state2, $step1, 'course', $course2);
+        $expectedactivesteps += $this->get_expected_active_step($state2, $step1, 'course', $course2, '');
         $this->assertEquals($expectedactivesteps, $activesteps);
 
-        // Create a new workflow object which applies to quiz.
+        // Create a new workflow object which applies to quiz.216
         list($quizworkflow, $step1q) = $this->create_a_workflow_with_one_step($before5days, 'quiz;timeopen', 'quiz');
 
         // Add to context and check if the step is active.
@@ -223,6 +227,21 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $expectedactivesteps += $this->get_expected_active_step($state1q, $step1q, 'quiz', $course1, $quiz1->id);
         $activesteps = $this->stepfinisher->get_all_active_steps();
         $this->assertEquals(3, count($activesteps));
+        $this->assertEquals($expectedactivesteps, $activesteps);
+
+        // Create a new workflow object which applies to externalquiz.
+        list($externalquizworkflow, $step1eq) = $this->create_a_workflow_with_one_step($before5days, 'externalquiz;timeopen', 'externalquiz');
+
+        // Add to context and check if the step is active.
+        $state1eq = $externalquizworkflow->add_to_context($externalquizcontext1->id);
+        $this->assertEquals($step1eq->id, $state1eq->stepid);
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $state1eq->state);
+
+        // Create expected objects for active steps and test them against the actual objects.
+        $expectedactivesteps += $this->get_expected_active_step($state1eq, $step1eq, 'externalquiz', $course2, $externalquiz1->id);
+        $activesteps = $this->stepfinisher->get_all_active_steps();
+        $this->assertEquals(4, count($activesteps));
+        $this->assertEquals(count($expectedactivesteps), count($activesteps));
         $this->assertEquals($expectedactivesteps, $activesteps);
 
         // Check relevant fields in 'block_workflow_step_states' table before finishing automatically.

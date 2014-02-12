@@ -915,23 +915,33 @@ class block_workflow_step {
             // 'vl_v_crs_version_pres;vle_student_open_date'.
             $days = self::get_list_of_days(self::DAYS_BEFORE_COURSE, self::DAYS_AFTER_COURSE);
 
+            // Here we are using 'db-tablename;relevatfield' as array key.
             $options['course;startdate'] = get_string('coursestartdate', 'block_workflow');
 
             // Check whether vl_v_crs_version_pres table exists.
             $sql = "SELECT table_name FROM information_schema.tables
                     WHERE table_name = 'vl_v_crs_version_pres'";
             if ($DB->get_record_sql($sql)) {
+                // Here we are using 'db-tablename;relevatfield' as array key.
                 $options['vl_v_crs_version_pres;vle_student_open_date'] = get_string('coursestudentopen', 'block_workflow');
                 $options['vl_v_crs_version_pres;vle_student_close_date'] = get_string('coursestudentclose', 'block_workflow');
                 $options['vl_v_crs_version_pres;vle_tutor_open_date'] = get_string('coursetutoropen', 'block_workflow');
                 $options['vl_v_crs_version_pres;vle_tutor_close_date'] = get_string('coursetutorclose', 'block_workflow');
             }
-        } else {
+        } else if ($appliesto === 'quiz' || $appliesto === 'externalquiz') {
+            // The workflow applies to the quiz or external quiz.
+            // It could have apply to other course mdoules if relevat db-fields had the same field name.
+
+            // We are using the same constants for quiz and external quiz
             $days = self::get_list_of_days(self::DAYS_BEFORE_QUIZ, self::DAYS_AFTER_QUIZ);
 
-            $options['quiz;timeopen'] = get_string('quizopendate', 'block_workflow');
-            $options['quiz;timeclose'] = get_string('quizclosedate', 'block_workflow');
+            // Here we are using 'db-tablename;relevatfield' as array key.
+            $options["$appliesto;timeopen"] = get_string('quizopendate', 'block_workflow');
+            $options["$appliesto;timeclose"] = get_string('quizclosedate', 'block_workflow');
+        } else {
+            $days = self::get_list_of_days(0, 0);
         }
+
         return array($options, $days);
     }
 

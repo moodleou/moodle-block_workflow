@@ -120,13 +120,11 @@ class block_workflow_automatic_step_finisher {
                 LEFT JOIN {course_modules} cm ON cm.id = ctx.instanceid AND wf.appliesto <> 'course'
 
                 WHERE step.autofinish != :autofinish
-                    AND step.autofinishoffset != :autofinishoffset
                     AND state.state = :state
                     AND (ctx.contextlevel = :coursecotext OR ctx.contextlevel = :modulecontext)
                     ORDER BY state.id ASC";
 
-        $options = array('autofinish' => '',
-                        'autofinishoffset' => 0,
+        $options = array('autofinish' => 'donotautomaticallyfinish',
                         'state' => BLOCK_WORKFLOW_STATE_ACTIVE,
                         'coursecotext' => CONTEXT_COURSE,
                         'modulecontext' => CONTEXT_MODULE);
@@ -176,15 +174,14 @@ class block_workflow_automatic_step_finisher {
                 return false;
             }
             $field = $relevantdate;
+
         } else if ($dbtable === 'course') {
             $id = $activestep->courseid;
             $field = $DB->get_field($dbtable, $dbfield, array('id' => $id));
-        } else if ($dbtable === 'quiz') {
+
+        } else {
             $id = $activestep->moduleid;
             $field = $DB->get_field($dbtable, $dbfield, array('id' => $id));
-        } else {
-            throw new coding_exception('Unrecognised table name in auto-finish condition ' .
-                    $activestep->autofinish);
         }
 
         $finishtime = $field + $activestep->autofinishoffset;
