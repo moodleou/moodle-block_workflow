@@ -120,6 +120,8 @@ class block_workflow_automatic_step_finisher {
                 LEFT JOIN {course_modules} cm ON cm.id = ctx.instanceid AND wf.appliesto <> 'course'
 
                 WHERE step.autofinish != :autofinish
+                    AND step.autofinish != ''
+                    AND step.autofinish IS NOT NULL
                     AND state.state = :state
                     AND (ctx.contextlevel = :coursecotext OR ctx.contextlevel = :modulecontext)
                     ORDER BY state.id ASC";
