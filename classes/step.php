@@ -200,10 +200,10 @@ class block_workflow_step {
         }
 
         // Set the default autofinish and autofinishoffset.
-        if (!isset($step->autofinish)) {
-            $step->autofinish = '';
+        if (empty($step->autofinish)) {
+            $step->autofinish = null;
         }
-        if (!isset($step->autofinishoffset)) {
+        if (empty($step->autofinishoffset)) {
             $step->autofinishoffset = 0;
         }
 
@@ -435,6 +435,13 @@ class block_workflow_step {
                 $transaction->rollback(new block_workflow_invalid_step_exception(
                         get_string('invalidfield', 'block_workflow', $k)));
             }
+        }
+
+        if (empty($data->autofinish)) {
+            $data->autofinish = null;
+        }
+        if (empty($data->autofinishoffset)) {
+            $data->autofinishoffset = 0;
         }
 
         // Validate any changes to the onactivescript and oncompletescript.
@@ -906,7 +913,7 @@ class block_workflow_step {
         global $DB;
 
         $options = array();
-        $options['donotautomaticallyfinish'] = get_string('donotautomaticallyfinish', 'block_workflow');
+        $options[''] = get_string('donotautomaticallyfinish', 'block_workflow');
         if ($appliesto === 'course') {
             // The string is stored in the database in the following format.
             // {database table name};{field name with value as timestamp or

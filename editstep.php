@@ -88,7 +88,7 @@ if ($stepedit->is_cancelled()) {
     $formdata->instructionsformat   = $data->instructions_editor['format'];
     $formdata->onactivescript       = $data->onactivescript;
     $formdata->oncompletescript     = $data->oncompletescript;
-    $formdata->autofinish           = $data->autofinish;
+    $formdata->autofinish           = isset($data->autofinish) ? $data->autofinish : '';
     $formdata->autofinishoffset     = $data->autofinishoffset;
 
     if (isset($step)) {

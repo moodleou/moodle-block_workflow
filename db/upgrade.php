@@ -25,10 +25,9 @@
 function xmldb_block_workflow_upgrade($oldversion) {
     global $DB, $CFG;
 
-    $result = true;
     $dbman = $DB->get_manager();
 
-    if ($result && $oldversion < 2012101700) {
+    if ($oldversion < 2012101700) {
         $table = new xmldb_table('block_workflow_steps');
 
         $field = new xmldb_field('autofinish', XMLDB_TYPE_CHAR, '64', null, null, null, null, 'oncompletescript');
@@ -43,10 +42,25 @@ function xmldb_block_workflow_upgrade($oldversion) {
     }
 
     // Override the oldformat.
-    $result = block_workflow_upgrade_autofinish_steps($oldversion, 2013042300);
+    if ($oldversion < 2013042300) {
+        $sql = "SELECT step.*
+            FROM {block_workflow_steps} step
+            WHERE step.autofinish = 'quiz_timeopen'
+                OR step.autofinish = 'quiz_timeclose'
+                OR step.autofinish = 'course_startdate'
+            ORDER BY step.id ASC";
+        $steps = $DB->get_records_sql($sql);
+        if ($steps) {
+            foreach ($steps as $key => $step) {
+                $step->autofinish = str_replace('_', ';', $step->autofinish);
+                $DB->update_record('block_workflow_steps', $step);
+            }
+        }
+        upgrade_block_savepoint(true, 2013042300, 'workflow');
+    }
 
     // Add 'messageformat' field to the 'block_workflow_emails' table.
-    if ($result && $oldversion < 2013071600) {
+    if ($oldversion < 2013071600) {
         $table = new xmldb_table('block_workflow_emails');
         $field = new xmldb_field('messageformat', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'message');
         if (!$dbman->field_exists($table, $field)) {
@@ -62,43 +76,23 @@ function xmldb_block_workflow_upgrade($oldversion) {
                 }
                 $rs->close();
             }
-            upgrade_block_savepoint(true, 2013071600, 'workflow');
         }
+        upgrade_block_savepoint(true, 2013071600, 'workflow');
     }
 
     // Replace 'course:startdate' with 'course;startdate'.
-    if ($result && $oldversion < 2013072200) {
+    if ($oldversion < 2013072200) {
         $sql = "UPDATE {block_workflow_steps} SET autofinish = :new WHERE autofinish = :old";
         $DB->execute($sql, array('new' => 'course;startdate', 'old' => 'course:startdate'));
         upgrade_block_savepoint(true, 2013072200, 'workflow');
     }
 
-    return $result;
-}
-
-/**
- * Gets steps in old autofinish format and update them with new format
- * @param int $oldversion
- * @param int $newversion
- * @return boolean
- */
-function block_workflow_upgrade_autofinish_steps($oldversion, $newversion) {
-    $result = true;
-    if ($result && $oldversion < $newversion) {
-        global $DB;
-        $sql = "SELECT step.*
-            FROM {block_workflow_steps} step
-            WHERE step.autofinish = 'quiz_timeopen'
-                OR step.autofinish = 'quiz_timeclose'
-                OR step.autofinish = 'course_startdate'
-            ORDER BY step.id ASC";
-        $steps = $DB->get_records_sql($sql);
-        if ($steps) {
-            foreach ($steps as $key => $step) {
-                $step->autofinish = str_replace('_', ';', $step->autofinish);
-                $DB->update_record('block_workflow_steps', $step);
-            }
-        }
+    // Fix broken autofinish values.
+    if ($oldversion < 2014030500) {
+        $DB->set_field_select('block_workflow_steps', 'autofinish', null,
+                'autofinish IN (?, ?)', array('', 'donotautomaticallyfinish'));
+        upgrade_block_savepoint(true, 2014030500, 'workflow');
     }
-    return $result;
+
+    return true;
 }

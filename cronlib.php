@@ -119,15 +119,12 @@ class block_workflow_automatic_step_finisher {
                 LEFT JOIN {course} c ON c.id = ctx.instanceid
                 LEFT JOIN {course_modules} cm ON cm.id = ctx.instanceid AND wf.appliesto <> 'course'
 
-                WHERE step.autofinish != :autofinish
-                    AND step.autofinish != ''
-                    AND step.autofinish IS NOT NULL
+                WHERE step.autofinish IS NOT NULL
                     AND state.state = :state
                     AND (ctx.contextlevel = :coursecotext OR ctx.contextlevel = :modulecontext)
                     ORDER BY state.id ASC";
 
-        $options = array('autofinish' => 'donotautomaticallyfinish',
-                        'state' => BLOCK_WORKFLOW_STATE_ACTIVE,
+        $options = array('state' => BLOCK_WORKFLOW_STATE_ACTIVE,
                         'coursecotext' => CONTEXT_COURSE,
                         'modulecontext' => CONTEXT_MODULE);
 

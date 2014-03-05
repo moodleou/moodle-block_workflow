@@ -147,6 +147,11 @@ if ($importform->is_cancelled()) {
         $stepx->autofinishoffset = clean_and_check_field_validity('autofinishoffset', $importedstep, false);
         $stepx->workflowid = $workflow->id;
 
+        // Fix legacy data.
+        if ($stepx->autofinish == 'donotautomaticallyfinish') {
+            $stepx->autofinish = '';
+        }
+
         // Create the step.
         $step = $step->create_step($stepx);
 

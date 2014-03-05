@@ -75,7 +75,7 @@ class step_edit extends moodleform {
         $mform->setDefault('autofinishoffset', 0);
         $mform->setDefault('autofinish', '');
 
-        $mform->disabledIf('autofinishoffset', 'autofinish', 'eq', 'donotautomaticallyfinish');
+        $mform->disabledIf('autofinishoffset', 'autofinish', 'eq', '');
 
         // We disable the autofinish functionality for modules other than quiz or external quiz.
         $autofinshallowed = array('course', 'quiz', 'externalquiz');
