@@ -30,7 +30,8 @@ var CSS = {
 var PARAMS = {
     id: 'id',
     HEADER: 'header',
-    BODY: 'body'
+    BODY: 'body',
+    STEPNO: 'stepno'
 };
 
 var POPUP = function() {
@@ -38,33 +39,26 @@ var POPUP = function() {
 };
 
 Y.extend(POPUP, Y.Base, {
-    userinfobutton: Y.one(CSS.USERINFO),
-
-    header: null,
-    body: null,
 
     initializer : function() {
-        userinfoclass = Y.one(CSS.USERINFOCLASS);
-        var node = userinfoclass._node;
-
-        // Set popup header and body.
-        this.header = node.getAttribute(PARAMS.HEADER);
-        this.body = node.getAttribute(PARAMS.BODY);
-
-        this.userinfobutton.on('click', this.display_dialog, this);
+        Y.all(CSS.USERINFOCLASS).each(function(node) {
+            var stepno = node.getAttribute(PARAMS.STEPNO);
+            var header = node.getAttribute(PARAMS.HEADER);
+            var body = node.getAttribute(PARAMS.BODY);
+            node.on('click', this.display_dialog, this, stepno, header, body);
+        }, this);
     },
 
-    display_dialog : function (e) {
+    display_dialog : function (e, stepno, header, body) {
         e.preventDefault();
 
         // Configure the popup.
         var config = {
-            headerContent : this.header,
-            bodyContent : this.body,
+            headerContent : header,
+            bodyContent : body,
             draggable : true,
             modal : true,
             zIndex : 1000,
-            //context: [CSS.REPAGINATECOMMAND, 'tr', 'br', ['beforeShow']],
             centered: false,
             width: 'auto',
             visible: false,

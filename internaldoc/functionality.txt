@@ -44,8 +44,9 @@ Step No, Step name, Roles, Comments, State, Last modified and the last column.
 The table headings are self explanatory apart from the last column which does not
 have a heading but provides a button in each row. If the step is active, the button
 shows "Finish Step", otherwise "Jump to step".
-Another button which may appear in the Roles column on active step row is "Show names(N)"
-which is disabled when N=0 otherwise, triggers the popup dialogue (See above).
+Another button which may appear in the Roles column on each step row after the
+role names is "Show names(N)" which is disabled when N=0 otherwise, triggers the
+popup dialogue (See above).
 
 Finishing steps automatically
 -----------------------------

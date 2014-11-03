@@ -1128,6 +1128,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         foreach ($states as $state) {
             $table->data[] = $this->workflow_overview_step($state, $context);
         }
+        $this->page->requires->yui_module('moodle-block_workflow-userinfo', 'M.block_workflow.userinfo.init');
 
         // Add information as to what happens at the end of the workflow.
         $table->data[] = $this->workflow_overview_step_atend($workflow);
@@ -1195,10 +1196,8 @@ class block_workflow_renderer extends plugin_renderer_base {
         $cell = new html_table_cell($this->workflow_step_doers($step));
 
         // Add the "Show names(N)" button to the role column.
-        if ($stateobj->state === BLOCK_WORKFLOW_STATE_ACTIVE) {
-            $cell->text .= $this->get_popup_button($roles, $context);
-            $this->page->requires->yui_module('moodle-block_workflow-userinfo', 'M.block_workflow.userinfo.init');
-        }
+        $cell->text .= $this->get_popup_button($roles, $context, $stepstate->stepno);
+
         $row->cells[] = $cell;
 
         // Comments.
@@ -1355,11 +1354,12 @@ class block_workflow_renderer extends plugin_renderer_base {
      * @return NULL|string
      */
     protected function get_userinfo_button($options, $numberofusers) {
+        $stepno = $options['stepno'];
         $disabled = '';
         if ($numberofusers == 0) {
             $disabled = 'disabled="disabled"';
         }
-        $userinfobutton = '<input id="userinfo" ' . $disabled . '" type="submit" name="userinfo"
+        $userinfobutton = '<input id="userinfo' . $stepno . '"'. $disabled . '" type="submit" name="userinfo' . $stepno . '"
                             value="'. get_string('shownamesx', 'block_workflow', $numberofusers) . '"/>';
         $userinfobutton = html_writer::tag('span', $userinfobutton, $options);
         return $userinfobutton;
@@ -1369,7 +1369,7 @@ class block_workflow_renderer extends plugin_renderer_base {
      * Returns popup with a header and body where the body an html table
      * @param object $users, array of users who have roles
      */
-    protected function get_popup_table($users) {
+    protected function get_popup_table($users, $stepno) {
         global $CFG, $DB;
 
         if (!$users) {
@@ -1419,8 +1419,12 @@ class block_workflow_renderer extends plugin_renderer_base {
         $table->head  = $tableheader;
         $table->data  = $data;
 
+        $popupheader = get_string('showpeoplecandotask', 'block_workflow');
+        if ($stepno > 0) {
+            $popupheader .= " (Step $stepno)";
+        }
         // Return header and body of the popup.
-        return array(get_string('showpeoplecandotask', 'block_workflow'), html_writer::table($table));
+        return array($popupheader, html_writer::table($table));
     }
 
     /**
@@ -1429,12 +1433,12 @@ class block_workflow_renderer extends plugin_renderer_base {
      * @param object $roles
      * @param object $context
      */
-    protected function get_popup_button($roles, $context) {
+    protected function get_popup_button($roles, $context, $stepno = 0) {
         $steptate = new block_workflow_step_state();
         $users = $steptate->get_all_users_and_their_roles($roles, $context);
         $numberofusers = count($users);
-        list ($header, $body) = $this->get_popup_table($users);
-        $options = array('class' => 'userinfoclass', 'header' => $header, 'body' => $body);
+        list ($header, $body) = $this->get_popup_table($users, $stepno);
+        $options = array('class' => 'userinfoclass', 'header' => $header, 'body' => $body, 'stepno' => $stepno);
 
         if (!$roles) {
             return null;
