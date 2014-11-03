@@ -35,6 +35,7 @@ class import_workflow extends moodleform {
 
         $mform->addElement('filepicker', 'importfile', get_string('importfile', 'block_workflow'),
                 null, array('accepted_type' => '*.xml'));
+        $mform->addRule('importfile', null, 'required', null, 'client');
 
         $this->add_action_buttons(true, get_string('importworkflow', 'block_workflow'));
     }

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<workflow version="2">
+  <shortname>testworkflow</shortname>
+  <name>Test course workflow</name>
+  <description format="html">This workflow manages course creation.</description>
+  <appliesto>course</appliesto>
+  <atendgobacktostep/>
+  <steps>
+    <step no="1">
+      <name>Configure basic site</name>
+      <instructions format="html">Set up the basic site settings, such as course format and enrolment.</instructions>
+      <onactivescript>setcoursevisibility hidden</onactivescript>
+      <oncompletescript># You may place a set of actions to complete when marking this step finished here</oncompletescript>
+      <autofinish/>
+      <autofinishoffset>0</autofinishoffset>
+      <doer>manager</doer>
+      <todo>Set the course format</todo>
+      <todo>Setup enrolment plugins</todo>
+    </step>
+    <step no="2">
+      <name>Prepare your web site</name>
+      <instructions format="html">Please add learning content to your new web site.</instructions>
+      <onactivescript>email taskemail to teacher</onactivescript>
+      <oncompletescript>setcoursevisibility visible</oncompletescript>
+      <autofinish>course;startdate</autofinish>
+      <autofinishoffset>-86400</autofinishoffset>
+      <doer>editingteacher</doer>
+      <todo>Add resources</todo>
+      <todo>Add actvities</todo>
+      <todo>Set up block</todo>
+      <todo>Set up block</todo>
+      <todo>Configure gradebook</todo>
+    </step>
+  </steps>
+  <emailtemplates>
+    <emailtemplate>
+      <shortname>taskemail</shortname>
+      <subject>Please do this workflow task</subject>
+      <body>Please go and do task %%stepname%% of workflow %%workflowname%%.</body>
+    </emailtemplate>
+  </emailtemplates>
+</workflow>

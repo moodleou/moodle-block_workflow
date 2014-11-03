@@ -276,7 +276,7 @@ class block_workflow_workflow {
             $emptystep->workflowid          = $workflow->id;
             $emptystep->name                = get_string('defaultstepname',         'block_workflow');
             $emptystep->instructions        = get_string('defaultstepinstructions', 'block_workflow');
-            $emptystep->instructionsformat  = FORMAT_PLAIN;
+            $emptystep->instructionsformat  = FORMAT_HTML;
             $emptystep->onactivescript      = get_string('defaultonactivescript',   'block_workflow');
             $emptystep->oncompletescript    = get_string('defaultoncompletescript', 'block_workflow');
 

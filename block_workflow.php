@@ -75,7 +75,7 @@ class block_workflow extends block_base {
             $this->title = $state->step()->workflow()->name;
 
             // Prepare editor.
-            $editor = new MoodleQuickForm_editor('comment_editor', null,
+            $editor = new MoodleQuickForm_editor('comment_editor', get_string('commentlabel', 'block_workflow'),
                     array('id' => 'wkf-comment-editor'), block_workflow_editor_options());
             $editor->setValue(array('text' => $state->comment));
 
@@ -86,9 +86,11 @@ class block_workflow extends block_base {
 
             // Initialise the YUI module.
             $arguments = array(
-                'stateid' => $state->id,
-                'editorhtml' => $editor->toHtml(),
-                'editorid' => $editor->getAttribute('id'),
+                'stateid'    => $state->id,
+                'editorhtml' => html_writer::label(get_string('commentlabel', 'block_workflow'),
+                        'wkf-comment-editor', false, array('class' => 'accesshide')) .
+                        $editor->toHtml(),
+                'editorid'   => $editor->getAttribute('id'),
                 'editorname' => $editor->getName(),
             );
             $PAGE->requires->yui_module('moodle-block_workflow-comments', 'M.blocks_workflow.init_comments',
