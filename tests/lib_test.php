@@ -327,7 +327,7 @@ class block_workflow_lib_test extends block_workflow_testlib {
         // And check that the values are acceptable.
         $this->assertEquals($step->name,                 get_string('defaultstepname',           'block_workflow'));
         $this->assertEquals($step->instructions,         get_string('defaultstepinstructions',   'block_workflow'));
-        $this->assertEquals($step->instructionsformat,   FORMAT_PLAIN);
+        $this->assertEquals($step->instructionsformat,   FORMAT_HTML);
         $this->assertEquals($step->stepno,               1);
         $this->assertEquals($step->onactivescript,       get_string('defaultonactivescript',     'block_workflow'));
         $this->assertEquals($step->oncompletescript,     get_string('defaultoncompletescript',   'block_workflow'));

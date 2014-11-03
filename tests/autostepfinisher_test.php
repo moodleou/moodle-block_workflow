@@ -65,6 +65,57 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $this->stepfinisher = null;
     }
 
+    protected function create_version_pres_tables() {
+        global $DB;
+        // Set that we have dataload tables.
+        set_config('hasdataloadtables', 1);
+
+        // Check nobody's trying to test on a 'real' database.
+        if ($DB->record_exists_sql("SELECT 1 FROM information_schema.tables " .
+                "WHERE table_name='vl_c_crs_version_pres_a'")) {
+            throw new Exception('You cannot run phpunit tests on a database that ' .
+                    'contains vl_c_crs_version_pres_a table; automated and manual ' .
+                    'testing might need to be on different databases');
+        }
+
+        // Create the table if it doesn't exist. NOTE we are not using Moodle
+        // database manager because the table (actually it's normally a view)
+        // is not prefixed.
+        if (!$DB->record_exists_sql("SELECT 1 FROM information_schema.tables " .
+                "WHERE table_name='vl_v_crs_version_pres'")) {
+
+            $createsql = "
+                CREATE TABLE vl_v_crs_version_pres
+                (
+                    course_code character varying(7) NOT NULL DEFAULT ' '::character varying,
+                    course_version_num character(2) NOT NULL DEFAULT ' '::bpchar,
+                    pres_code character(3) NOT NULL DEFAULT ' '::bpchar,
+                    pres_code_5 character(5) NOT NULL DEFAULT ' '::bpchar,
+                    vle_course_short_name character varying(15) NOT NULL DEFAULT ' '::character varying,
+                    vle_control_course character(1) NOT NULL DEFAULT ' '::bpchar,
+                    vle_link_creation_date date,
+                    vle_student_open_date date,
+                    vle_student_close_date date,
+                    vle_tutor_open_date date,
+                    vle_tutor_close_date date,
+                    e_tmas_permitted character(1) NOT NULL DEFAULT ' '::bpchar,
+                    assmnt_strategy_cnfltn_desc character varying(200) NOT NULL DEFAULT ' '::character varying,
+                    assmnt_strategy_oca_desc character varying(500) NOT NULL DEFAULT ' '::character varying,
+                    assmnt_strategy_substn_desc character varying(200) NOT NULL DEFAULT ' '::character varying,
+                    assmnt_strategy_oes_desc character varying(500) NOT NULL DEFAULT ' '::character varying,
+                    assmnt_strategy_threshold_desc character varying(600) NOT NULL DEFAULT ' '::character varying,
+                    pres_start_date timestamp without time zone,
+                    pres_finish_date timestamp without time zone,
+                    vle_course_page_in_stud_home character(1) NOT NULL DEFAULT ' '::bpchar,
+                    full_course_title character varying(70) NOT NULL DEFAULT ' '::character varying
+                )";
+            $DB->execute($createsql);
+        }
+
+        // Clear the table.
+        $DB->execute("TRUNCATE vl_v_crs_version_pres");
+    }
+
     private function get_days($days, $beforeafter = 'after') {
         if ($beforeafter === 'before') {
             return -($days * 24 * 60 * 60);
@@ -156,22 +207,17 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $coursecontext2 = context_course::instance($course2->id);
 
         // Generate a vl_v_crs_version_pres table.
-         $DB->execute("CREATE TABLE vl_c_crs_version_pres_a " .
-                 "(vle_course_short_name VARCHAR, vle_student_open_date DATE)");
-         $DB->execute("CREATE TABLE vl_c_crs_version_pres_b " .
-                 "(vle_course_short_name VARCHAR, vle_student_open_date DATE)");
-         $DB->execute("CREATE OR REPLACE VIEW vl_v_crs_version_pres AS
-                 SELECT * FROM vl_c_crs_version_pres_a");
+        $this->create_version_pres_tables();
 
         // Insert data to the above table
         $courseshortname = 'M123-12J';
         $studentopendate = '2013-04-11';
-         $DB->execute("INSERT INTO vl_c_crs_version_pres_a (vle_course_short_name, vle_student_open_date) " .
+         $DB->execute("INSERT INTO vl_v_crs_version_pres (vle_course_short_name, vle_student_open_date) " .
                  "VALUES ('$courseshortname', '$studentopendate')");
 
         $courseondataloadtable = $DB->get_record_sql(
                 'SELECT * FROM vl_v_crs_version_pres ' .
-                'WHERE vle_course_short_name =?', array($courseshortname), MUST_EXIST);
+                'WHERE vle_course_short_name = ?', array($courseshortname), MUST_EXIST);
 
         // Create a new workflow object which applies to course.
         list($courseworkflow, $step1) = $this->create_a_workflow_with_one_step($after5days);

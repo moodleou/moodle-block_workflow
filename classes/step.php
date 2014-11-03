@@ -910,7 +910,7 @@ class block_workflow_step {
     }
 
     public static function get_autofinish_options($appliesto) {
-        global $DB;
+        global $CFG, $DB;
 
         $options = array();
         $options[''] = get_string('donotautomaticallyfinish', 'block_workflow');
@@ -926,9 +926,7 @@ class block_workflow_step {
             $options['course;startdate'] = get_string('coursestartdate', 'block_workflow');
 
             // Check whether vl_v_crs_version_pres table exists.
-            $sql = "SELECT table_name FROM information_schema.tables
-                    WHERE table_name = 'vl_v_crs_version_pres'";
-            if ($DB->get_record_sql($sql)) {
+            if ($CFG->hasdataloadtables) {
                 // Here we are using 'db-tablename;relevatfield' as array key.
                 $options['vl_v_crs_version_pres;vle_student_open_date'] = get_string('coursestudentopen', 'block_workflow');
                 $options['vl_v_crs_version_pres;vle_student_close_date'] = get_string('coursestudentclose', 'block_workflow');
