@@ -555,4 +555,77 @@ class block_workflow_steps_test extends block_workflow_testlib {
                 'set_workflow', 1);
     }
 
+    public function test_get_all_users_and_their_roles() {
+        global $DB;
+         $this->resetAfterTest(true);
+
+        // Create roles
+        $roleids = $DB->get_records_menu('role', null, '', 'shortname, id');
+        $roles = $DB->get_records('role');
+
+        $rolenames = array();
+        $rolenames['manager'] = 'Manager';
+        $rolenames['coursecreator'] = 'Course creater';
+        $rolenames['editingteacher'] = 'Teacher';
+        $rolenames['teacher'] = 'Non-editing teacher';
+        $rolenames['student'] = 'Student';
+
+        // Create a new workflow.
+        $data = new stdClass();
+        $data->shortname            = 'username role workflow';
+        $data->name                 = 'User name in each role Workflow';
+        $data->appliesto            = 'course';
+        $data->obsolete             = 0;
+        $data->description          = 'User name in each role workflow applying to a course for the unit test';
+        $data->descriptionformat    = FORMAT_PLAIN;
+        $workflow = new block_workflow_workflow();
+        $workflow->create_workflow($data);
+
+        $generator = $this->getDataGenerator();
+
+        // Create users.
+        $maxnumberofusers = 5;
+        $users = array();
+        for ($index = 1; $index < ($maxnumberofusers + 1); $index++) {
+            $users[$index] = $generator->create_user(array('username' => 'user' . $index));
+        }
+        // Create a course.
+        $course = $generator->create_course(array('shortname' => 'MK123-12J'));
+        $coursecontext = context_course::instance($course->id);
+
+        // Users one to 5 get following roles.
+        // user1 is a manager.
+        // user2 is a coursecreater.
+        // user3 is a editingteacher.
+        // user4 is a teacher.
+        // user5 is a student.
+        $manualenrol = enrol_get_plugin('manual');
+        $manualenrol->add_default_instance($course);
+        $instance1 = $DB->get_record('enrol', array('enrol' => 'manual', 'courseid' => $course->id));
+
+        foreach ($users as $i => $user ) {
+            $manualenrol->enrol_user($instance1,  $user->id, $roleids[$roles[$i]->shortname]);
+        }
+        $expectedroles = array();
+
+        $expectedusers = array();
+        foreach ($users as $key => $user) {
+            $user->roles = array();
+            $user->roles[] = $rolenames[$roles[$key]->shortname];
+            $expectedusers[$user->id] = $user;
+        }
+
+        // Add workflow to context
+        $state = $workflow->add_to_context($coursecontext->id);
+
+        $stepstate = new block_workflow_step_state();
+        $users = $stepstate->get_all_users_and_their_roles($roles, $coursecontext);
+
+        $this->assertEquals('array', gettype($users));
+        $this->assertEquals('array', gettype($expectedusers));
+
+        $this->assertSame(sort($expectedusers), sort($users));
+
+        return;
+    }
 }

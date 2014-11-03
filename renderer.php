@@ -88,7 +88,9 @@ class block_workflow_renderer extends plugin_renderer_base {
                 }
             }
 
-            $output .= html_writer::tag('p', $who);
+            $output .= html_writer::tag('span', $who);
+            $output .= $this->get_popup_button($roles, $context);
+            $this->page->requires->yui_module('moodle-block_workflow-userinfo', 'M.block_workflow.userinfo.init');
         }
 
         // Instructions.
@@ -158,7 +160,7 @@ class block_workflow_renderer extends plugin_renderer_base {
      * @return  string            The rendered list item
      */
     public function block_display_todo_item($todo, $stateid, $editable) {
-        global $CFG, $PAGE;
+        global $CFG;
         $todoattribs = array();
 
         // The contents of the list item.
@@ -171,7 +173,7 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         if ($editable) {
             // Generate the URL and Link.
-            $returnurl = str_replace($CFG->wwwroot, '', $PAGE->url->out(false));
+            $returnurl = str_replace($CFG->wwwroot, '', $this->page->url->out(false));
             $url = new moodle_url('/blocks/workflow/toggletaskdone.php',
                     array('sesskey' => sesskey(), 'stateid' => $stateid, 'todoid' => $todo->id, 'returnurl' => $returnurl));
             $li  = html_writer::tag('li', html_writer::link($url, $text,
@@ -218,19 +220,14 @@ class block_workflow_renderer extends plugin_renderer_base {
         $output  = '';
 
         // The manage workflows section.
-        $output .= $this->box_start('generalbox boxwidthwide boxaligncenter', 'manage');
         $output .= $this->output->heading(get_string('manageworkflows', 'block_workflow'));
         $output .= html_writer::tag('p', get_string('managedescription', 'block_workflow'), array('class' => 'mdl-align'));
         $output .= $this->list_workflows($workflows);
-        $output .= $this->box_end();
 
         // The manage workflows section.
-        $output .= $this->box_start('generalbox boxwidthwide boxaligncenter', 'manage');
         $output .= $this->output->heading(get_string('manageemails', 'block_workflow'));
         $output .= html_writer::tag('p', get_string('emaildescription', 'block_workflow'), array('class' => 'mdl-align'));
         $output .= $this->list_emails($emails);
-
-        $output .= $this->box_end();
 
         return $output;
     }
@@ -247,7 +244,7 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // Display the current workflows.
         $table = new html_table();
-        $table->attributes['class'] = 'boxaligncenter';
+        $table->attributes['class'] = '';
         $table->head        = array();
         $table->colclasses  = array();
         $table->data        = array();
@@ -398,7 +395,7 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // Table setup.
         $table = $this->setup_table();
-        $table->attributes['class'] = 'boxaligncenter';
+        $table->attributes['class'] = '';
         $table->head[]      = get_string('shortname',       'block_workflow');
         $table->head[]      = get_string('emailsubject', 'block_workflow');
         $table->head[]      = '';
@@ -492,17 +489,16 @@ class block_workflow_renderer extends plugin_renderer_base {
         $output = '';
 
         // List of steps.
-        $output .= $this->box_start('generalbox boxwidthwide boxaligncenter', 'manage');
         $output .= $this->output->heading(get_string('workflowsteps', 'block_workflow'));
 
         // Set up the table and it's headers.
         $table = $this->setup_table();
-        $table->attributes['class'] = 'boxaligncenter';
+        $table->attributes['class'] = '';
         $table->head[] = get_string('stepno', 'block_workflow');
         $table->head[] = get_string('stepname', 'block_workflow');
+        $table->head[] = get_string('doerstitle', 'block_workflow');
         $table->head[] = get_string('stepinstructions', 'block_workflow');
         $table->head[] = get_string('finish', 'block_workflow');
-        $table->head[] = get_string('doerstitle', 'block_workflow');
         $table->head[] = '';
 
         // Retrieve a list of steps etc.
@@ -550,7 +546,6 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // Display the table.
         $output .= html_writer::table($table);
-        $output .= $this->box_end();
 
         return $output;
     }
@@ -567,16 +562,16 @@ class block_workflow_renderer extends plugin_renderer_base {
         $cell = new html_table_cell(format_string($step->name));
         $row->cells[] = $cell;
 
+        // Roles reponsible for this step.
+        $cell = new html_table_cell($this->workflow_step_doers($step));
+        $row->cells[] = $cell;
+
         // Instructions.
         $cell = new html_table_cell(format_text($step->instructions, $step->instructionsformat));
         $row->cells[] = $cell;
 
         // Automatically finish.
         $cell = new html_table_cell($this->workflow_step_auto_finish($step, $info->appliesto));
-        $row->cells[] = $cell;
-
-        // Roles reponsible for this step.
-        $cell = new html_table_cell($this->workflow_step_doers($step));
         $row->cells[] = $cell;
 
         // Modification.
@@ -755,12 +750,11 @@ class block_workflow_renderer extends plugin_renderer_base {
         $output = '';
 
         // Start the box.
-        $output .= $this->box_start('generalbox boxwidthwide boxaligncenter', 'manage');
         $output .= $this->output->heading(get_string('workflowsettings', 'block_workflow'));
 
         // Setup the table.
         $table = $this->setup_table();
-        $table->attributes['class'] = 'boxaligncenter';
+        $table->attributes['class'] = '';
 
         // Shortname.
         $row = new html_table_row(array(
@@ -844,7 +838,6 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // Display the table.
         $output .= html_writer::table($table);
-        $output .= $this->box_end();
 
         return $output;
     }
@@ -1125,6 +1118,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         $table->attributes['class'] = 'boxaligncenter';
         $table->head[] = get_string('stepno', 'block_workflow');
         $table->head[] = get_string('stepname', 'block_workflow');
+        $table->head[] = get_string('roles', 'block_workflow');
         $table->head[] = get_string('comments', 'block_workflow');
         $table->head[] = get_string('state', 'block_workflow');
         $table->head[] = get_string('lastmodified', 'block_workflow');
@@ -1192,6 +1186,19 @@ class block_workflow_renderer extends plugin_renderer_base {
         // Step Name.
         $cell = new html_table_cell(format_string($stepstate->name));
         $cell->attributes['class'] = 'mdl-align';
+        $row->cells[] = $cell;
+
+        // Roles reponsible for this step.
+        $stateobj = new block_workflow_step_state($stepstate->stateid);
+        $roles = $stateobj->step()->roles();
+        $step = $stateobj->step();
+        $cell = new html_table_cell($this->workflow_step_doers($step));
+
+        // Add the "Show names(N)" button to the role column.
+        if ($stateobj->state === BLOCK_WORKFLOW_STATE_ACTIVE) {
+            $cell->text .= $this->get_popup_button($roles, $context);
+            $this->page->requires->yui_module('moodle-block_workflow-userinfo', 'M.block_workflow.userinfo.init');
+        }
         $row->cells[] = $cell;
 
         // Comments.
@@ -1339,5 +1346,99 @@ class block_workflow_renderer extends plugin_renderer_base {
         $output .= $this->output->heading(get_string('finishstep', 'block_workflow'), 1, 'title');
         $output .= $this->output->container(get_string('finishstepinstructions', 'block_workflow'));
         return $output;
+    }
+
+    /**
+     * Return user infor button
+     * @param object $options, array of options passing to userinfo.js
+     * @param int $numberofusers, number of users which
+     * @return NULL|string
+     */
+    protected function get_userinfo_button($options, $numberofusers) {
+        $disabled = '';
+        if ($numberofusers == 0) {
+            $disabled = 'disabled="disabled"';
+        }
+        $userinfobutton = '<input id="userinfo" ' . $disabled . '" type="submit" name="userinfo"
+                            value="'. get_string('shownamesx', 'block_workflow', $numberofusers) . '"/>';
+        $userinfobutton = html_writer::tag('span', $userinfobutton, $options);
+        return $userinfobutton;
+    }
+
+    /**
+     * Returns popup with a header and body where the body an html table
+     * @param object $users, array of users who have roles
+     */
+    protected function get_popup_table($users) {
+        global $CFG, $DB;
+
+        if (!$users) {
+            return null;
+        }
+
+        // Get extra user information from the user policies settings.
+        $extrafields = array();
+        if ($CFG->showuseridentity) {
+            $extrafields = explode(',', $CFG->showuseridentity);
+        }
+        // Set up the table header.
+        $tableheader = array();
+        $tableheader[] = get_string('name');
+        foreach ($extrafields as $field) {
+            if ($field === 'phone1') {
+                $field = 'phone';
+            }
+            $tableheader[] = get_string($field);
+        }
+        $tableheader[] = get_string('roles');
+
+        $data = array();
+        foreach ($users as $key => $user) {
+            $row = array();
+            $row[0] = html_writer::tag('b', fullname($user));
+            $extraindex = 1;
+            if ($extrafields) {
+                foreach ($extrafields as $field) {
+                    if ($field == 'email') {
+                        $row[$extraindex] = html_writer::link('mailto:' . $user->$field, $user->$field);
+                    } else {
+                        $row[$extraindex] = $user->$field;
+                    }
+                    $extraindex++;
+                }
+            }
+            $row[$extraindex] = implode(', ', $user->roles);
+            $data[] = $row;
+        }
+        if (!$data) {
+            return null;
+        }
+
+        // Create an html table and collect header and the data.
+        $table = new html_table();
+        $table->head  = $tableheader;
+        $table->data  = $data;
+
+        // Return header and body of the popup.
+        return array(get_string('showpeoplecandotask', 'block_workflow'), html_writer::table($table));
+    }
+
+    /**
+     * Return the button if there are roles
+     * @param object $state, block_workflow_step_state object
+     * @param object $roles
+     * @param object $context
+     */
+    protected function get_popup_button($roles, $context) {
+        $steptate = new block_workflow_step_state();
+        $users = $steptate->get_all_users_and_their_roles($roles, $context);
+        $numberofusers = count($users);
+        list ($header, $body) = $this->get_popup_table($users);
+        $options = array('class' => 'userinfoclass', 'header' => $header, 'body' => $body);
+
+        if (!$roles) {
+            return null;
+        }
+        return  html_writer::tag('span', ' ' . $this->get_userinfo_button($options, $numberofusers));
     }
 }

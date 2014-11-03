@@ -446,4 +446,46 @@ class block_workflow_step_state {
                 ORDER BY changes.timestamp DESC';
         return $DB->get_records_sql($sql, array($stateid));
     }
+
+    /**
+     * Returns an array of users including their roles
+     * @param object $roles, array of roles
+     * @param object $context, the workflow context
+     */
+    public function get_all_users_and_their_roles($roles, $context) {
+        global $CFG, $DB;
+        if (!$roles) {
+            return null;
+        }
+
+        list ($sortorder, $notused) =  users_order_by_sql('u');
+        $roleinfo = role_get_names($context);
+        $rolenames = array();
+        foreach ($roleinfo as $role) {
+            $rolenames[$role->shortname] = $role->localname;
+        }
+        list($roleids, $params) = $DB->get_in_or_equal(array_keys($roles));
+        $sql = "SELECT u.*, r.shortname
+                FROM {user} u
+                JOIN {role_assignments} ra ON u.id=ra.userid
+                JOIN {role} r ON r.id = ra.roleid
+                WHERE ra.roleid $roleids AND ra.contextid = ? ORDER BY $sortorder, r.sortorder";
+        $params[] = $context->id;
+
+        $userroles = $DB->get_recordset_sql($sql, $params);
+
+        $users = array();
+        foreach ($userroles as $userrole) {
+            if (!array_key_exists($userrole->id, $users)) {
+                $users[$userrole->id] = $userrole;
+                $users[$userrole->id]->roles = array($rolenames[$userrole->shortname]);
+            } else {
+                $users[$userrole->id]->roles[] = $rolenames[$userrole->shortname];
+            }
+        }
+        $userroles->close();
+
+        return $users;
+    }
+
 }

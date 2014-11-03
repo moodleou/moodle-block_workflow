@@ -1,0 +1,10 @@
+{
+    "name": "moodle-block_workflow-userinfo",
+    "builds": {
+        "moodle-block_workflow-userinfo": {
+            "jsfiles": [
+                "userinfo.js"
+            ]
+        }
+    }
+}

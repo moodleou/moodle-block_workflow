@@ -4,6 +4,48 @@ This document assumes that the reader knows how workflow system works, how to
 create workflows and workflow steps, and how to setup email notifications based
 on configurable templates.
 
+Workflow block
+--------------
+When a workflow is added to a course or a module, the workflow block displays
+the name of the attached workflow as header and some headings and buttons regarding
+current workflow step as well as a Workflow overview button.
+
+Block header: Workflow name
+
+"Currently active task" heading: step name
+
+"To be completed by" heading: Text (e.g.: You, or any other, rolename1, rolename2, ... or
+rolenameN), Buttoon "Show names(N)" (where N is number of users)
+
+"Show names(N)" button: This button is disabled when N=0 otherwise, triggers a
+popup dialogue with the heading:
+"People who can do this task" and the following table headings:
+'Name , 'Personal Identifier', 'Email address', ..., 'Roles'.
+NB: 'Personal Identifier', 'Email address', etc. are taken from the setting page
+under "System administration" -> "Users" -> "Permissions" ->  "User policies",
+"Show user identity" where the user identity is set. So, the table columns may vary
+depending upon this settings.
+
+"Instructions" heading: Instructions about the current step
+Comments: comments about the current step
+
+"Edit comments" button: Opens a dialogue box and allow user to edit/make a comment.
+
+"Finish step" button: Opens a dialogue box and allow user to edit/make a comment
+and finish the step manually. After finishing current step, the workflow block
+will display the information about the next step.
+
+"Workflow overview" button: This button takes the user to the workflow overview page.
+
+"Overview"
+---------
+This page displays a table with following headings:
+Step No, Step name, Roles, Comments, State, Last modified and the last column.
+The table headings are self explanatory apart from the last column which does not
+have a heading but provides a button in each row. If the step is active, the button
+shows "Finish Step", otherwise "Jump to step".
+Another button which may appear in the Roles column on active step row is "Show names(N)"
+which is disabled when N=0 otherwise, triggers the popup dialogue (See above).
 
 Finishing steps automatically
 -----------------------------

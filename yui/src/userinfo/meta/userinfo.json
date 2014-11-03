@@ -1,0 +1,10 @@
+{
+    "moodle-block_workflow-userinfo": {
+        "requires": [
+            "base",
+            "event",
+            "node",
+            "io"
+        ]
+    }
+}
