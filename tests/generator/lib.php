@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class block_workflow_generator extends phpunit_block_generator {
+class block_workflow_generator extends testing_block_generator {
 
     /**
      * Create new block instance
