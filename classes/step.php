@@ -926,7 +926,7 @@ class block_workflow_step {
             $options['course;startdate'] = get_string('coursestartdate', 'block_workflow');
 
             // Check whether vl_v_crs_version_pres table exists.
-            if ($CFG->hasdataloadtables) {
+            if (!empty($CFG->hasdataloadtables)) {
                 // Here we are using 'db-tablename;relevatfield' as array key.
                 $options['vl_v_crs_version_pres;vle_student_open_date'] = get_string('coursestudentopen', 'block_workflow');
                 $options['vl_v_crs_version_pres;vle_student_close_date'] = get_string('coursestudentclose', 'block_workflow');
