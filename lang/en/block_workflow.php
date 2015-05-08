@@ -28,6 +28,8 @@ $string['pluginname']                   = 'Workflows';
 $string['workflow']                     = 'Workflow';
 
 $string['activetasktitle']              = 'Currently active task';
+$string['addaworkflow']                 = 'Add a workflow';
+$string['addanotherworkflow']           = 'Add another workflow';
 $string['addemail']                     = 'Add email template';
 $string['addroletostep']                = 'Add role to step';
 $string['addstep']                      = 'Add an additional step to this workflow';
@@ -213,7 +215,7 @@ $string['nameshortname']                = '{$a->name} ({$a->shortname})';
 $string['noactiveworkflow']             = 'There is currently no active workflow.';
 $string['nocomment']                    = 'No comment yet...';
 $string['nocomments']                   = 'No comments have been made about this step yet';
-$string['nomorestepsleft']              = 'You have completed all steps.';
+$string['nomorestepsleft']              = 'The workflow has been completed.';
 $string['norolesspecified']             = 'No roles were specified';
 $string['nosuchrole']                   = 'Role {$a} does not exist';
 $string['notacourse']                   = 'This is not a course';
@@ -233,7 +235,6 @@ $string['overview']                     = 'Overview';
 $string['overviewtitle']                = 'Overview of {$a->workflowname} workflow on {$a->contexttitle}';
 
 $string['percentcomplete']              = '{$a}% complete';
-$string['previousworkflow']             = 'The workflow on this {$a->contexttype} is now complete.<br/> You can still <a href="{$a->overviewurl}">see the overview</a> of this workflow, or add a new workflow to this {$a->contexttype}.';
 
 $string['quizopendate']                 = 'the quiz open date';
 $string['quizclosedate']                = 'the quiz close date';

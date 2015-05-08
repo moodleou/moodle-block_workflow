@@ -25,7 +25,7 @@ Feature: Workflow block - follow a workflow
     And I follow "Course 1"
     And I turn editing mode on
     And I add the "Workflow" block
-    Then I should see "There are currently no available workflows"
+    Then I should see "There is currently no workflow assigned for this page"
 
   @javascript
   Scenario: Add a workflow to a course and step through it.
@@ -116,9 +116,11 @@ Feature: Workflow block - follow a workflow
     # Finish task & course visiblility again.
     When I press "Finish step"
     And I click on "Finish step" "button" in the "Finish step" "dialogue"
-    Then I should see "You have completed all steps."
-    When I reload the page
-    Then I should not see "workflow"
+    Then I should see "The workflow has been completed."
+    And "Workflow overview" "button" in the "Test course workflow" "block" should be visible
+    And I reload the page
+    And I should see "The workflow has been completed."
+    And "Workflow overview" "button" in the "Workflow" "block" should be visible
 
     # Check that the finish step script did the right thing.
     When I navigate to "Edit settings" node in "Course administration"
@@ -127,7 +129,7 @@ Feature: Workflow block - follow a workflow
     When I log out
     And I log in as "manager1"
     And I follow "Course 1"
-    Then I should see "The workflow on this Course is now complete. You can still see the overview of this workflow, or add a new workflow to this Course."
-    When I follow "see the overview"
-    Then I should see "Complete" in the "Configure basic site" "table_row"
+    Then I should see "The workflow has been completed."
+    And I click on "Workflow overview" "button" in the "Workflow" "block"
+    And I should see "Complete" in the "Configure basic site" "table_row"
     And I should see "Complete" in the "Prepare your web site" "table_row"

@@ -79,22 +79,21 @@ switch ($action) {
             // There is a next possible state, and the current user may view and/or work on it.
             $outcome->response->blockcontent = $renderer->block_display($newstate, true);
             $outcome->response->stateid = $newstate->id;
-        } else if (has_capability('block/workflow:manage', $state->context())) {
-            // Last step has been reached, if permitted retrieve the list of workflows.
-            $workflows = new block_workflow_workflow();
-            $appliesto = $state->step()->workflow()->appliesto;
-            $options = block_workflow_workflow::available_workflows($appliesto);
-            // Retrieve previous uses.
-            $previous = $workflows->load_context_workflows($state->contextid);
-            // Display.
-            $outcome->response->blockcontent = $renderer->assign_workflow($state->contextid, $options, $previous);
-            $outcome->response->listworkflows = true;
         } else if ($newstate) {
             // There is a new step, but this user can't view it, and can't work on it ...
             $outcome->response->blockcontent = $renderer->block_display_step_complete_confirmation();
         } else {
-            // ... or display message that there are no steps left.
-            $outcome->response->blockcontent = $renderer->block_display_no_more_steps();
+            // Last step has been reached, if permitted retrieve the list of workflows.
+            $workflows = new block_workflow_workflow();
+            $previous = $workflows->load_context_workflows($state->contextid);
+            $canadd = has_capability('block/workflow:manage', $state->context());
+            $appliesto = $state->step()->workflow()->appliesto;
+            $addableworkflows = block_workflow_workflow::available_workflows($appliesto);
+            $outcome->response->listworkflows = $canadd && $addableworkflows;
+
+            // Display.
+            $outcome->response->blockcontent = $renderer->block_display_no_more_steps(
+                    $state->contextid, $canadd, $addableworkflows, $previous);
         }
         break;
     case 'toggletaskdone':

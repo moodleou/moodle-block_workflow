@@ -395,7 +395,7 @@ class block_workflow_workflow {
     public static function available_workflows($for) {
         global $DB;
         $workflows = $DB->get_records('block_workflow_workflows',
-                array('appliesto' => $for, 'obsolete' => 0), 'shortname');
+                array('appliesto' => $for, 'obsolete' => 0), 'name');
         return $workflows;
     }
 

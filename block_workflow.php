@@ -93,11 +93,9 @@ class block_workflow extends block_base {
             // Display the block for this state.
             $this->content->text = $renderer->block_display($state);
         } else {
-            // The parent context currently has no workflow assigned.
-            if (!has_capability('block/workflow:manage', $this->context)) {
-                // We require workflow:manage to add a workflow.
-                return $this->content;
-            }
+            $workflows = new block_workflow_workflow();
+            $previous = $workflows->load_context_workflows($this->instance->parentcontextid);
+            $canadd = has_capability('block/workflow:manage', $this->context);
 
             // If this is a module, retrieve it's name, otherwise try the pagelayout to confirm
             // that this is a course.
@@ -108,10 +106,10 @@ class block_workflow extends block_base {
             }
 
             // Retrieve the list of workflows and display.
-            $workflows = new block_workflow_workflow();
-            $this->content->text = $renderer->assign_workflow($this->instance->parentcontextid,
-                    block_workflow_workflow::available_workflows($appliesto),
-                    $workflows->load_context_workflows($this->instance->parentcontextid));
+            $addableworkflows = block_workflow_workflow::available_workflows($appliesto);
+
+            $this->content->text = $renderer->block_display_no_more_steps(
+                    $this->instance->parentcontextid, $canadd, $addableworkflows, $previous);
         }
 
         return $this->content;

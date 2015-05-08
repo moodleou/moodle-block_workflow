@@ -165,15 +165,23 @@ class block_workflow_renderer extends plugin_renderer_base {
             $output .= html_writer::tag('div', $this->output->render($finishbutton));
         }
 
-        // Workflow overview.
-        $url = new moodle_url('/blocks/workflow/overview.php', array(
-                'contextid' => $state->contextid, 'workflowid' => $state->step()->workflowid));
-        $overviewbutton = new single_button($url,
-                get_string('workflowoverview', 'block_workflow', $state->step()->name), 'get');
-
-        $output .= html_writer::tag('div', $this->output->render($overviewbutton));
+        $output .= $this->workflow_overview_button($state->contextid, $state->step()->workflowid);
 
         return $output;
+    }
+
+    /**
+     * Display a button to go to the workflow overview.
+     * @param int $contextid the context to display the overiew for.
+     * @param int $workflowid the workflow to display the overiew for.
+     * @return string HTML of the button.
+     */
+    public function workflow_overview_button($contextid, $workflowid) {
+        $url = new moodle_url('/blocks/workflow/overview.php', array(
+                'contextid' => $contextid, 'workflowid' => $workflowid));
+        $overviewbutton = new single_button($url,
+                get_string('workflowoverview', 'block_workflow'), 'get');
+        return html_writer::tag('div', $this->output->render($overviewbutton));
     }
 
     /**
@@ -213,14 +221,52 @@ class block_workflow_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Render the content to display when no more steps remain
-     *
-     * This is used by the ajax library so that users get feedback when finishing the final step
-     *
-     * @return  string  The text to render
+     * Render the content when there is no active workflow.
+     * @param $context database record containing the context data
+     * @param $addableworkflows array The list of available workflows
+     * @param $previous array A list of the previous workflows on this
+     * context
+     * @return string the HTML to output.
      */
-    public function block_display_no_more_steps() {
-        return html_writer::tag('p', get_string('nomorestepsleft', 'block_workflow'));
+    public function block_display_no_more_steps($parentcontextid,
+            $canadd, array $addableworkflows, array $previous = null) {
+        $output = '';
+
+        if ($previous) {
+            $p = reset($previous);
+            $output .= html_writer::tag('p', get_string('nomorestepsleft', 'block_workflow'));
+            $output .= $this->workflow_overview_button($parentcontextid, $p->id);
+        }
+
+        if (!$canadd) {
+            return $output;
+        }
+
+        if (!$previous) {
+            // No workflow was previously assigned.
+            $output .= html_writer::tag('p', get_string('noworkflow', 'block_workflow'));
+        }
+
+        if ($addableworkflows) {
+            $url = new moodle_url('/blocks/workflow/addworkflow.php',
+                    array('sesskey' => sesskey(), 'contextid' => $parentcontextid));
+
+            $addoptions = array();
+            foreach ($addableworkflows as $wf) {
+                $addoptions[$wf->id] = $wf->name;
+            }
+            $list = new single_select($url, 'workflow', $addoptions);
+            if ($previous) {
+                $list->set_label(get_string('addanotherworkflow', 'block_workflow'));
+            } else {
+                $list->set_label(get_string('addaworkflow', 'block_workflow'));
+            }
+
+            // And generate the output.
+            $output .= html_writer::tag('div', $this->output->render($list));
+        }
+
+        return $output;
     }
 
     /**
@@ -1083,53 +1129,6 @@ class block_workflow_renderer extends plugin_renderer_base {
         $table->colclasses  = array();
         $table->data        = array();
         return $table;
-    }
-
-    /**
-     * Assign a workflow to a context
-     * @param $context database record containing the context data
-     * @param $options array The list of available workflows
-     * @param $previous array A list of the previous workflows on this
-     * context
-     */
-    public function assign_workflow($parentcontextid, $options, array $previous = null) {
-        if (count($options) == 0) {
-            // If there are currently no available workflows, give an
-            // informative message to that effect.
-            return get_string('noworkflows', 'block_workflow');
-        }
-
-        $output  = '';
-        $context = context::instance_by_id($parentcontextid);
-
-        if ($previous) {
-            $p = array_shift($previous);
-            // If a workflow was previously assigned, we should give a link to it's overview.
-            $a = array();
-            $url = new moodle_url('/blocks/workflow/overview.php',
-                    array('contextid' => $parentcontextid, 'workflowid' => $p->id));
-            $a['contexttype'] = context_helper::get_level_name($context->contextlevel);
-            $a['overviewurl'] = $url->out();
-            $output .= get_string('previousworkflow', 'block_workflow', $a);
-        } else {
-            // No workflow was previously assigned.
-            $output .= get_string('noworkflow', 'block_workflow');
-        }
-
-        // The script addworkflow.php handles adding a context to a workflow.
-        $url = new moodle_url('/blocks/workflow/addworkflow.php',
-                array('sesskey' => sesskey(), 'contextid' => $parentcontextid));
-
-        // Create the list of available workflows.
-        foreach ($options as $o) {
-            $option[$o->id] = $o->name;
-        }
-        $list = new single_select($url, 'workflow', $option);
-
-        // And generate the output.
-        $output .= html_writer::tag('div', $this->output->render($list));
-
-        return $output;
     }
 
     public function workflow_overview($workflow, array $states, $context) {
