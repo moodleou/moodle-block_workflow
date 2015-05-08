@@ -41,7 +41,7 @@ class block_workflow_renderer extends plugin_renderer_base {
      * @param   object  $state  The block_workflow_step_state to render for
      * @return  string          The rendered content
      */
-    public function block_display(block_workflow_step_state $state) {
+    public function block_display(block_workflow_step_state $state, $ajax = false) {
         global $USER;
 
         $canmakechanges = block_workflow_can_make_changes($state);
@@ -131,8 +131,33 @@ class block_workflow_renderer extends plugin_renderer_base {
 
             $output .= html_writer::tag('div', $this->output->render($editbutton));
 
+            if (!$ajax) {
+                // Output the contents of the edit comment dialogue, hidden.
+                // Prepare editor.
+                $editor = new MoodleQuickForm_editor('comment_editor', get_string('commentlabel', 'block_workflow'),
+                        array('id' => 'wkf-comment-editor'), block_workflow_editor_options());
+                $editor->setValue(array('text' => $state->comment));
+
+                $output .= '<div class="block-workflow-panel">
+                                <form class="wkf-comments" action='.'>
+                                    <div class="wfk-textarea">' .
+                                        html_writer::label(get_string('commentlabel', 'block_workflow'),
+                                                'wkf-comment-editor', false, array('class' => 'accesshide')) .
+                                        $editor->toHtml() . '
+                                    </div>
+                                    <div class="wfk-submit">
+                                        <input type="button" class="submitbutton"/>
+                                    </div>
+                                </form>
+                                <div class="loading-lightbox hidden">' .
+                                    $this->pix_icon('i/loading', get_string('loading', 'admin'), 'moodle',
+                                            array('class' => 'loading-icon')) . '
+                                </div>
+                            </div>';
+            }
+
             // Finish step.
-            $url    = new moodle_url('/blocks/workflow/finishstep.php',
+            $url = new moodle_url('/blocks/workflow/finishstep.php',
                     array('stateid' => $state->id));
             $finishbutton = new single_button($url, get_string('finishstep', 'block_workflow'), 'get');
             $finishbutton->class = 'singlebutton block_workflow_finishstepbutton';

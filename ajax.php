@@ -26,6 +26,7 @@ define('AJAX_SCRIPT', true);
 
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
+require_once($CFG->dirroot . '/lib/form/editor.php');
 
 // Require the session key.
 require_sesskey();
@@ -76,7 +77,7 @@ switch ($action) {
 
         if ($newstate && ($canview || block_workflow_can_make_changes($newstate))) {
             // There is a next possible state, and the current user may view and/or work on it.
-            $outcome->response->blockcontent = $renderer->block_display($newstate);
+            $outcome->response->blockcontent = $renderer->block_display($newstate, true);
             $outcome->response->stateid = $newstate->id;
         } else if (has_capability('block/workflow:manage', $state->context())) {
             // Last step has been reached, if permitted retrieve the list of workflows.

@@ -30,3 +30,5 @@ $plugin->cron      = 60;
 $plugin->component = 'block_workflow';
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->release   = 'v1.4 for Moodle 2.7+';
+
+$plugin->outestssufficient = true;

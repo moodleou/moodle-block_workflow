@@ -1,32 +1,32 @@
 YUI.add('moodle-block_workflow-comments', function (Y, NAME) {
 
 var COMMENTSNAME = 'blocks_workflow_comments',
-    BASE = 'commentsBase',
     AJAXURL = '/blocks/workflow/ajax.php',
     STATEID = 'stateid',
-    EDITORHTML = 'editorhtml',
     EDITORID = 'editorid',
     EDITORNAME = 'editorname',
     CSS = {
-        BLOCKWORKFLOW : 'block_workflow',
-        BLOCKCOMMENTS : 'block_workflow_comments',
-        BLOCKCOMMBTN : 'block_workflow_editcommentbutton',
-        BLOCKFINISHBTN : 'block_workflow_finishstepbutton',
-        PANEL : 'block-workflow-panel',
-        CONTENT : 'content',
-        COMMENTS : 'wkf-comments',
-        LIGHTBOX : 'loading-lightbox',
-        LOADINGICON : 'loading-icon',
-        TEXTAREA : 'wfk-textarea',
-        SUBMIT : 'wfk-submit',
-        HIDDEN : 'hidden'
+        BLOCKWORKFLOW:  'block_workflow',
+        BLOCKCOMMENTS:  'block_workflow_comments',
+        BLOCKCOMMBTN:   'block_workflow_editcommentbutton',
+        BLOCKFINISHBTN: 'block_workflow_finishstepbutton',
+        PANEL:          'block-workflow-panel',
+        CONTENT:        'content',
+        COMMENTS:       'wkf-comments',
+        LIGHTBOX:       'loading-lightbox',
+        LOADINGICON:    'loading-icon',
+        TEXTAREA:       'wfk-textarea',
+        SUBMIT:         'wfk-submit',
+        HIDDEN:         'hidden'
     };
 
 var overlay = new M.core.dialogue({
-    visible : false, //by default it is not displayed
-    lightbox : true,
-    width : 'auto', //'default 431px'
-    zIndex : 100
+    headerContent: '',
+    bodyContent:   Y.one('.' + CSS.PANEL),
+    visible:       false,
+    modal:         true,
+    width:         'auto',
+    zIndex:        100
 });
 
 var COMMENTS = function() {
@@ -34,43 +34,28 @@ var COMMENTS = function() {
 };
 
 Y.extend(COMMENTS, Y.Base, {
-    _formSubmitEvent :null,
-    _escCloseEvent : null,
+    _formSubmitEvent:  null,
+    _escCloseEvent:    null,
     _closeButtonEvent: null,
-    _loadingNode : null,
+    _loadingNode:      null,
 
-    initializer : function() {
+    initializer: function() {
         overlay.hide();
-        this.set(BASE, Y.Node.create('<div class="' + CSS.PANEL + '"></div>')
-                    .append(Y.Node.create('<div class="' + CSS.COMMENTS + '"></div>')
-                        .append(Y.Node.create('<div class="' + CSS.TEXTAREA + '"></div>')
-                            .append(Y.Node.create(this.get(EDITORHTML))))
-                        .append(Y.Node.create('<div class="' + CSS.SUBMIT + '"></div>')
-                            .append(Y.Node.create('<input type="button" class="submitbutton"/>')))
-                    )
-                    .append(Y.Node.create('<div class="' + CSS.LIGHTBOX + ' ' + CSS.HIDDEN + '"></div>')
-                        .append(Y.Node.create('<img alt="loading" class="' + CSS.LOADINGICON + '" />')
-                            .setAttribute('src', M.util.image_url('i/loading', 'moodle')))
-                        .setStyle('opacity', 0.5)
-                    ));
-        this._loadingNode = this.get(BASE).one('.' + CSS.LIGHTBOX);
-
-        // prepare content
-        overlay.set('bodyContent', this.get(BASE));
+        this._loadingNode = Y.one('.' + CSS.PANEL).one('.' + CSS.LIGHTBOX);
         this.attachEvents();
     },
 
-    show : function (e, finishstep) {
+    show: function (e, finishstep) {
         e.halt();
 
         // Different scenario depending on whether we finishing the step or just editiong the comment
         if (finishstep) {
             overlay.set('headerContent', M.str.block_workflow.finishstep);
-            this.get(BASE).one('.' + CSS.SUBMIT + ' input').set('value', M.str.block_workflow.finishstep);
+            Y.one('.' + CSS.PANEL).one('.' + CSS.SUBMIT + ' input').set('value', M.str.block_workflow.finishstep);
             this._formSubmitEvent = Y.one('.' + CSS.SUBMIT + ' input').on('click', this.finishstep, this);
         } else {
             overlay.set('headerContent', M.str.block_workflow.editcomments);
-            this.get(BASE).one('.' + CSS.SUBMIT + ' input').set('value', M.str.moodle.savechanges);
+            Y.one('.' + CSS.PANEL).one('.' + CSS.SUBMIT + ' input').set('value', M.str.moodle.savechanges);
             this._formSubmitEvent = Y.one('.' + CSS.SUBMIT + ' input').on('click', this.save, this);
         }
 
@@ -85,26 +70,28 @@ Y.extend(COMMENTS, Y.Base, {
 
         // Build the data for submission
         var data = {
-            sesskey : M.cfg.sesskey,
-            action  : 'getcomment',
-            stateid : this.get(STATEID)
+            sesskey: M.cfg.sesskey,
+            action:  'getcomment',
+            stateid: this.get(STATEID)
         };
 
-        var ed = tinyMCE.get(this.get(EDITORID));
+        if (typeof tinyMCE !== 'undefined') {
+            var ed = tinyMCE.get(this.get(EDITORID));
 
-        // Resize then editor when first shown if it would otherwise be too small.
-        var ifr = tinymce.DOM.get(this.get(EDITORID) + '_ifr');
-        var size = tinymce.DOM.getSize(ifr);
-        if (size.h === 30) {
-            ed.theme.resizeTo(size.w, 90);
+            // Resize then editor when first shown if it would otherwise be too small.
+            var ifr = tinymce.DOM.get(this.get(EDITORID) + '_ifr');
+            var size = tinymce.DOM.getSize(ifr);
+            if (size.h === 30) {
+                ed.theme.resizeTo(size.w, 90);
+            }
         }
 
         // Fetch the comment and update the form
         Y.io(M.cfg.wwwroot + AJAXURL, {
             method:'POST',
             data:build_querystring(data),
-            on : {
-                start : this.displayLoading,
+            on: {
+                start: this.displayLoading,
                 complete: function(tid, outcome) {
                     var result;
                     try {
@@ -115,15 +102,25 @@ Y.extend(COMMENTS, Y.Base, {
                     } catch (e) {
                         new M.core.exception(e);
                     }
-                    ed.setContent(result.response.comment);
+                    if (typeof tinyMCE !== 'undefined') {
+                        ed.setContent(result.response.comment);
+                    } else {
+                        var editorid = this.get(EDITORID);
+                        var editor = Y.one(document.getElementById(editorid + 'editable'));
+                        if (editor) {
+                            editor.setHTML(result.response.comment);
+                        }
+                        Y.one(document.getElementById(editorid)).set(
+                                'value', result.response.comment);
+                    }
                 },
-                end : this.removeLoading
+                end: this.removeLoading
             },
             context:this
         });
     },
 
-    hide : function () {
+    hide: function () {
         overlay.hide(); //hide the overlay
         if (this._escCloseEvent) {
             this._escCloseEvent.detach();
@@ -138,23 +135,29 @@ Y.extend(COMMENTS, Y.Base, {
             this._formSubmitEvent = null;
         }
     },
-    save : function () {
-        var ed = tinyMCE.get(this.get(EDITORID));
+    save: function () {
+        var comment;
+        if (typeof tinyMCE !== 'undefined') {
+            comment = tinyMCE.get(this.get(EDITORID)).getContent();
+        } else {
+            comment = Y.one(document.getElementById(this.get(EDITORID))).get('value');
+        }
+
         var commentsblock = Y.one('.' + CSS.BLOCKWORKFLOW + ' .' + CSS.BLOCKCOMMENTS);
         // Build the data for submission
         var data = {
-            sesskey : M.cfg.sesskey,
-            action  : 'savecomment',
-            stateid : this.get(STATEID),
-            text    : ed.getContent(),
-            format  : document.getElementsByName(this.get(EDITORNAME) + '[format]')[0].value
+            sesskey: M.cfg.sesskey,
+            action:  'savecomment',
+            stateid: this.get(STATEID),
+            text:    comment,
+            format:  document.getElementsByName(this.get(EDITORNAME) + '[format]')[0].value
         };
 
         Y.io(M.cfg.wwwroot + AJAXURL, {
             method:'POST',
             data:build_querystring(data),
-            on : {
-                start : this.displayLoading,
+            on: {
+                start: this.displayLoading,
                 complete: function(tid, outcome) {
                     var result;
                     try {
@@ -171,29 +174,35 @@ Y.extend(COMMENTS, Y.Base, {
                         commentsblock.setContent(M.str.block_workflow.nocomments);
                     }
                 },
-                end : this.removeLoading
+                end: this.removeLoading
             },
             context:this
         });
         this.hide();
     },
-    finishstep : function () {
-        var ed = tinyMCE.get(this.get(EDITORID));
+    finishstep: function () {
+        var comment;
+        if (typeof tinyMCE !== 'undefined') {
+            comment = tinyMCE.get(this.get(EDITORID)).getContent();
+        } else {
+            comment = Y.one(document.getElementById(this.get(EDITORID))).get('value');
+        }
+
         var workflowblock = Y.one('.' + CSS.BLOCKWORKFLOW + ' .' + CSS.CONTENT);
         // Build the data for submission
         var data = {
-            sesskey : M.cfg.sesskey,
-            action  : 'finishstep',
-            stateid : this.get(STATEID),
-            text    : ed.getContent(),
-            format  : document.getElementsByName(this.get(EDITORNAME) + '[format]')[0].value
+            sesskey: M.cfg.sesskey,
+            action:  'finishstep',
+            stateid: this.get(STATEID),
+            text:    comment,
+            format:  document.getElementsByName(this.get(EDITORNAME) + '[format]')[0].value
         };
 
         Y.io(M.cfg.wwwroot + AJAXURL, {
             method:'POST',
             data:build_querystring(data),
-            on : {
-                start : this.displayLoading,
+            on: {
+                start: this.displayLoading,
                 complete: function(tid, outcome) {
                     var result;
                     try {
@@ -217,26 +226,25 @@ Y.extend(COMMENTS, Y.Base, {
                         }
                         if (result.response.listworkflows) {
                             // Last step, avialable workflows are listed
-                            var form_id = workflowblock.one('.singleselect form').getAttribute('id');
                             var select_id = workflowblock.one('.singleselect form select').getAttribute('id');
                             // Reinit single_select event
-                            M.util.init_select_autosubmit(Y, form_id, select_id, "");
+                            M.core.init_formautosubmit({selectid: select_id, nothing: ''});
                         }
                     }
                 },
-                end : this.removeLoading
+                end: this.removeLoading
             },
             context:this
         });
         this.hide();
     },
-    displayLoading : function() {
+    displayLoading: function() {
         this._loadingNode.removeClass(CSS.HIDDEN);
     },
-    removeLoading : function() {
+    removeLoading: function() {
         this._loadingNode.addClass(CSS.HIDDEN);
     },
-    attachEvents : function() {
+    attachEvents: function() {
         var commentbutton = Y.one('.' + CSS.BLOCKCOMMBTN + ' input');
         if (commentbutton) {
             commentbutton.on('click', this.show, this, false);
@@ -248,20 +256,16 @@ Y.extend(COMMENTS, Y.Base, {
     }
 
 }, {
-    NAME : COMMENTSNAME,
-    ATTRS : {
+    NAME: COMMENTSNAME,
+    ATTRS: {
         stateid: {
             value: null
         },
-        editorhtml : {
-            validator : Y.Lang.isString,
+        editorid: {
             value: null
         },
-        editorid : {
-            value: null
-        },
-        editorname : {
-            validator : Y.Lang.isString,
+        editorname: {
+            validator: Y.Lang.isString,
             value: null
         }
 
@@ -274,4 +278,4 @@ M.blocks_workflow.init_comments = function(params) {
 };
 
 
-}, '@VERSION@', {"requires": ["base", "overlay", "moodle-core-notification"]});
+}, '@VERSION@', {"requires": ["base", "overlay", "moodle-core-formautosubmit", "moodle-core-notification"]});

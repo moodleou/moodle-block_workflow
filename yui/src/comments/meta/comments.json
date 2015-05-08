@@ -3,6 +3,7 @@
         "requires": [
             "base",
             "overlay",
+            "moodle-core-formautosubmit",
             "moodle-core-notification"
         ]
     }

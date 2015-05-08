@@ -156,8 +156,8 @@ function block_workflow_editor_options() {
 
     // Disallow files.
     $options['maxfiles'] = 0;
+    $options['autosave'] = false;
 
-    // Disallow use of images.
     return $options;
 }
 
