@@ -72,7 +72,7 @@ class block_workflow_command_test extends block_workflow_testlib {
         $data->appliesto            = 'quiz';
         $data->obsolete             = 0;
         $data->description          = 'This is a test workflow';
-        $data->descriptionformat    = FORMAT_PLAIN;
+        $data->descriptionformat    = FORMAT_HTML;
 
         // Create a new workflow object.
         $workflow = new block_workflow_workflow();

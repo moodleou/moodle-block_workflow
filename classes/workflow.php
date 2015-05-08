@@ -228,7 +228,7 @@ class block_workflow_workflow {
 
         // Set the default descriptionformat.
         if (!isset($workflow->descriptionformat)) {
-            $workflow->descriptionformat = FORMAT_PLAIN;
+            $workflow->descriptionformat = FORMAT_HTML;
         }
 
         // Set the default appliesto to 'course'.

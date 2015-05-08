@@ -139,7 +139,7 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $data->appliesto            = $appliesto;
         $data->obsolete             = 0;
         $data->description          = 'This is a test workflow applying to a ' . $appliesto . ' for the unit test';
-        $data->descriptionformat    = FORMAT_PLAIN;
+        $data->descriptionformat    = FORMAT_HTML;
         $workflow->create_workflow($data);
 
         // When creating a workflow, the initial step will have automatically been created.
@@ -172,8 +172,8 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
                         'stepname' => $step->name,
                         'autofinish' => $step->autofinish,
                         'autofinishoffset' => $step->autofinishoffset,
-                        'courseid' => $course->id,
-                        'courseshortname' => $course->shortname,
+                        'courseid' => ($course ? $course->id : null),
+                        'courseshortname' => ($course ? $course->shortname : null),
                         'moduleid' => $cmid)
                     );
     }
@@ -270,7 +270,7 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $state1q->state);
 
         // Create expected objects for active steps and test them against the actual objects.
-        $expectedactivesteps += $this->get_expected_active_step($state1q, $step1q, 'quiz', $course1, $quiz1->id);
+        $expectedactivesteps += $this->get_expected_active_step($state1q, $step1q, 'quiz', null, $quiz1->id);
         $activesteps = $this->stepfinisher->get_all_active_steps();
         $this->assertEquals(3, count($activesteps));
         $this->assertEquals($expectedactivesteps, $activesteps);
@@ -284,7 +284,7 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $state1eq->state);
 
         // Create expected objects for active steps and test them against the actual objects.
-        $expectedactivesteps += $this->get_expected_active_step($state1eq, $step1eq, 'externalquiz', $course2, $externalquiz1->id);
+        $expectedactivesteps += $this->get_expected_active_step($state1eq, $step1eq, 'externalquiz', null, $externalquiz1->id);
         $activesteps = $this->stepfinisher->get_all_active_steps();
         $this->assertEquals(4, count($activesteps));
         $this->assertEquals(count($expectedactivesteps), count($activesteps));

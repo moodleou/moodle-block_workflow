@@ -107,7 +107,7 @@ class block_workflow_lib_test extends block_workflow_testlib {
         $data->appliesto            = 'course';
         $data->obsolete             = 0;
         $data->description          = 'This is a test workflow applying to a course for the unit test';
-        $data->descriptionformat    = FORMAT_PLAIN;
+        $data->descriptionformat    = FORMAT_HTML;
 
         // This has the same shortname, but a different name.
         $data->name                 = 'differentname';
@@ -211,7 +211,7 @@ class block_workflow_lib_test extends block_workflow_testlib {
         $data->appliesto            = 'course';
         $data->obsolete             = 0;
         $data->description          = 'This is a test workflow applying to a course for the unit test';
-        $data->descriptionformat    = FORMAT_PLAIN;
+        $data->descriptionformat    = FORMAT_HTML;
 
         // The method create_workflow will return a completed workflow object.
         $return = $workflow->create_workflow($data);
@@ -273,7 +273,7 @@ class block_workflow_lib_test extends block_workflow_testlib {
         $data->appliesto            = 'course';
         $data->obsolete             = 0;
         $data->description          = 'This is a test workflow applying to a course for the unit test';
-        $data->descriptionformat    = FORMAT_PLAIN;
+        $data->descriptionformat    = FORMAT_HTML;
 
         // The method create_workflow will return a completed workflow object.
         $return = $workflow->create_workflow($data);
@@ -337,7 +337,7 @@ class block_workflow_lib_test extends block_workflow_testlib {
         $nsdata->workflowid         = $workflow->id;
         $nsdata->name               = 'Second Step';
         $nsdata->instructions       = 'New Instructions';
-        $nsdata->instructionsformat = FORMAT_PLAIN;
+        $nsdata->instructionsformat = FORMAT_HTML;
         $nsdata->onactivescript     = '';
         $nsdata->oncompletescript   = '';
 
@@ -411,7 +411,7 @@ class block_workflow_lib_test extends block_workflow_testlib {
         $nsdata->workflowid         = $workflow->id;
         $nsdata->name               = 'Second Step';
         $nsdata->instructions       = 'New Instructions';
-        $nsdata->instructionsformat = FORMAT_PLAIN;
+        $nsdata->instructionsformat = FORMAT_HTML;
         $nsdata->onactivescript     = '';
         $nsdata->oncompletescript   = '';
 
@@ -593,7 +593,7 @@ class block_workflow_lib_test extends block_workflow_testlib {
         $nsdata->name               = 'Second Step';
 
         $nsdata->instructions       = 'New Instructions';
-        $nsdata->instructionsformat = FORMAT_PLAIN;
+        $nsdata->instructionsformat = FORMAT_HTML;
         $nsdata->onactivescript     = '';
         $nsdata->oncompletescript   = '';
 
@@ -635,7 +635,7 @@ class block_workflow_lib_test extends block_workflow_testlib {
         $nsdata->workflowid         = $workflow->id;
         $nsdata->name               = 'Second Step';
         $nsdata->instructions       = 'New Instructions';
-        $nsdata->instructionsformat = FORMAT_PLAIN;
+        $nsdata->instructionsformat = FORMAT_HTML;
         $nsdata->onactivescript     = '';
         $nsdata->oncompletescript   = '';
 
@@ -673,7 +673,7 @@ class block_workflow_lib_test extends block_workflow_testlib {
         $nsdata->workflowid         = $workflow->id;
         $nsdata->name               = 'Second Step';
         $nsdata->instructions       = 'New Instructions';
-        $nsdata->instructionsformat = FORMAT_PLAIN;
+        $nsdata->instructionsformat = FORMAT_HTML;
         $nsdata->onactivescript     = '';
         $nsdata->oncompletescript   = '';
 
@@ -697,7 +697,7 @@ class block_workflow_lib_test extends block_workflow_testlib {
         // And then faking the form submission editor part too.
         $newdata->description_editor = array(
             'text'      => 'Example text',
-            'format'    => FORMAT_PLAIN,
+            'format'    => FORMAT_HTML,
         );
         $clone = block_workflow_workflow::clone_workflow($workflow->id, $newdata);
 
@@ -796,7 +796,7 @@ class block_workflow_lib_test extends block_workflow_testlib {
             $state->load_active_state($this->contextid);
 
             // Update the comment on it.
-            $state->update_comment('Sample Comment');
+            $state->update_comment('Sample Comment', FORMAT_HTML);
 
             // Verify our comment updated.
             $this->assertEquals($state->comment, 'Sample Comment');
@@ -830,7 +830,7 @@ class block_workflow_lib_test extends block_workflow_testlib {
         $data->appliesto            = 'quiz';
         $data->obsolete             = 0;
         $data->description          = 'Quiz Workflow';
-        $data->descriptionformat    = FORMAT_PLAIN;
+        $data->descriptionformat    = FORMAT_HTML;
 
         // Create a new workflow object.
         $workflow = new block_workflow_workflow();

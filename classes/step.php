@@ -196,7 +196,7 @@ class block_workflow_step {
 
         // Set the default instructionsformat.
         if (!isset($step->instructionsformat)) {
-            $step->instructionsformat = FORMAT_PLAIN;
+            $step->instructionsformat = FORMAT_HTML;
         }
 
         // Set the default autofinish and autofinishoffset.

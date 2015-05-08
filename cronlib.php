@@ -211,7 +211,7 @@ class block_workflow_automatic_step_finisher {
             // Add a comment and finsh the step automatically.
             $newcomment = get_string('finishstepautomatically',  'block_workflow',
                                         date('H:i:s') . ' on ' . date('jS \of F Y'));
-            $state->finish_step($newcomment, FORMAT_PLAIN);
+            $state->finish_step($newcomment, FORMAT_HTML);
 
             // Cron setup user.
             cron_setup_user();

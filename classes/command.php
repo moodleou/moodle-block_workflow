@@ -135,7 +135,7 @@ class block_workflow_command {
      * @return  Array    A list of users for the specified context and role
      */
     public function role_users($role, $context) {
-        return get_role_users($role->id, $context);
+        return get_role_users($role->id, $context, false, 'u.*');
     }
 
     /**

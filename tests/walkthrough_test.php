@@ -77,7 +77,7 @@ class block_workflow_walkthrough_test extends advanced_testcase {
         $data->appliesto            = 'course';
         $data->obsolete             = 0;
         $data->description          = 'This is a test workflow applying to a course for the unit test';
-        $data->descriptionformat    = FORMAT_PLAIN;
+        $data->descriptionformat    = FORMAT_HTML;
 
         // Create_workflow will return a completed workflow object.
         $workflow->create_workflow($data);
@@ -97,7 +97,7 @@ class block_workflow_walkthrough_test extends advanced_testcase {
         $nsdata->workflowid         = $workflow->id;
         $nsdata->name               = 'Second step';
         $nsdata->instructions       = 'New instructions';
-        $nsdata->instructionsformat = FORMAT_PLAIN;
+        $nsdata->instructionsformat = FORMAT_HTML;
         $nsdata->onactivescript     = 'setcoursevisibility visible';
         $nsdata->oncompletescript   = 'setcoursevisibility hidden';
 
@@ -124,7 +124,7 @@ class block_workflow_walkthrough_test extends advanced_testcase {
         $DB->set_field('course', 'visible', '0', array('id' => $course->id));
 
         // Finish the first step.
-        $state2 = $state->finish_step('Comment on task 1', FORMAT_PLAIN);
+        $state2 = $state->finish_step('Comment on task 1', FORMAT_HTML);
 
         // Verify step 1 is complete.
         $this->assertEquals($step1->id, $state->stepid);
@@ -174,12 +174,12 @@ class block_workflow_walkthrough_test extends advanced_testcase {
         $DB->set_field('course', 'visible', 0, array('id' => $course->id));
 
         // Finish both steps, and hence the workflow.
-        $state2again = $state1again->finish_step('Updated comment on task 1', FORMAT_PLAIN);
+        $state2again = $state1again->finish_step('Updated comment on task 1', FORMAT_HTML);
 
         // Verify that step 2's onactive script ran.
         $this->assertTrue((bool) $DB->get_field('course', 'visible', array('id' => $course->id)));
 
-        $results = $state2again->finish_step('Comment on task 2', FORMAT_PLAIN);
+        $results = $state2again->finish_step('Comment on task 2', FORMAT_HTML);
 
         // Check no active step was returned.
         $this->assertSame(false, $results);

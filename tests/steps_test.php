@@ -283,7 +283,7 @@ class block_workflow_steps_test extends block_workflow_testlib {
         $data->appliesto            = 'course';
         $data->obsolete             = 0;
         $data->description          = 'This is a test workflow applying to a course for the unit test';
-        $data->descriptionformat    = FORMAT_PLAIN;
+        $data->descriptionformat    = FORMAT_HTML;
 
         // Create a new workflow object.
         $workflow = new block_workflow_workflow();
@@ -415,7 +415,7 @@ class block_workflow_steps_test extends block_workflow_testlib {
         $data->appliesto            = 'course';
         $data->obsolete             = 0;
         $data->description          = 'This is a test workflow applying to a course for the unit test';
-        $data->descriptionformat    = FORMAT_PLAIN;
+        $data->descriptionformat    = FORMAT_HTML;
 
         // Create a new workflow object.
         $workflow = new block_workflow_workflow();
@@ -577,7 +577,7 @@ class block_workflow_steps_test extends block_workflow_testlib {
         $data->appliesto            = 'course';
         $data->obsolete             = 0;
         $data->description          = 'User name in each role workflow applying to a course for the unit test';
-        $data->descriptionformat    = FORMAT_PLAIN;
+        $data->descriptionformat    = FORMAT_HTML;
         $workflow = new block_workflow_workflow();
         $workflow->create_workflow($data);
 

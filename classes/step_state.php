@@ -185,7 +185,7 @@ class block_workflow_step_state {
      * @return  An update block_workflow_step_state record as returned by
      *          {@link load_state}.
      */
-    public function update_comment($newcomment, $newcommentformat = FORMAT_PLAIN) {
+    public function update_comment($newcomment, $newcommentformat) {
         global $DB;
         $transaction = $DB->start_delegated_transaction();
 
@@ -262,7 +262,7 @@ class block_workflow_step_state {
      * @param   integer $newcommentformat   The format of the updated comment
      * @return  mixed   The next state or false if there is none
      */
-    public function finish_step($newcomment, $newcommentformat = FORMAT_PLAIN) {
+    public function finish_step($newcomment, $newcommentformat) {
         global $DB, $USER;
         $transaction = $DB->start_delegated_transaction();
 
