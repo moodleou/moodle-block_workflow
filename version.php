@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014111200;
+$plugin->version   = 2015022300;
 $plugin->requires  = 2014041100;
 $plugin->cron      = 60;
 $plugin->component = 'block_workflow';

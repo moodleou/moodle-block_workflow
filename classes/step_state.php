@@ -393,8 +393,8 @@ class block_workflow_step_state {
 
         if ($this->todos === null) {
             $sql = 'SELECT todos.*, done.timestamp, done.userid, done.id AS doneid
-                    FROM {block_workflow_step_todos} AS todos
-                    LEFT JOIN {block_workflow_todo_done} AS done ON done.steptodoid = todos.id AND done.stepstateid = ?
+                    FROM {block_workflow_step_todos} todos
+                    LEFT JOIN {block_workflow_todo_done} done ON done.steptodoid = todos.id AND done.stepstateid = ?
                     WHERE todos.stepid = ? AND todos.obsolete = 0
                     ORDER BY todos.id';
             $this->todos = $DB->get_records_sql($sql, array($this->id, $this->stepid));
@@ -440,8 +440,8 @@ class block_workflow_step_state {
     public static function state_changes($stateid) {
         global $DB;
         $sql = 'SELECT changes.*, ' . $DB->sql_fullname('u.firstname', 'u.lastname') . ' AS username
-                FROM {block_workflow_state_changes} AS changes
-                INNER JOIN {user} AS u ON u.id = changes.userid
+                FROM {block_workflow_state_changes} changes
+                INNER JOIN {user} u ON u.id = changes.userid
                 WHERE changes.stepstateid = ?
                 ORDER BY changes.timestamp DESC';
         return $DB->get_records_sql($sql, array($stateid));
@@ -458,7 +458,7 @@ class block_workflow_step_state {
             return null;
         }
 
-        list ($sortorder, $notused) =  users_order_by_sql('u');
+        list ($sortorder, $notused) = users_order_by_sql('u');
         $roleinfo = role_get_names($context);
         $rolenames = array();
         foreach ($roleinfo as $role) {

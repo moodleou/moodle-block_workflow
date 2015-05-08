@@ -149,17 +149,17 @@ class block_workflow_email {
         $sql = "SELECT emails.*,
             (
                 SELECT COUNT(activescripts.id)
-                FROM {block_workflow_steps} AS activescripts
+                FROM {block_workflow_steps} activescripts
                 WHERE " . $DB->sql_like('activescripts.onactivescript',
                         $DB->sql_concat(':email1', 'emails.shortname', ':to1'), false) . "
             ) AS activecount,
             (
                 SELECT COUNT(completescripts.id)
-                FROM {block_workflow_steps} AS completescripts
+                FROM {block_workflow_steps} completescripts
                 WHERE " . $DB->sql_like('completescripts.oncompletescript',
                         $DB->sql_concat(':email2', 'emails.shortname', ':to2'), false) . "
             ) AS completecount
-            FROM {block_workflow_emails} AS emails
+            FROM {block_workflow_emails} emails
             ORDER BY shortname ASC
         ";
         $params = array('email1' => '%email%', 'email2' => '%email%', 'to1' => '%to%', 'to2' => '%to%');
@@ -315,14 +315,14 @@ class block_workflow_email {
 
         // Count the uses in the activescripts.
         $sql = "SELECT activescripts.onactivescript AS script
-                FROM {block_workflow_steps} AS activescripts
+                FROM {block_workflow_steps} activescripts
                 WHERE " . $DB->sql_like('activescripts.onactivescript', '?', false);
         $activescripts = $DB->get_records_sql($sql, array('%email%' . $this->shortname . '%to%'));
         $count += $this->_used_count($activescripts);
 
         // Count the uses in the completescripts.
         $sql = "SELECT completescripts.oncompletescript AS script
-                FROM {block_workflow_steps} AS completescripts
+                FROM {block_workflow_steps} completescripts
                 WHERE " . $DB->sql_like('completescripts.oncompletescript', '?', false);
         $completescripts = $DB->get_records_sql($sql, array('%email%' . $this->shortname . '%to%'));
         $count += $this->_used_count($completescripts);

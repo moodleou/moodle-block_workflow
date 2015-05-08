@@ -937,7 +937,7 @@ class block_workflow_step {
             // The workflow applies to the quiz or external quiz.
             // It could have apply to other course mdoules if relevat db-fields had the same field name.
 
-            // We are using the same constants for quiz and external quiz
+            // We are using the same constants for quiz and external quiz.
             $days = self::get_list_of_days(self::DAYS_BEFORE_QUIZ, self::DAYS_AFTER_QUIZ);
 
             // Here we are using 'db-tablename;relevatfield' as array key.

@@ -559,7 +559,7 @@ class block_workflow_steps_test extends block_workflow_testlib {
         global $DB;
          $this->resetAfterTest(true);
 
-        // Create roles
+        // Create roles.
         $roleids = $DB->get_records_menu('role', null, '', 'shortname, id');
         $roles = $DB->get_records('role');
 
@@ -603,7 +603,7 @@ class block_workflow_steps_test extends block_workflow_testlib {
         $manualenrol->add_default_instance($course);
         $instance1 = $DB->get_record('enrol', array('enrol' => 'manual', 'courseid' => $course->id));
 
-        foreach ($users as $i => $user ) {
+        foreach ($users as $i => $user) {
             $manualenrol->enrol_user($instance1,  $user->id, $roleids[$roles[$i]->shortname]);
         }
         $expectedroles = array();
@@ -615,7 +615,7 @@ class block_workflow_steps_test extends block_workflow_testlib {
             $expectedusers[$user->id] = $user;
         }
 
-        // Add workflow to context
+        // Add workflow to context.
         $state = $workflow->add_to_context($coursecontext->id);
 
         $stepstate = new block_workflow_step_state();

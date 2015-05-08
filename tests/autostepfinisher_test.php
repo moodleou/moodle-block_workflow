@@ -209,7 +209,7 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         // Generate a vl_v_crs_version_pres table.
         $this->create_version_pres_tables();
 
-        // Insert data to the above table
+        // Insert data to the above table.
         $courseshortname = 'M123-12J';
         $studentopendate = '2013-04-11';
          $DB->execute("INSERT INTO vl_v_crs_version_pres (vle_course_short_name, vle_student_open_date) " .
@@ -261,7 +261,7 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $expectedactivesteps += $this->get_expected_active_step($state2, $step1, 'course', $course2, '');
         $this->assertEquals($expectedactivesteps, $activesteps);
 
-        // Create a new workflow object which applies to quiz.216
+        // Create a new workflow object which applies to quiz.
         list($quizworkflow, $step1q) = $this->create_a_workflow_with_one_step($before5days, 'quiz;timeopen', 'quiz');
 
         // Add to context and check if the step is active.
@@ -276,7 +276,8 @@ class block_workflow_automatic_step_finisher_test extends advanced_testcase {
         $this->assertEquals($expectedactivesteps, $activesteps);
 
         // Create a new workflow object which applies to externalquiz.
-        list($externalquizworkflow, $step1eq) = $this->create_a_workflow_with_one_step($before5days, 'externalquiz;timeopen', 'externalquiz');
+        list($externalquizworkflow, $step1eq) = $this->create_a_workflow_with_one_step(
+                $before5days, 'externalquiz;timeopen', 'externalquiz');
 
         // Add to context and check if the step is active.
         $state1eq = $externalquizworkflow->add_to_context($externalquizcontext1->id);

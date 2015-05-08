@@ -246,10 +246,10 @@ class block_workflow_command_setactivityvisibility_test extends block_workflow_t
 
         $module = $workflow->appliesto;
         $sql = "SELECT cm.id
-                FROM {" . $module . "} AS m
-                INNER JOIN {course_modules} AS cm ON cm.instance = m.id
-                INNER JOIN {context} AS c ON c.instanceid = cm.id
-                INNER JOIN {modules} AS md ON md.id = cm.module
+                FROM {" . $module . "} m
+                INNER JOIN {course_modules} cm ON cm.instance = m.id
+                INNER JOIN {context} c ON c.instanceid = cm.id
+                INNER JOIN {modules} md ON md.id = cm.module
                 WHERE md.name = ? AND cm.course = ? LIMIT 1";
         $instance = $DB->get_record_sql($sql, array($module, $this->courseid));
 
