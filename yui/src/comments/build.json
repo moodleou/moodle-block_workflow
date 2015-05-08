@@ -1,0 +1,10 @@
+{
+    "name": "moodle-block_workflow-comments",
+    "builds": {
+        "moodle-block_workflow-comments": {
+            "jsfiles": [
+                "comments.js"
+            ]
+        }
+    }
+}

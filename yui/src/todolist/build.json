@@ -1,0 +1,10 @@
+{
+    "name": "moodle-block_workflow-todolist",
+    "builds": {
+        "moodle-block_workflow-todolist": {
+            "jsfiles": [
+                "todolist.js"
+            ]
+        }
+    }
+}

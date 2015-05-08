@@ -1,0 +1,9 @@
+{
+    "moodle-block_workflow-comments": {
+        "requires": [
+            "base",
+            "overlay",
+            "moodle-core-notification"
+        ]
+    }
+}
