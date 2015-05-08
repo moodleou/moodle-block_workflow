@@ -246,12 +246,12 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // The manage workflows section.
         $output .= $this->output->heading(get_string('manageworkflows', 'block_workflow'));
-        $output .= html_writer::tag('p', get_string('managedescription', 'block_workflow'), array('class' => 'mdl-align'));
+        $output .= html_writer::tag('p', get_string('managedescription', 'block_workflow'));
         $output .= $this->list_workflows($workflows);
 
         // The manage workflows section.
         $output .= $this->output->heading(get_string('manageemails', 'block_workflow'));
-        $output .= html_writer::tag('p', get_string('emaildescription', 'block_workflow'), array('class' => 'mdl-align'));
+        $output .= html_writer::tag('p', get_string('emaildescription', 'block_workflow'));
         $output .= $this->list_emails($emails);
 
         return $output;

@@ -341,9 +341,10 @@ class block_workflow_step {
 
         // Clone the roles.
         foreach ($src->roles() as $role) {
-            unset($role->id);
-            $role->stepid = $newstep->id;
-            $DB->insert_record('block_workflow_step_doers', $role);
+            $doer = new stdClass();
+            $doer->stepid = $newstep->id;
+            $doer->roleid = $role->id;
+            $DB->insert_record('block_workflow_step_doers', $doer);
         }
 
         // Allow the transaction at this stage, and return the newly
@@ -872,7 +873,7 @@ class block_workflow_step {
         // avoid additional queries later.
         $sql = 'SELECT r.*
                 FROM {block_workflow_step_doers} d
-                INNER JOIN {role} r ON r.id = d.roleid
+                JOIN {role} r ON r.id = d.roleid
                 WHERE d.stepid = ?
                 ORDER BY r.shortname ASC';
 

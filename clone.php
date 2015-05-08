@@ -77,8 +77,8 @@ if ($cloneform->is_cancelled()) {
 // Set the clone workflow form defaults.
 $data = new stdClass();
 $data->workflowid           = $workflow->id;
-$data->shortname            = $workflow->shortname;
-$data->name                 = $workflow->name;
+$data->shortname            = get_string('clonedshortname', 'block_workflow', $workflow->shortname);
+$data->name                 = get_string('clonedname', 'block_workflow', $workflow->name);
 $data->description          = $workflow->description;
 $data->descriptionformat    = $workflow->descriptionformat;
 $data->appliesto            = block_workflow_appliesto($workflow->appliesto);

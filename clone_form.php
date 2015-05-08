@@ -34,13 +34,13 @@ class clone_workflow extends moodleform {
         $mform->addElement('header', 'general', get_string('cloneworkflow', 'block_workflow'));
 
         // Shortname.
-        $mform->addElement('text', 'shortname', get_string('shortname', 'block_workflow'), array('maxlength' => 255));
+        $mform->addElement('text', 'shortname', get_string('shortname', 'block_workflow'), array('size' => 80, 'maxlength' => 255));
         $mform->setType('shortname', PARAM_TEXT);
         $mform->addRule('shortname', null, 'required', null, 'client');
         $mform->addRule('shortname', null, 'maxlength', 255);
 
         // Name.
-        $mform->addElement('text', 'name', get_string('name', 'block_workflow'), array('maxlength' => 255));
+        $mform->addElement('text', 'name', get_string('name', 'block_workflow'), array('size' => 80, 'maxlength' => 255));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', null, 'maxlength', 255);

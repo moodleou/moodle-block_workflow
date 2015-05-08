@@ -50,6 +50,8 @@ $string['cannotremovestepsinuse']       = 'Unable to remove step. This step is c
 $string['cannotremoveworkflowinuse']    = 'Unable to remove workflow -- this workflow is currently in use';
 $string['cannotstepflowinuse']          = 'Unable to remove step -- this step is currently in use';
 $string['clone']                        = 'Clone';
+$string['clonedname']                   = '{$a} (cloned)';
+$string['clonedshortname']              = '{$a}_cloned';
 $string['cloneworkflow']                = 'Clone workflow';
 $string['cloneworkflowinstructions']    = 'Clone workflow instructions';
 $string['cloneworkflowname']            = 'Clone workflow \'{$a}\'';
@@ -197,7 +199,7 @@ $string['jumptosteptitle']              = 'Jump to step \'{$a->tostep}\' for \'{
 
 $string['lastmodified']                 = 'Last modified';
 
-$string['managedescription']            = 'Description for the manageworkflows page.';
+$string['managedescription']            = 'On this page you can create end edit workflows and the email templates that they use.';
 $string['manageemails']                 = 'Manage email templates';
 $string['manageworkflows']              = 'Manage workflows';
 $string['messageprovider:notification'] = 'Workflow notifications and alerts';
