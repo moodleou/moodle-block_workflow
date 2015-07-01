@@ -39,7 +39,11 @@ Y.extend(COMMENTS, Y.Base, {
 
     initializer: function() {
         overlay.hide();
-        this._loadingNode = Y.one('.' + CSS.PANEL).one('.' + CSS.LIGHTBOX);
+        var panel = Y.one('.' + CSS.PANEL);
+        if (!panel) {
+            return;
+        }
+        this._loadingNode = panel.one('.' + CSS.LIGHTBOX);
         this.attachEvents();
     },
 
