@@ -30,8 +30,7 @@ global $CFG;
 require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
 require_once($CFG->dirroot . '/blocks/workflow/tests/lib.php');
 
-class block_workflow_automatic_step_finisher_test extends block_workflow_testlib {
-
+class block_workflow_extra_notify_test extends block_workflow_testlib {
     public function test_automatic_step_finisher() {
         global $CFG, $DB;
         $now = time();
@@ -59,18 +58,18 @@ class block_workflow_automatic_step_finisher_test extends block_workflow_testlib
         $courseshortname = 'M123-12J';
         $studentopendate = '2013-04-11';
         $DB->execute("INSERT INTO vl_v_crs_version_pres (vle_course_short_name, vle_student_open_date) " .
-                 "VALUES ('$courseshortname', '$studentopendate')");
+                "VALUES ('$courseshortname', '$studentopendate')");
 
         $courseondataloadtable = $DB->get_record_sql(
                 'SELECT * FROM vl_v_crs_version_pres ' .
                 'WHERE vle_course_short_name = ?', array($courseshortname), MUST_EXIST);
 
         // Create a new workflow object which applies to course.
-        $stepoptions = array('autofinish' => 'course;startdate', 'autofinishoffset' => $before5days);
+        $stepoptions = array('extranotify' => 'course;startdate', 'extranotifyoffset' => $before5days, 'onextranotifyscript' => '');
         list($courseworkflow, $step1) = $this->create_a_workflow_with_one_step($stepoptions);
 
         // Required DB tables are not populated and therefore following methods return empty arrays.
-        $stepoptions = array('autofinish', 'autofinishoffset', null);
+        $stepoptions = array('extranotify', 'extranotifyoffset', 'onextranotifyscript');
         $activesteps = block_workflow_get_active_steps_with_fields_not_null($stepoptions);
         $this->assertEmpty($activesteps);
 
@@ -85,7 +84,7 @@ class block_workflow_automatic_step_finisher_test extends block_workflow_testlib
         $course1->vle_student_open_date = strtotime($courseondataloadtable->vle_student_open_date);
 
         // Create expected objects for active steps and test them against the actual objects.
-        $expectedactivesteps = $this->create_expected_active_step($state1, $step1, 'course', $course1);
+        $expectedactivesteps = $this->create_expected_active_step($state1, $step1, 'course', $course1, 0, 'extranotify');
         $this->assertEquals($expectedactivesteps, $activesteps);
 
         // Add to context and check the step is active.
@@ -98,20 +97,19 @@ class block_workflow_automatic_step_finisher_test extends block_workflow_testlib
         $this->assertEquals(2, count($activesteps));
 
         // Create expected objects for active steps and test them against the actual objects.
-        $expectedactivesteps += $this->create_expected_active_step($state2, $step1, 'course', $course2);
+        $expectedactivesteps += $this->create_expected_active_step($state2, $step1, 'course', $course2, 0, 'extranotify');
         $this->assertEquals($expectedactivesteps, $activesteps);
 
-        // Check relevant fields in 'block_workflow_step_states' table before finishing automatically.
+        // Check relevant fields in 'block_workflow_step_states' table before sending extra notification.
         $statebeforefinish = $DB->get_record('block_workflow_step_states', array('id' => $state1->id));
         $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $statebeforefinish->state);
         $this->assertEmpty($statebeforefinish->comment);
 
-         // Get ready active steps and finish them automatically.
-        block_workflow_autofinish_steps();
+        // Get ready active steps and finish them automatically.
+        block_workflow_send_extra_notification();
 
         // Check relevant fields in 'block_workflow_step_states' table after finishing automatically.
         $stateafterfinish = $DB->get_record('block_workflow_step_states', array('id' => $state1->id));
-        $this->assertEquals(BLOCK_WORKFLOW_STATE_COMPLETED, $stateafterfinish->state);
-        $this->assertNotEmpty($stateafterfinish->comment);
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $stateafterfinish->state);
     }
 }

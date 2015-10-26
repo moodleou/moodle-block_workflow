@@ -145,6 +145,9 @@ if ($importform->is_cancelled()) {
         $stepx->oncompletescript = clean_and_check_field_validity('oncompletescript', $importedstep, false);
         $stepx->autofinish = clean_and_check_field_validity('autofinish', $importedstep, false);
         $stepx->autofinishoffset = clean_and_check_field_validity('autofinishoffset', $importedstep, false);
+        $stepx->extranotify = clean_and_check_field_validity('extranotify', $importedstep, false);
+        $stepx->extranotifyoffset = clean_and_check_field_validity('extranotifyoffset', $importedstep, false);
+        $stepx->onextranotifyscript = clean_and_check_field_validity('onextranotifyscript', $importedstep, false);
         $stepx->workflowid = $workflow->id;
 
         // Fix legacy data.

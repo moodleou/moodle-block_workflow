@@ -243,7 +243,16 @@ class block_workflow_step_state {
         }
 
         // Request that any required scripts be processed.
-        $this->step()->process_script($this);
+        switch ($state->state) {
+            case BLOCK_WORKFLOW_STATE_ACTIVE:
+                $this->step()->process_script($this, $this->step()->onactivescript);
+                break;
+            case BLOCK_WORKFLOW_STATE_COMPLETED:
+                $this->step()->process_script($this, $this->step()->oncompletescript);
+                break;
+            default:
+                break;
+        }
 
         $transaction->allow_commit();
 

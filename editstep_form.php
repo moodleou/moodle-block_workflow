@@ -48,11 +48,6 @@ class step_edit extends moodleform {
 
         // Scripts.
         $scriptoptions = array('cols' => 80, 'rows' => 8);
-        $mform->addElement('textarea', 'onactivescript', get_string('onactivescript', 'block_workflow'), $scriptoptions);
-        $mform->setType('onactivescript', PARAM_RAW);
-
-        $mform->addElement('textarea', 'oncompletescript', get_string('oncompletescript', 'block_workflow'), $scriptoptions);
-        $mform->setType('oncompletescript', PARAM_RAW);
 
         // IDs.
         $mform->addElement('hidden', 'stepid');
@@ -64,17 +59,45 @@ class step_edit extends moodleform {
         $mform->addElement('hidden', 'beforeafter');
         $mform->setType('beforeafter', PARAM_INT);
 
-        // Automatically finish.
         list($options, $days) = block_workflow_step::get_autofinish_options(
                 $this->_customdata['appliesto']);
+
+        // Step activation.
+        $mform->addElement('header', 'stepactivation', get_string('stepactivation', 'block_workflow'));
+        $mform->addHelpButton('stepactivation', 'stepactivation', 'block_workflow');
+        $mform->addElement('textarea', 'onactivescript', get_string('onactivescript', 'block_workflow'), $scriptoptions);
+        $mform->setType('onactivescript', PARAM_RAW);
+
+        // Step extra notification.
+        $mform->addElement('header', 'stepextranotify', get_string('stepextranotify', 'block_workflow'));
+        $mform->addHelpButton('stepextranotify', 'stepextranotify', 'block_workflow');
+
+        $options[''] = get_string('donotnotify', 'block_workflow');
+        $notificationdate[] = $mform->createElement('select', 'extranotifyoffset', null, $days);
+        $notificationdate[] = $mform->createElement('select', 'extranotify', null, $options);
+        $mform->addGroup($notificationdate, null, get_string('notificationdate', 'block_workflow'), ' ', true);
+
+        $mform->addElement('textarea', 'onextranotifyscript', get_string('onextranotifyscript', 'block_workflow'), $scriptoptions);
+        $mform->setType('onextranotifyscript', PARAM_RAW);
+        $mform->setDefault('onextranotifyscript', '');
+        $mform->setDefault('extranotifyoffset', 0);
+        $mform->setDefault('extranotify', '');
+        $mform->disabledIf('extranotifyoffset', 'extranotify', 'eq', '');
+        $mform->disabledIf('onextranotifyscript', 'extranotify', 'eq', '');
+
+        // Step completion.
+        $mform->addElement('header', 'stepcompletion', get_string('stepcompletion', 'block_workflow'));
+        $mform->addHelpButton('stepcompletion', 'stepcompletion', 'block_workflow');
+
+        $options[''] = get_string('donotautomaticallyfinish', 'block_workflow');
+        $mform->addElement('textarea', 'oncompletescript', get_string('oncompletescript', 'block_workflow'), $scriptoptions);
+        $mform->setType('oncompletescript', PARAM_RAW);
         $autofinish = array();
         $autofinish[] = $mform->createElement('select', 'autofinishoffset', null, $days);
         $autofinish[] = $mform->createElement('select', 'autofinish', null, $options);
         $mform->addGroup($autofinish, null, get_string('automaticallyfinish', 'block_workflow'), ' ', true);
-
         $mform->setDefault('autofinishoffset', 0);
         $mform->setDefault('autofinish', '');
-
         $mform->disabledIf('autofinishoffset', 'autofinish', 'eq', '');
 
         // We disable the autofinish functionality for modules other than quiz or external quiz.
@@ -85,6 +108,7 @@ class step_edit extends moodleform {
             $mform->disabledIf('autofinishoffset', '');
             $mform->disabledIf('autofinish', '');
         }
+
         $this->add_action_buttons();
     }
 
@@ -106,6 +130,15 @@ class step_edit extends moodleform {
             if ($script->errors) {
                 // Only display the first error.
                 $errors['onactivescript'] = get_string('invalidscript', 'block_workflow', $script->errors[0]);
+            }
+        }
+
+        if (isset($data['onextrascript'])) {
+            // Validate the onextranotifyscript.
+            $script = $step->validate_script($data['onextranotifyscript']);
+            if ($script->errors) {
+                // Only display the first error.
+                $errors['onextranotifyscript'] = get_string('invalidscript', 'block_workflow', $script->errors[0]);
             }
         }
 

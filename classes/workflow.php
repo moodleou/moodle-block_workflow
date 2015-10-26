@@ -279,6 +279,7 @@ class block_workflow_workflow {
             $emptystep->instructionsformat  = FORMAT_HTML;
             $emptystep->onactivescript      = get_string('defaultonactivescript',   'block_workflow');
             $emptystep->oncompletescript    = get_string('defaultoncompletescript', 'block_workflow');
+            $emptystep->onextranotifyscript = get_string('defaultonextranotifyscript', 'block_workflow');
 
             $step = new block_workflow_step();
             $step->create_step($emptystep);
@@ -455,7 +456,7 @@ class block_workflow_workflow {
         $DB->insert_record('block_workflow_state_changes', $statechange);
 
         // Process any required scripts for this state.
-        $step->process_script($state);
+        $step->process_script($state, $step->onactivescript);
 
         $transaction->allow_commit();
 

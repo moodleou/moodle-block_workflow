@@ -141,17 +141,4 @@ class block_workflow extends block_base {
     public function has_config() {
         return true;
     }
-
-    /**
-     * Standard blocks api cron function, called every time cron runs.
-     */
-    public function cron() {
-        global $CFG;
-        // Call the workflow automatic step finisher.
-        require_once(dirname(__FILE__) . '/cronlib.php');
-        $bwfasf = new block_workflow_automatic_step_finisher();
-
-        // Rund the cron and finish the steps.
-        $bwfasf->cron();
-    }
 }

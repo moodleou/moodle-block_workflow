@@ -46,6 +46,9 @@
         <FIELD NAME="oncompletescript" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Actions performed when this step is completed"/>
         <FIELD NAME="autofinish" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="Containing a string like after_quiz_timeopen, before_course_startdate"/>
         <FIELD NAME="autofinishoffset" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Containing durations in seconds"/>
+        <FIELD NAME="extranotify" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="Containing a string like after_quiz_timeopen, before_course_startdate"/>
+        <FIELD NAME="extranotifyoffset" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Containing durations in seconds"/>
+        <FIELD NAME="onextranotifyscript" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Actions performed when conditions are met for extranotify, extranotifyoffset and this step is active"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

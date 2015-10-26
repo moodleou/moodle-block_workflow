@@ -53,4 +53,4 @@ Feature: Workflow block - import and export workflows
 
     # Export the workflow.
     # TODO update the next step once MDL-47497 is available in OUVLE.
-    And following "Export workflow" should download between "1700" and "1750" bytes
+    And following "Export workflow" should download between "2100" and "2200" bytes

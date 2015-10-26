@@ -35,6 +35,7 @@ Feature: Workflow block - create and edit workflows
     # Edit the first step.
     When I click on "Edit step" "link" in the "First step" "table_row"
     Then I should see "Editing step 'First step'"
+    And I expand all fieldsets
     When I set the following fields to these values:
       | Name         | Configure basic site                                                 |
       | Instructions | Set up the basic site settings, such as course format and enrolment. |
@@ -82,6 +83,7 @@ Feature: Workflow block - create and edit workflows
     Then I should not see "Something stupid"
 
     # Explore start script (eventually hide course)
+    And I expand all fieldsets
     When I set the field "On step activation" to "setcoursevisibility hidden"
     And I press "Save changes"
 
@@ -148,3 +150,26 @@ Feature: Workflow block - create and edit workflows
     And I set the field "At the end of step 2" to "finish the workflow"
     And I press "Save changes"
     Then I should see "After step 2, this workflow will end."
+
+    # Add another step for extra notification
+    And I click on "Add an additional step to this workflow" "link" in the "After step 2, this workflow will end." "table_row"
+    And I expand all fieldsets
+
+    # Default settings for extra notification
+    Then I should see "Do not send extra notification"
+    And the "id_extranotifyoffset" "field" should be disabled
+    And the "id_onextranotifyscript" "field" should be disabled
+
+    When I set the field "id_extranotify" to "the course start date"
+    Then the "id_extranotifyoffset" "field" should be enabled
+    And the "id_onextranotifyscript" "field" should be enabled
+
+    When I set the following fields to these values:
+      | Name                        | Send extra notification          |
+      | Instructions                | Please setup extra notification. |
+      | extranotifyoffset           | 1 day before                     |
+      | extranotify                 | the course start date            |
+      | Notify while step is active | email taskemail to teacher       |
+
+    And I press "Save changes"
+    Then I should see "Please setup extra notification." in the "Send extra notification" "table_row"

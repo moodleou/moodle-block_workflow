@@ -15,20 +15,36 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Workflow block version.
+ * Definition of Workflow scheduled tasks.
+ * Default is to run once every minute.
  *
  * @package block_workflow
- * @copyright 2013 The Open University / Lancaster University Network Services Limited
+ * @category task
+ * @copyright 2015 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015101500;
-$plugin->requires  = 2014041100;
-$plugin->cron      = 60;
-$plugin->component = 'block_workflow';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'v1.4 for Moodle 2.7+';
-
-$plugin->outestssufficient = true;
+$tasks = array(
+    // Run once a day after 05:01 AM.
+    array(
+        'classname' => 'block_workflow\task\send_extra_notification',
+        'blocking' => 0,
+        'minute' => '1',
+        'hour' => '5',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*'
+    ),
+    // Run once a day after 01:01 AM.
+    array(
+        'classname' => 'block_workflow\task\finish_step_automatically',
+        'blocking' => 0,
+        'minute' => '1',
+        'hour' => '1',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*'
+    )
+);

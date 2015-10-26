@@ -74,6 +74,9 @@ foreach ($workflow->steps() as $step) {
     $stepx->addChild('oncompletescript',    check_output_text($step->oncompletescript));
     $stepx->addChild('autofinish',          check_output_text($step->autofinish));
     $stepx->addChild('autofinishoffset',    $step->autofinishoffset);
+    $stepx->addChild('extranotify',         check_output_text($step->extranotify));
+    $stepx->addChild('extranotifyoffset',   $step->extranotifyoffset);
+    $stepx->addChild('onextranotifyscript', check_output_text($step->onextranotifyscript));
 
     // Add the roles for this step.
     foreach ($step->roles() as $role) {

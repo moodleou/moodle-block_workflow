@@ -94,5 +94,24 @@ function xmldb_block_workflow_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2014030500, 'workflow');
     }
 
+    if ($oldversion < 2015101500) {
+        $table = new xmldb_table('block_workflow_steps');
+
+        $field = new xmldb_field('extranotify', XMLDB_TYPE_CHAR, '64', null, null, null, null, 'autofinishoffset');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('extranotifyoffset', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'extranotify');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('onextranotifyscript', XMLDB_TYPE_TEXT, null, null, null, null, null, 'extranotifyoffset');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_block_savepoint(true, 2015101500, 'workflow');
+    }
+
     return true;
 }

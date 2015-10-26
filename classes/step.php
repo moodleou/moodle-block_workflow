@@ -33,16 +33,19 @@ defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @property-read int       $id                 The ID of the step
- * @property-read int       $workflowid         The ID of the owner workflow
- * @property-read int       $stepno             The step number
- * @property-read string    $name               The full name of the step
- * @property-read string    $instructions       The formatted instructions of the step
- * @property-read int       $instructionsformat The format of the instructions field
- * @property-read string    $onactivescript     The script for processing when the step is made active
- * @property-read string    $oncompletescript   The script for processing when the step is made complete
- * @property-read string    $autofinish         The string for processing when the step is finished automatically.
- * @property-read int       $autofinishoffset   The duration in seconds relative to $autofinish
+ * @property-read int       $id                  The ID of the step
+ * @property-read int       $workflowid          The ID of the owner workflow
+ * @property-read int       $stepno              The step number
+ * @property-read string    $name                The full name of the step
+ * @property-read string    $instructions        The formatted instructions of the step
+ * @property-read int       $instructionsformat  The format of the instructions field
+ * @property-read string    $onactivescript      The script for processing when the step is made active
+ * @property-read string    $oncompletescript    The script for processing when the step is made complete
+ * @property-read string    $autofinish          The string for processing when the step is finished automatically.
+ * @property-read int       $autofinishoffset    The duration in seconds relative to $autofinish
+ * @property-read string    $extranotify         The string for processing when extra notification should be sent.
+ * @property-read int       $extranotifyoffset   The duration in seconds relative to $extranotify
+ * @property-read string    $onextranotifyscript The script for processing which email notification should be sent.
  */
 class block_workflow_step {
     const DAYS_BEFORE_QUIZ = -10;
@@ -64,6 +67,9 @@ class block_workflow_step {
     public $oncompletescript;
     public $autofinish;
     public $autofinishoffset;
+    public $extranotify;
+    public $extranotifyoffset;
+    public $onextranotifyscript;
 
     /**
      * Constructor to obtain a step
@@ -99,6 +105,9 @@ class block_workflow_step {
         $this->oncompletescript     = $step->oncompletescript;
         $this->autofinish           = $step->autofinish;
         $this->autofinishoffset     = $step->autofinishoffset;
+        $this->extranotify          = $step->extranotify;
+        $this->extranotifyoffset    = $step->extranotifyoffset;
+        $this->onextranotifyscript  = $step->onextranotifyscript;
         return $this;
     }
 
@@ -129,7 +138,10 @@ class block_workflow_step {
             'onactivescript',
             'oncompletescript',
             'autofinish',
-            'autofinishoffset'
+            'autofinishoffset',
+            'extranotify',
+            'extranotifyoffset',
+            'onextranotifyscript'
         );
     }
 
@@ -207,6 +219,17 @@ class block_workflow_step {
             $step->autofinishoffset = 0;
         }
 
+        // Set the default extranotify.
+        if (empty($step->extranotify)) {
+            $step->extranotify = null;
+        }
+        if (empty($step->extranotifyoffset)) {
+            $step->extranotifyoffset = 0;
+        }
+        if (!isset($step->onextranotifyscript)) {
+            $step->onextranotifyscript = '';
+        }
+
         $transaction = $DB->start_delegated_transaction();
 
         // Check that the workflowid was specified.
@@ -265,7 +288,7 @@ class block_workflow_step {
             }
         }
 
-        // Validate any onactivescript and oncompletescript.
+        // Validate any onactivescript, onextranotifyscript and oncompletescript.
         if (isset($step->onactivescript)) {
             $result = $this->validate_script($step->onactivescript);
             if ($result->errors) {
@@ -276,6 +299,14 @@ class block_workflow_step {
 
         if (isset($step->oncompletescript)) {
             $result = $this->validate_script($step->oncompletescript);
+            if ($result->errors) {
+                $transaction->rollback(new block_workflow_invalid_command_exception(
+                        get_string('invalidscript', 'block_workflow', $result->errors[0])));
+            }
+        }
+
+        if (isset($step->onextranotifyscript)) {
+            $result = $this->validate_script($step->onextranotifyscript);
             if ($result->errors) {
                 $transaction->rollback(new block_workflow_invalid_command_exception(
                         get_string('invalidscript', 'block_workflow', $result->errors[0])));
@@ -445,9 +476,17 @@ class block_workflow_step {
             $data->autofinishoffset = 0;
         }
 
-        // Validate any changes to the onactivescript and oncompletescript.
+        // Validate any changes to the onactivescript, onextranotifyscript and oncompletescript.
         if (isset($data->onactivescript)) {
             $result = $this->validate_script($data->onactivescript);
+            if ($result->errors) {
+                $transaction->rollback(new block_workflow_invalid_command_exception(
+                        get_string('invalidscript', 'block_workflow', $result->errors[0])));
+            }
+        }
+
+        if (isset($data->onextranotifyscript)) {
+            $result = $this->validate_script($data->onextranotifyscript);
             if ($result->errors) {
                 $transaction->rollback(new block_workflow_invalid_command_exception(
                         get_string('invalidscript', 'block_workflow', $result->errors[0])));
@@ -702,23 +741,12 @@ class block_workflow_step {
      * if the provided state is complete, then the oncompletescript is tested executed.
      *
      * @param   block_workflow_step_state $state The step_state to process the script for
+     * @param   string $script the script to run.
      * @return  void
      */
-    public function process_script(block_workflow_step_state $state) {
+    public function process_script(block_workflow_step_state $state, $script) {
         global $DB;
         $transaction = $DB->start_delegated_transaction();
-
-        switch ($state->state) {
-            case BLOCK_WORKFLOW_STATE_ACTIVE:
-                $script = $this->onactivescript;
-                break;
-            case BLOCK_WORKFLOW_STATE_COMPLETED:
-                $script = $this->oncompletescript;
-                break;
-            default:
-                $script = '';
-                break;
-        }
 
         // Parse the script to retrieve a list of all valid commands.
         $commands = self::parse_script($script);

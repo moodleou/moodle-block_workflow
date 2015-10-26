@@ -90,6 +90,9 @@ if ($stepedit->is_cancelled()) {
     $formdata->oncompletescript     = $data->oncompletescript;
     $formdata->autofinish           = isset($data->autofinish) ? $data->autofinish : '';
     $formdata->autofinishoffset     = $data->autofinishoffset;
+    $formdata->extranotify          = isset($data->extranotify) ? $data->extranotify : '';
+    $formdata->extranotifyoffset    = $data->extranotifyoffset;
+    $formdata->onextranotifyscript  = $data->onextranotifyscript;
 
     if (isset($step)) {
         // We're editing an existing step.
@@ -122,6 +125,9 @@ if (isset($step)) {
     $data->oncompletescript     = $step->oncompletescript;
     $data->autofinish           = $step->autofinish;
     $data->autofinishoffset     = $step->autofinishoffset;
+    $data->extranotify          = $step->extranotify;
+    $data->extranotifyoffset    = $step->extranotifyoffset;
+    $data->onextranotifyscript  = $step->onextranotifyscript;
     $data = file_prepare_standard_editor($data, 'instructions', array('noclean' => true));
     $stepedit->set_data($data);
 } else {

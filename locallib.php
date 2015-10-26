@@ -241,3 +241,128 @@ function block_workflow_can_make_changes($state) {
     }
     return $canmakechanges[$context->id][$state->id];
 }
+
+/**
+ * Return all active steps which are set for 'extranotify' or 'autofinish'
+ *
+ * @param array $stepoptions An array of params to check whther we are looking for 'extranotify' or 'autofinish'
+ * @return array
+ */
+function block_workflow_get_active_steps_with_fields_not_null($stepoptions) {
+    global $DB;
+    list($offsettype, $offset, $textarea) = $stepoptions;
+    $where = $textarea ? ' AND step.onextranotifyscript IS NOT NULL ' : '';
+
+    $sql = "SELECT state.id AS stateid, state.stepid, state.state,
+                        wf.id AS workflowid, wf.appliesto,
+                        step.name AS stepname, step.$offsettype, step.$offset,
+                        c.id AS courseid, c.shortname AS courseshortname,
+                        cm.instance AS moduleid
+                FROM {block_workflow_step_states} state
+                LEFT JOIN {block_workflow_steps} step ON step.id = state.stepid
+                LEFT JOIN {block_workflow_workflows} wf ON wf.id = step.workflowid
+                LEFT JOIN {context} ctx ON ctx.id = state.contextid
+                LEFT JOIN {course} c ON c.id = ctx.instanceid
+                LEFT JOIN {course_modules} cm ON cm.id = ctx.instanceid AND wf.appliesto <> 'course'
+
+                WHERE step.$offsettype IS NOT NULL $where
+                    AND state.state = :state
+                    AND (ctx.contextlevel = :coursecotext OR ctx.contextlevel = :modulecontext)
+                    ORDER BY state.id ASC";
+
+    $options = array('state' => BLOCK_WORKFLOW_STATE_ACTIVE,
+            'coursecotext' => CONTEXT_COURSE,
+            'modulecontext' => CONTEXT_MODULE);
+
+    return $DB->get_records_sql($sql, $options);
+}
+
+/**
+ * Return the timestamp for 'extranotify' or 'autofinish'
+ * @param string $courseshortname
+ * @param int $courseid
+ * @param int $moduleid
+ * @param string $offsettype
+ * @param int $offset
+ * @return int
+ */
+function block_workflow_get_offset_time($courseshortname, $courseid, $moduleid, $offsettype, $offset) {
+    global $DB;
+    list($dbtable, $dbfield) = explode(';', $offsettype);
+
+    $timestamp = 0;
+    if ($dbtable === 'vl_v_crs_version_pres') {
+        $sql = "SELECT * FROM vl_v_crs_version_pres
+                WHERE vle_course_short_name = ?";
+        if ($rowofdata = $DB->get_record_sql($sql, array($courseshortname), MUST_EXIST)) {
+            $timestamp = strtotime($rowofdata->$dbfield);
+        }
+    } else if ($dbtable === 'course') {
+        $timestamp = $DB->get_field('course', $dbfield, array('id' => $courseid));
+    } else {
+        $timestamp = $DB->get_field($dbtable, $dbfield, array('id' => $moduleid));
+    }
+    return $timestamp + $offset;
+}
+
+/**
+ * Send email notifications.
+ * @return void
+ */
+function block_workflow_send_extra_notification() {
+    $options = array('extranotify', 'extranotifyoffset', 'onextranotifyscript');
+    $activesteps = block_workflow_get_active_steps_with_fields_not_null($options);
+
+    if (!$activesteps) {
+        return;
+    }
+    $now = time();
+
+    foreach ($activesteps as $key => $activestep) {
+        $state = new block_workflow_step_state($activestep->stateid);
+        $notificationtime = block_workflow_get_offset_time($activestep->courseshortname,
+                $activestep->courseid, $activestep->moduleid, $activestep->extranotify, $activestep->extranotifyoffset);
+
+        // Is is the time to notify?
+        if ($notificationtime < $now) {
+            if ($state->step()->onextranotifyscript) {
+                $state->step()->process_script($state, $state->step()->onextranotifyscript);
+
+                // Cron setup user.
+                cron_setup_user();
+            }
+        }
+    }
+}
+
+/**
+ * Finish the step automatically.
+ * @return void
+ */
+function block_workflow_autofinish_steps() {
+    $options = array('autofinish', 'autofinishoffset', null);
+    $activesteps = block_workflow_get_active_steps_with_fields_not_null($options);
+
+    if (!$activesteps) {
+        return;
+    }
+    $now = time();
+
+    foreach ($activesteps as $key => $activestep) {
+        $autofinishtime = block_workflow_get_offset_time($activestep->courseshortname,
+                $activestep->courseid, $activestep->moduleid, $activestep->autofinish, $activestep->autofinishoffset);
+
+        // Is is the time to finish the step automayically?
+        if ($autofinishtime < $now) {
+            // Add a comment and finsh the step automatically.
+            $newcomment = get_string('finishstepautomatically',  'block_workflow',
+                                        date('H:i:s') . ' on ' . date('jS \of F Y'));
+
+            $state = new block_workflow_step_state($activestep->stateid);
+            $state->finish_step($newcomment, FORMAT_HTML);
+
+            // Cron setup user.
+            cron_setup_user();
+        }
+    }
+}

@@ -145,7 +145,7 @@ class block_workflow_testlib extends advanced_testcase {
         $this->set_up_modules();
     }
 
-    private function set_up_modules() {
+    protected function set_up_modules() {
         global $DB;
 
         $modules = array(
@@ -389,5 +389,142 @@ class block_workflow_testlib extends advanced_testcase {
         // The method create_workflow will return a completed workflow object.
         $workflow->create_workflow($data, $createstep);
         return $workflow;
+    }
+
+    /**
+     * Create vl_v_crs_version_pres table
+     * @throws Exception
+     */
+    protected function create_version_pres_tables() {
+        global $DB;
+        // Set that we have dataload tables.
+        set_config('hasdataloadtables', 1);
+
+        // Check nobody's trying to test on a 'real' database.
+        if ($DB->record_exists_sql("SELECT 1 FROM information_schema.tables " .
+                "WHERE table_name='vl_c_crs_version_pres_a'")) {
+                throw new Exception('You cannot run phpunit tests on a database that ' .
+                        'contains vl_c_crs_version_pres_a table; automated and manual ' .
+                        'testing might need to be on different databases');
+        }
+
+        // Create the table if it doesn't exist. NOTE we are not using Moodle
+        // database manager because the table (actually it's normally a view)
+        // is not prefixed.
+        if (!$DB->record_exists_sql("SELECT 1 FROM information_schema.tables " .
+                "WHERE table_name='vl_v_crs_version_pres'")) {
+
+            $createsql = "
+                    CREATE TABLE vl_v_crs_version_pres
+                (
+                    course_code character varying(7) NOT NULL DEFAULT ' '::character varying,
+                    course_version_num character(2) NOT NULL DEFAULT ' '::bpchar,
+                    pres_code character(3) NOT NULL DEFAULT ' '::bpchar,
+                    pres_code_5 character(5) NOT NULL DEFAULT ' '::bpchar,
+                    vle_course_short_name character varying(15) NOT NULL DEFAULT ' '::character varying,
+                    vle_control_course character(1) NOT NULL DEFAULT ' '::bpchar,
+                    vle_link_creation_date date,
+                    vle_student_open_date date,
+                    vle_student_close_date date,
+                    vle_tutor_open_date date,
+                    vle_tutor_close_date date,
+                    e_tmas_permitted character(1) NOT NULL DEFAULT ' '::bpchar,
+                    assmnt_strategy_cnfltn_desc character varying(200) NOT NULL DEFAULT ' '::character varying,
+                    assmnt_strategy_oca_desc character varying(500) NOT NULL DEFAULT ' '::character varying,
+                    assmnt_strategy_substn_desc character varying(200) NOT NULL DEFAULT ' '::character varying,
+                    assmnt_strategy_oes_desc character varying(500) NOT NULL DEFAULT ' '::character varying,
+                    assmnt_strategy_threshold_desc character varying(600) NOT NULL DEFAULT ' '::character varying,
+                    pres_start_date timestamp without time zone,
+                    pres_finish_date timestamp without time zone,
+                    vle_course_page_in_stud_home character(1) NOT NULL DEFAULT ' '::bpchar,
+                    full_course_title character varying(70) NOT NULL DEFAULT ' '::character varying
+                )";
+            $DB->execute($createsql);
+        }
+
+        // Clear the table.
+        $DB->execute("TRUNCATE vl_v_crs_version_pres");
+    }
+
+    protected function get_days($days, $beforeafter = 'after') {
+        if ($beforeafter === 'before') {
+            return -($days * 24 * 60 * 60);
+        }
+        return ($days * 24 * 60 * 60);
+    }
+
+    /**
+     * Creates a workflow with one step and returns the workflow object and the step object.
+     * @param int $offset, autofinshoffset or extranotifyoffset
+     * @param string $type, 'autofinish' or 'extranotify
+     * @param string $typevalue, the value for autofinish or extranotify filed
+     * @param string $appliesto
+     */
+    protected function create_a_workflow_with_one_step($stepoptions, $appliesto = 'course') {
+
+        // Create a new workflow object.
+        $workflow = new block_workflow_workflow();
+        $data = new stdClass();
+        $data->shortname            = $appliesto . 'workflow';
+        $data->name                 = 'First ' .  $appliesto . ' workflow';
+        $data->appliesto            = $appliesto;
+        $data->obsolete             = 0;
+        $data->description          = 'This is a test workflow applying to a ' . $appliesto . ' for the unit test';
+        $data->descriptionformat    = FORMAT_HTML;
+        $workflow->create_workflow($data);
+
+        // When creating a workflow, the initial step will have automatically been created.
+        // Retrieve the list of steps.
+        $steps = $workflow->steps();
+        $step1 = array_pop($steps);
+        if ($stepoptions) {
+            foreach ($stepoptions as $key => $value) {
+                $step1->$key = $value;
+            }
+        }
+
+        // Update current step.
+        $newstep = new block_workflow_step($step1->id);
+        $newstep->update_step($step1);
+        return array($workflow, $step1);
+    }
+
+    /**
+     * Create expected object for one active step and returns an array which contains the expected object.
+     * @param object $state
+     * @param object $step
+     * @param object $workflow
+     * @param object $course
+     * @param object $module
+     */
+    protected function create_expected_active_step($state, $step, $appliesto, $course, $cmid = 0, $type = 'autofinish') {
+        if ($type == 'autofinish') {
+            return array($state->id => (object)array(
+                    'stateid' => $state->id,
+                    'stepid' => $step->id,
+                    'state' => BLOCK_WORKFLOW_STATE_ACTIVE,
+                    'workflowid' => $step->workflowid,
+                    'appliesto' => $appliesto,
+                    'stepname' => $step->name,
+                    'autofinish' => $step->autofinish,
+                    'autofinishoffset' => $step->autofinishoffset,
+                    'courseid' => ($course ? $course->id : null),
+                    'courseshortname' => ($course ? $course->shortname : null),
+                    'moduleid' => $cmid)
+            );
+        }
+        return array($state->id => (object)array(
+                'stateid' => $state->id,
+                'stepid' => $step->id,
+                'state' => BLOCK_WORKFLOW_STATE_ACTIVE,
+                'workflowid' => $step->workflowid,
+                'appliesto' => $appliesto,
+                'stepname' => $step->name,
+                'extranotify' => $step->extranotify,
+                'extranotifyoffset' => "$step->extranotifyoffset",
+                'courseid' => ($course ? $course->id : null),
+                'courseshortname' => ($course ? $course->shortname : null),
+                'moduleid' => $cmid)
+        );
     }
 }

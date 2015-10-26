@@ -13,6 +13,9 @@
       <oncompletescript># You may place a set of actions to complete when marking this step finished here</oncompletescript>
       <autofinish/>
       <autofinishoffset>0</autofinishoffset>
+      <extranotify>vl_v_crs_version_pres;vle_student_open_date</extranotify>
+      <extranotifyoffset>-259200</extranotifyoffset>
+      <onextranotifyscript>email taskemail to manager</onextranotifyscript>
       <doer>manager</doer>
       <todo>Set the course format</todo>
       <todo>Setup enrolment plugins</todo>
@@ -24,6 +27,9 @@
       <oncompletescript>setcoursevisibility visible</oncompletescript>
       <autofinish>course;startdate</autofinish>
       <autofinishoffset>-86400</autofinishoffset>
+      <extranotify>vl_v_crs_version_pres;vle_student_open_date</extranotify>
+      <extranotifyoffset>0</extranotifyoffset>
+      <onextranotifyscript>email taskemail to teacher</onextranotifyscript>
       <doer>editingteacher</doer>
       <todo>Add resources</todo>
       <todo>Add actvities</todo>

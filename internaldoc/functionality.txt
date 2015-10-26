@@ -1,8 +1,242 @@
 Workflow
 ===============
-This document assumes that the reader knows how workflow system works, how to
-create workflows and workflow steps, and how to setup email notifications based
-on configurable templates.
+This document describes how to creat/edit workflows and workflow steps
+and how to setup email notifications based on configurable templates.
+
+
+Manage workflows / Manage email templates
+-----------------------------------------
+Under Administration menu go to:
+System administration->Plugins->Blocks->Workflows, then you will be on
+/blocks/workflow/manage.php page where you can Manage workflows and manage
+email templates.
+
+For creating a new workflow, you can press the + (create new workflow)
+icon which takes you to /blocks/workflow/editsettings.php where you can fill
+the form and press "Save changes" button.
+
+For importing a workflow, you can press the 'Import workflow' icon.
+
+For creating a new email template, press the + (Add email template) icon which
+takes you to /blocks/workflow/editemail.php page, then you can set the following
+fields "Shortname", "Subject", "Message" and press the "Save chnages" button.
+
+After creating workflows and email templates
+Under "Manage workflows" heading you will see a list of workflows and set of icons
+
+'View/Edit workflow' : This allows users to view the workflow sttings, edit the workflow
+settings, manage workflow steps as well as clone and export the fokflow.
+
+'Expoet workflow' : This allows users to export current workflow for importing it
+ to another intalation of Moodle.
+
+'Clone workflow' : This allows users to clone current workflow including all
+workflow steps. Cloning can be a quick way of producing a new workflow which does
+similar job.
+
+'Disable workflow'/'Enable workflow': This allows users to disable/enable the current workflow.
+
+'Remove workflow' : This allows users to delete the current workflow if it is not used.
+
+
+Create new workflow / Edit workflow settings
+--------------------------------------------
+On /blocks/workflow/editsettings.php page you can set the following fields:
+"Shortname"      : The short name of the workflow
+"Name"           : The name of the workflow which appears on the workflow block
+"Description"    : Describes what the workflow does
+"Applies to"     : Whether the workflow applies to a course or an activity (e.g. quiz)
+"Current status" : Enabled / Disabled
+
+and press "Save changes" button.
+
+
+Create/Edit workflow steps
+---------------------
+On /blocks/workflow/editsettings.php page a newly created workflow contains the 
+first step of the workflow with default values which can be changed.
+under Workflow steps heading you can Edit the current step or add new steps to
+the current workflow.
+
+On /blocks/workflow/editstep.php page you will fill the form with following sections:
+
+Step settings:
+"Name"        : The name of the current step.
+"Instructions": The instructions about what the current step supposed to do
+
+Step activation:
+"On step activation": Set of actions to be completed when making this step active
+
+Step extra notification:
+"Notification date": Combination of two select menus
+        1) Number of days before/after, e.g.: '5 days before' 
+        2) A significant date such as 'the course start date'
+"Notify while step is active": Set of actions to be completed while the Notification
+date is reached and the current step is still in an active state.
+
+Step completion:
+"On Step completion": Set of actions to be completed when this step is completed
+the completion could be manually or automatically.
+"Automatically finish": Combination of two select menus
+        1) Number of days before/after, e.g.: '10 days before' 
+        2) A significant date such as 'the course start date'
+
+and press "save changes" button.
+
+There are other section on this page such as:
+'Items to complete for this step' : where you can add number of tasks
+'Roles responsible for this step' : where you can add or remove roles
+
+
+Enhancing the workflow system for 'Step extra notify' and 'Step finisher'
+------------------------------------------------------------------------
+Here wa have the following advantages for enhancing the workflow system:
+a. The workflow system is already capable of sending email messages to the
+right people based on configurable templates.
+b. It will be easy to tell, from the currently active step in the the workflow,
+whether the email has been sent or not.
+c. To send the email early for any reason (e.g. bank holiday weekend coming up)
+an admin can manually go in and finish the step. Similarly, the step can be skipped
+if necessary using the Jump feature.
+d. This functionality can be useful in other workflows, e.g. doing something
+automatically around the time a course start-date. Or if we decided to apply a
+workflow to other activities such as wiki, blog, etc, the functionality is
+already in place and with a very minor modification can be serving other activities.
+
+
+Setting up Step extra notification
+----------------------------------
+Sometime there is a need to notify module teams during production on certain
+active step. For instance, 10 days before the course start date.
+
+How does it work
+----------------
+On the step form on 'Notification date' there are two select menus,
+
+First one with the options:
+
+10 days before
+9 days before
+.............
+1 day before
+Same day as (default)
+1 day after
+...........
+9 days after
+10 days after
+
+The options of the second select menu depends on the deployment of the workflow.
+
+If the workflow applies to a course, the options are:
+
+Do not send extra notification (default)
+the course start date
+
+If the workflow applies to a quiz, the options are:
+
+Do not send extra notification (default)
+the quiz open date
+the quiz close date
+
+A typical setting might be:
+Notification date: '5 days before' 'the course start date'
+Notify while step is active: email emailtemplate to manager editigteacher
+
+Obviously the effect is based on the setting of both select nenus.
+NB: If the second select menu is set to 'Do not send extra notification',
+the first select menu and the field "Notify while step is active" are 
+automatically disabled (This is the default which means we do not want to
+send extra notification while the curent step is active).
+
+How to setup an step to send extra notification
+-----------------------------------------------
+Under Side administration -> Plugins ->blocks -> workflows
+go to the list of workflows (assuming there is at least one workflow on the list)
+and choose a workflow by clicking on the 'view/edit workflow' icon which takes
+you to your chosen workflow where you can see the workflow settings and the
+workflow steps. click on 'Edit step' icon to modify a step. Expand the
+'Step extra notification' heading in the form and set the following fields:
+ 
+"Notification date" : '7 days before' 'the course start date'
+"Notify while step is active": 'email emailtemplate to courseteachupdater manager'
+
+and press "Save changes" button
+
+
+Setting up Step completion to finish the step automatically
+-----------------------------------------------------------
+Sometime there is a need to finish a workflow step automatically depending on
+certain conditions. For instance,
+Automatically finish '5 days before' 'the course start date'.
+
+The workflow step finisher functionality finishes the step when condition is
+reached and add a comment stating that the current step has been finished
+automatically
+
+How does it work
+----------------
+very similar to 'Step extra notification'
+On the step form on 'Automatically finish' there are two select menus,
+
+First one with the options are exactly the same as the options mentioned under
+'Setting up Step extra notification'
+
+The options of the second select menu are the same as the options mentioned under
+'Setting up Step extra notification' apart from the default value which is set to
+'Do not automatically finish'
+
+Obviously the effect is based on the setting of both select nenus.
+NB: If the second select menu is set to 'Do not automatically finish',
+the first select menu is automatically disabled (This is the default which means
+we do not want to finish the current step automatically).
+
+How to setup an step to be finished automatically
+-------------------------------------------------
+Under Side administration -> Plugins ->blocks -> workflows
+go to the list of workflows (assuming there is at least one workflow on the list)
+and choose a workflow by clicking on the 'view/edit workflow' icon which takes
+you to your chosen workflow where you can see the workflow settings and the
+workflow steps. click on 'Edit step' icon to modify a step. Expand the
+'Step completion' heading in the form and set the following fields:
+ 
+"Automatically finish" : '7 days before' 'the course start date'
+
+and press "Save changes" button
+
+How does the scheduled tasks and cron work 
+------------------------------------------
+Two scheduled tasks are set for workflow system.
+1) 'Workflow step finisher'     : This deals with finishing steps automatically
+2) 'Workflow setp extra notify' : This deals with extra notification functionality.
+
+UNder Administration got to System administration->Server->Scheduled tasks
+On /admin/tool/task/scheduledtasks.php page you will see "Workflow steo finisher"
+and "Workflow steo extra notify" in the list of tasks.
+
+The tasks are organised in a table form with following headings:
+Name, Component, Edit, Last run, Next run, Minute, Hour, Day, Day of week, Month,  Fail delay, Default
+
+Both tasks are set to run every day at 1:01 AM. In other words, you will see that
+the Next run for these tasks are set to next day on 1:01 AM or 'ASAP' (if time has
+reached and the cron did not run). However, you can edit the scheduled time for
+testing purposes.
+
+Whewn the column 'Next run' show 'ASAP', that means the time has reached and
+at the next cron job the task will perform the automated task.
+
+1) 'Workflow step finisher' will finish the relevant workflow steps automatically
+2) 'Workflow setp extra notify' will send the notification to the users of the specified roles.
+
+How to run the cron
+-------------------
+On the acceptance or live server, the cron will be running regularly.
+
+On tt-server and other developemnt-servers /admin/cron.php on relevant server
+for instance, https://icmatest.vledev2.open.ac.uk/vle/admin/cron.php
+
+NB: When going to the above URL, all cron jobs will be executed depending
+on their conditions.
+
 
 Workflow block
 --------------
@@ -37,6 +271,7 @@ will display the information about the next step.
 
 "Workflow overview" button: This button takes the user to the workflow overview page.
 
+
 "Overview"
 ---------
 This page displays a table with following headings:
@@ -47,109 +282,3 @@ shows "Finish Step", otherwise "Jump to step".
 Another button which may appear in the Roles column on each step row after the
 role names is "Show names(N)" which is disabled when N=0 otherwise, triggers the
 popup dialogue (See above).
-
-Finishing steps automatically
------------------------------
-We needed to find a way to automatically notify module teams, 5 days before an
-iCMA close date, to go and check the iCMA statistics, and sign-off that the
-grading is OK. Then we decided that the best way to do this was to extend the
-workflow system so that particular workflow steps can be set up to be automatically
-marked as finished.
-
-The advantage of enhancing the workflow system for finishing steps automatically
---------------------------------------------------------------------------------
-a. The workflow system is already capable of sending email messages to the
-right people based on configurable templates.
-b. It will be easy to tell, from the currently active step in the the workflow,
-whether the email has been sent or not.
-c. To send the email early for any reason (e.g. bank holiday weekend coming up)
-an admin can manually go in and finish the step. Similarly, the step can be skipped
-if necessary using the Jump feature.
-d. This functionality can be useful in other workflows, e.g. doing something
-automatically around the time a course start-date. Or if we decided to apply a
-workflow to other activities such as wiki, blog, etc, the functionality is
-already in place and with a very minor modification can be serving other activities.
-
-How does it work
-----------------
-On the setp form on 'Automatically finish' there are two select menus,
-
-First one with the options:
-
-10 days before
-9 days before
-.............
-1 day before
-do not set (default)
-1 day after
-...........
-9 days after
-10 days after
-
-The options of the second select menu depends on the deployment of the workflow.
-
-If the workflow applies to a course, the options are:
-
-Do not automatically finish (default)
-the course start date
-
-If the workflow applies to a quiz, the options are:
-
-Do not automatically finish (default)
-the quiz open date
-the quiz close date
-
-The default setting is:
-Automatically finish 'do not set' 'Do not automatically finish'
-
-A typical setting might be:
-Automatically finish '5 days before' 'the quiz close date'
-
-Obviously the effect is based on the setting of both select nenus.
-NB: If the first select menu is set to 'do not set', the second select menu is
-automatically disabled (That is the dafault and means we do not want finish the
-current step automatically. In other words, if the first select menu is set to
-'n days before' or 'n days after', the second select menu must be set to an option
-which has association with some sort of time stamp such as 'the course start date'
-or ' the quiz close date'.
-
-How to setup an step to be finished automatically
-------------------------------------------------
-Under Side administration -> Plugins ->blocks -> workflows
-go to the list of workflows (assuming there is at least one workflow on the list)
-and choose a workflow by clicking on the view/edit icon which takes you to your
-chosen workflow where you can see the workflow settings and the workflow steps.
-click on edit step icon to modify a step. In order to automatically finish
-the step and set the desired condition as described above.
-
-How does the automatically finish step work
--------------------------------------------------
-A cron job will take care of that. I.e. at the site level, the cron functionality
- will check on daily basis whether there are any active steps that are set to
- be finished automatically and if the conditions are met, the steps are automatically
- finished and set to 'completed' and a comment is added to each step indicating
- that this particular step has been completed by the system including date and
- time of finishing the step.
-
-How to run the cron
--------------------
-On the acceptance or live server, the cron will be running regularly. The cron
-for workflow-automatic-step-finisher is set to run on daily basis between 1 AM
-and 7 AM. In other words, if the condition is met and some active steps are
-ready to be finished automatically, the action of automatic completion happens
-on daily basis.
-
-For testing purposes a functionality has been incorporated to allow users running
-the cron at any time, providing the debugging is set. On icmatest server, for
-instance, we need to check under
-
-Site administration -> Development -> Debugging
-
-that Debug messages are set to
-'DEVELOPER extra Moodle debug messages for developers'.
-
-Then we can run the cron job by going to:
-https://icmatest.vledev2.open.ac.uk/vle/admin/cron.php
-
-NB: When going to the above URL, all cron jobs will be executed depending
-on their conditions.
