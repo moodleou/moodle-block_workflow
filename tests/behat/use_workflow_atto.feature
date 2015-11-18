@@ -1,4 +1,4 @@
-@ou @ouvle @block @block_workflow
+@ou @ou_vle @block @block_workflow
 Feature: Workflow block - follow a workflow
   In order to create courses in a bureaucratic organisation
   as a manager and a teacher

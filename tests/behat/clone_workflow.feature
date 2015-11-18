@@ -1,4 +1,4 @@
-@ou @ouvle @block @block_workflow
+@ou @ou_vle @block @block_workflow
 Feature: Workflow block - clone a workflow
   In order to reuse my workflows
   As a manager

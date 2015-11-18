@@ -1,4 +1,4 @@
-@ou @ouvle @block @block_workflow
+@ou @ou_vle @block @block_workflow
 Feature: Workflow block - create and edit workflows
   In order to manage course or activity production
   as an admin

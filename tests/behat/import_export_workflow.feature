@@ -1,4 +1,4 @@
-@ou @ouvle @block @block_workflow
+@ou @ou_vle @block @block_workflow
 Feature: Workflow block - import and export workflows
   In order to reuse a workflow from another Moodle site
   as a manager

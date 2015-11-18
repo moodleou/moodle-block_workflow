@@ -1,4 +1,4 @@
-@ou @ouvle @block @block_workflow
+@ou @ou_vle @block @block_workflow
 Feature: Workflow block - email templates
   In order to notify users about workflow changes
   as an admin
