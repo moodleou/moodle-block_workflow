@@ -49,7 +49,7 @@ class block_workflow_testing_context_hack extends context_system {
     }
 }
 
-class block_workflow_testlib extends advanced_testcase {
+abstract class block_workflow_testlib extends advanced_testcase {
 
     // Add code coverage for the libraries.
     public static $includecoverage = array('blocks/workflow/locallib.php');
