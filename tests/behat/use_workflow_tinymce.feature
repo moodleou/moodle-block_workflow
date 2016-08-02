@@ -34,7 +34,6 @@ Feature: Workflow block - follow a workflow
     And I follow "Import workflow"
     And I upload "blocks/workflow/tests/fixtures/testworkflow.workflow.xml" file to "File" filemanager
     And I press "Import workflow"
-    And I follow "Continue"
     And I navigate to "Manage editors" node in "Site administration > Plugins > Text editors"
     And I click on "disable" "link" in the "Atto HTML editor" "table_row"
     And I log out

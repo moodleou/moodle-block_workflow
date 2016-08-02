@@ -43,6 +43,7 @@ if ($importform->is_cancelled()) {
     // Has the form been cancelled.
     redirect(new moodle_url('/blocks/workflow/manage.php'));
 } else if ($data = $importform->get_data()) {
+    $extramessage = '';
     $filecontent = $importform->get_file_content('importfile');
     // Content UTF8 validation.
     if (!is_utf8($filecontent)) {
@@ -80,7 +81,8 @@ if ($importform->is_cancelled()) {
 
         if ($email->load_email_shortname($templatex->shortname)) {
             // Warning about existance as spec suggests.
-            notify(get_string('emailtemplateexists', 'block_workflow', $templatex->shortname));
+            $extramessage .= get_string('emailtemplateexists', 'block_workflow', $templatex->shortname)
+                    . ' ';
         } else {
             $email->create($templatex);
         }
@@ -197,7 +199,7 @@ if ($importform->is_cancelled()) {
 
     // Redirect.
     redirect(new moodle_url('/blocks/workflow/editsteps.php', array('workflowid' => $workflow->id)),
-            get_string('importsuccess', 'block_workflow'), 10);
+            $extramessage . get_string('importsuccess', 'block_workflow'), 10);
 }
 
 // Display the page.

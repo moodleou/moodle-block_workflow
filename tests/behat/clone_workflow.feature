@@ -11,7 +11,6 @@ Feature: Workflow block - clone a workflow
     And I follow "Import workflow"
     And I upload "blocks/workflow/tests/fixtures/testworkflow.workflow.xml" file to "File" filemanager
     And I press "Import workflow"
-    And I follow "Continue"
     And I follow "Clone"
     And I press "id_submitbutton"
     Then I should see "testworkflow_cloned" in the "Shortname" "table_row"

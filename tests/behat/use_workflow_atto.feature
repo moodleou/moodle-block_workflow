@@ -34,7 +34,6 @@ Feature: Workflow block - follow a workflow
     And I follow "Import workflow"
     And I upload "blocks/workflow/tests/fixtures/testworkflow.workflow.xml" file to "File" filemanager
     And I press "Import workflow"
-    And I follow "Continue"
     And I log out
 
     When I log in as "manager1"
