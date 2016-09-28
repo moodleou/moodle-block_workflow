@@ -122,11 +122,12 @@ Feature: Workflow block - follow a workflow
     And "Workflow overview" "button" in the "Workflow" "block" should be visible
 
     # Check that the finish step script did the right thing.
-    When I navigate to "Edit settings" node in "Course administration"
-    Then the field "Visible" matches value "Show"
-
     When I log out
     And I log in as "manager1"
+    And I follow "Course 1"
+    And I navigate to "Edit settings" node in "Course administration"
+    Then the field "Visible" matches value "Show"
+
     And I follow "Course 1"
     Then I should see "The workflow has been completed."
     And I click on "Workflow overview" "button" in the "Workflow" "block"
