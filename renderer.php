@@ -1154,21 +1154,15 @@ class block_workflow_renderer extends plugin_renderer_base {
         }
         $this->page->requires->yui_module('moodle-block_workflow-userinfo', 'M.block_workflow.userinfo.init');
 
-        // Add information as to what happens at the end of the workflow.
-        $table->data[] = $this->workflow_overview_step_atend($workflow);
-
-        if (has_capability('block/workflow:manage', $context)) {
-            $url = new moodle_url('/blocks/workflow/removeworkflow.php',
-                    array('contextid' => $context->id, 'workflowid' => $workflow->id));
-            $cell = new html_table_cell(html_writer::tag('div',
-                    $this->output->render(new single_button($url, get_string('removeworkflow', 'block_workflow')))));
-            $cell->attributes['class'] = 'mdl-align';
-            $cell->colspan = 6;
-            $table->data[] = new html_table_row(array($cell));
-        }
-
         // Put everything together and return.
         $output .= html_writer::table($table);
+        // Put text and button after the table.
+        $output .= html_writer::tag('div', $this->atendgobackto($workflow), array('id' => 'text-after-table'));
+        if (has_capability('block/workflow:manage', $context)) {
+            $url = new moodle_url('/blocks/workflow/removeworkflow.php',
+                array('contextid' => $context->id, 'workflowid' => $workflow->id));
+            $output .= $this->output->render(new single_button($url, get_string('removeworkflow', 'block_workflow')));
+        }
         $output .= $this->box_end();
         return $output;
     }
@@ -1285,36 +1279,6 @@ class block_workflow_renderer extends plugin_renderer_base {
             $history[]      = html_writer::tag('p', get_string('state_history_detail', 'block_workflow', $a));
         }
         return implode("\n", $history);
-    }
-
-    /**
-     * Render a table row with details on what happens at the end of the workflow
-     *
-     * @param   object  $workflow The workflow to give information for
-     * @return  object  The table row for the atendgobacktostep information
-     */
-    private function workflow_overview_step_atend($workflow) {
-        $row = new html_table_row();
-        $row->attributes['class']        = 'step';
-
-        // Step Number.
-        $emptycell = new html_table_cell();
-        $row->cells[] = $emptycell;
-
-        // Step Name.
-        $cell = new html_table_cell($this->atendgobackto($workflow));
-        $cell->colspan = 2;
-
-        $row->cells[] = $cell;
-
-        // Time modified.
-        $row->cells[] = $emptycell;
-
-        // Add finish step/jump to step buttons.
-        $row->cells[] = $emptycell;
-
-        // Return the cell.
-        return $row;
     }
 
     /**
