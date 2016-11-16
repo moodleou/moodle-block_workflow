@@ -1131,11 +1131,20 @@ class block_workflow_renderer extends plugin_renderer_base {
         return $table;
     }
 
+    /**
+     * Gets CSS classes for the workflow overview box.
+     *
+     * @return string Css classes
+     */
+    protected function get_box_start_css_classes() {
+        return 'generalbox boxwidthwide boxaligncenter';
+    }
+
     public function workflow_overview($workflow, array $states, $context) {
         $output = '';
 
         // Add the box, title and description.
-        $output .= $this->box_start('generalbox boxwidthwide boxaligncenter', 'block-workflow-overview');
+        $output .= $this->box_start($this->get_box_start_css_classes(), 'block-workflow-overview');
         $output .= $this->output->heading(get_string('overview', 'block_workflow'));
 
         $table = $this->setup_table();
