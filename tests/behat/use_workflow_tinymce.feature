@@ -24,7 +24,7 @@ Feature: Workflow block - follow a workflow
     When I log in as "manager1"
     And I follow "Course 1"
     And I turn editing mode on
-    And I add the "Workflow" block
+    And I add the "Workflows" block
     Then I should see "There is currently no workflow assigned for this page"
 
   @javascript
@@ -41,7 +41,7 @@ Feature: Workflow block - follow a workflow
     When I log in as "manager1"
     And I follow "Course 1"
     And I turn editing mode on
-    And I add the "Workflow" block
+    And I add the "Workflows" block
     And I set the field "workflow" to "Test course workflow"
 
     Then I should see "Test course workflow"
@@ -71,17 +71,15 @@ Feature: Workflow block - follow a workflow
     Then I should see "Set the course format" in the "ul.block_workflow_todolist li" "css_element"
 
     When I press "Edit comments"
-    Then I should see "Edit comments"
+    Then I should see "Update comment"
     # Cannot actually set a comment, becuase Behat does not support TinyMCE any more.
-    And I press "Save changes"
+    And I click on "#id_submitbutton" "css_element"
 
     # Finish task
     When I press "Finish step"
     Then I should see "Finish step"
-    When I click on "Close" "button" in the "Finish step" "dialogue"
-    Then I should see "Test course workflow"
-    When I press "Finish step"
-    And I click on "Finish step" "button" in the "Finish step" "dialogue"
+    And I should see "Test course workflow"
+    When I click on "#id_submitbutton" "css_element"
     Then I should see "Prepare your web site"
     And I should see "Any Teacher"
 
@@ -113,9 +111,9 @@ Feature: Workflow block - follow a workflow
 
     # Finish task & course visiblility again.
     When I press "Finish step"
-    And I click on "Finish step" "button" in the "Finish step" "dialogue"
+    And I click on "#id_submitbutton" "css_element"
     Then I should see "The workflow has been completed."
-    And "Workflow overview" "button" in the "Test course workflow" "block" should be visible
+    And I should see "Workflow overview"
     And I reload the page
     And I should see "The workflow has been completed."
     And "Workflow overview" "button" in the "Workflow" "block" should be visible
