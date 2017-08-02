@@ -1,5 +1,5 @@
 @ou @ou_vle @block @block_workflow
-Feature: Workflow block - follow a workflow
+Feature: Workflow block - follow a workflow using TinyMCE
   In order to create courses in a bureaucratic organisation
   as a manager and a teacher
   I need to follow a workflow.
@@ -20,7 +20,7 @@ Feature: Workflow block - follow a workflow
       | student1 | C1     | student        |
 
   @javascript
-  Scenario: Try adding a workflow when none are defined.
+  Scenario: Try adding a workflow when none are defined using TinyMCE
     When I log in as "manager1"
     And I follow "Course 1"
     And I turn editing mode on
@@ -28,7 +28,7 @@ Feature: Workflow block - follow a workflow
     Then I should see "There is currently no workflow assigned for this page"
 
   @javascript
-  Scenario: Add a workflow to a course and step through it.
+  Scenario: Add a workflow to a course and step through it using TinyMCE
     When I log in as "admin"
     And I navigate to "Workflows" node in "Site administration > Plugins > Blocks"
     And I follow "Import workflow"

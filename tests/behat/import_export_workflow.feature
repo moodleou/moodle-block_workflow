@@ -5,7 +5,7 @@ Feature: Workflow block - import and export workflows
   I need to be able to import and export workflows.
 
   @javascript @_file_upload
-  Scenario: Add a workflow to a course and step through it.
+  Scenario: Import and export workflows
     When I log in as "admin"
     And I navigate to "Workflows" node in "Site administration > Plugins > Blocks"
     And I follow "Import workflow"
