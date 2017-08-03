@@ -22,7 +22,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
   @javascript
   Scenario: Try adding a workflow when none are defined using TinyMCE
     When I log in as "manager1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add the "Workflows" block
     Then I should see "There is currently no workflow assigned for this page"
@@ -39,7 +39,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
     And I log out
 
     When I log in as "manager1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     And I add the "Workflows" block
     And I set the field "workflow" to "Test course workflow"
@@ -104,7 +104,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
     # Teacher actions
     When I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "Test course workflow"
     And I should see "Prepare your web site"
     And I should see "You, or any other Teacher"
@@ -124,7 +124,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
 
     When I log out
     And I log in as "manager1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     Then I should see "The workflow has been completed."
     And I click on "Workflow overview" "button" in the "Workflow" "block"
     And I should see "Complete" in the "Configure basic site" "table_row"
