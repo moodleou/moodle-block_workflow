@@ -35,7 +35,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
     And I upload "blocks/workflow/tests/fixtures/testworkflow.workflow.xml" file to "File" filemanager
     And I press "Import workflow"
     And I navigate to "Manage editors" node in "Site administration > Plugins > Text editors"
-    And I click on "disable" "link" in the "Atto HTML editor" "table_row"
+    And I click on "Disable" "link" in the "Atto HTML editor" "table_row"
     And I log out
 
     When I log in as "manager1"
@@ -57,7 +57,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
 
     # Check that the finish step script did the right thing.
     When I navigate to "Edit settings" node in "Course administration"
-    Then the field "Visible" matches value "Hide"
+    Then the field "visible" matches value "Hide"
     And I press "Cancel"
 
     When I press "Show names (1)"
@@ -120,7 +120,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
 
     # Check that the finish step script did the right thing.
     When I navigate to "Edit settings" node in "Course administration"
-    Then the field "Visible" matches value "Show"
+    Then the field "visible" matches value "Show"
 
     When I log out
     And I log in as "manager1"
