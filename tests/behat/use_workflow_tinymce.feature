@@ -57,7 +57,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
 
     # Check that the finish step script did the right thing.
     When I navigate to "Edit settings" node in "Course administration"
-    Then the field "visible" matches value "Hide"
+    Then the field "Course visibility" matches value "Hide"
     And I press "Cancel"
 
     When I press "Show names (1)"
@@ -120,7 +120,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
 
     # Check that the finish step script did the right thing.
     When I navigate to "Edit settings" node in "Course administration"
-    Then the field "visible" matches value "Show"
+    Then the field "Course visibility" matches value "Show"
 
     When I log out
     And I log in as "manager1"

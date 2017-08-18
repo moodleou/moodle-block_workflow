@@ -55,7 +55,7 @@ Feature: Workflow block - follow a workflow
 
     # Check that the finish step script did the right thing.
     When I navigate to "Edit settings" node in "Course administration"
-    Then the field "Availability" matches value "Hide from students"
+    Then the field "Course visibility" matches value "Hide"
     And I press "Cancel"
 
     When I press "Show names (1)"
@@ -124,7 +124,7 @@ Feature: Workflow block - follow a workflow
     And I log in as "manager1"
     And I am on "Course 1" course homepage
     And I navigate to "Edit settings" node in "Course administration"
-    Then the field "Availability" matches value "Show on course page"
+    Then the field "Course visibility" matches value "Show"
 
     And I am on "Course 1" course homepage
     Then I should see "The workflow has been completed."
