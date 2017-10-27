@@ -141,7 +141,7 @@ class block_workflow_command_email extends block_workflow_command {
      *                        provided state.
      * @return  void
      */
-    public function execute($args, $state) {
+    public function execute($args, block_workflow_step_state $state) {
         // Validate the command and use it to retrieve the required data.
         $email = $this->parse($args, $state->step(), $state);
 
@@ -154,9 +154,10 @@ class block_workflow_command_email extends block_workflow_command {
         $this->email_params($email, $state);
 
         // Send the e-mail.
-        $eventdata = new stdClass();
+        $eventdata = new core\message\message();
         $eventdata->component   = 'block_workflow';
         $eventdata->name        = 'notification';
+        $eventdata->courseid    = context::instance_by_id($state->contextid)->get_course_context()->instanceid;
         $eventdata->userfrom    = core_user::get_noreply_user();
         $eventdata->subject     = $email->email->subject;
         $eventdata->fullmessage = $email->email->message;
