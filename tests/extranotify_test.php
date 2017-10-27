@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Workflow block test for autofinish fuctionality.
+ * Workflow block test for extra notify fuctionality.
  *
  * @package   block_workflow
  * @copyright 2012 The Open University
@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
 require_once($CFG->dirroot . '/blocks/workflow/tests/lib.php');
 
 class block_workflow_extra_notify_test extends block_workflow_testlib {
-    public function test_automatic_step_finisher() {
+    public function test_extra_notify() {
         global $CFG, $DB;
         $now = time();
         $after5days = $this->get_days(5);
@@ -64,8 +64,18 @@ class block_workflow_extra_notify_test extends block_workflow_testlib {
                 'SELECT * FROM vl_v_crs_version_pres ' .
                 'WHERE vle_course_short_name = ?', array($courseshortname), MUST_EXIST);
 
+        // Create an email template
+        $data  = new stdClass();
+        $data->shortname = 'testing';
+        $data->subject   = 'Workflow notification';
+        $data->message   = 'This is a notification message';
+
+        $email = new block_workflow_email();
+        $email->create($data);
+
         // Create a new workflow object which applies to course.
-        $stepoptions = array('extranotify' => 'course;startdate', 'extranotifyoffset' => $before5days, 'onextranotifyscript' => '');
+        $stepoptions = array('extranotify' => 'course;startdate', 'extranotifyoffset' => $before5days,
+                'onextranotifyscript' => 'email testing to manager');
         list($courseworkflow, $step1) = $this->create_a_workflow_with_one_step($stepoptions);
 
         // Required DB tables are not populated and therefore following methods return empty arrays.
@@ -101,9 +111,8 @@ class block_workflow_extra_notify_test extends block_workflow_testlib {
         $this->assertEquals($expectedactivesteps, $activesteps);
 
         // Check relevant fields in 'block_workflow_step_states' table before sending extra notification.
-        $statebeforefinish = $DB->get_record('block_workflow_step_states', array('id' => $state1->id));
-        $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $statebeforefinish->state);
-        $this->assertEmpty($statebeforefinish->comment);
+        $state = $DB->get_record('block_workflow_step_states', array('id' => $state1->id));
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $state->state);
 
         // Get ready active steps and finish them automatically.
         block_workflow_send_extra_notification();

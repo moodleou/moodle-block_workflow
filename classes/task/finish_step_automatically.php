@@ -43,9 +43,7 @@ class finish_step_automatically extends \core\task\scheduled_task {
         try {
             block_workflow_autofinish_steps();
         } catch (\Exception $e) {
-            $error = $e->getMessage();
-            mtrace('Workflow Automatic step finisher stopped at ' . date('H:i:s') );
-            mtrace($error);
+            block_workflow_report_scheduled_task_error('automatic step finisher', $e);
         }
     }
 }

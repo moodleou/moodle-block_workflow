@@ -469,11 +469,21 @@ class block_workflow_step {
             }
         }
 
+        // This comes from a form where the value may be various things like an
+        // empty string. But we strictly want to store NULL in the DB if this is not set.
         if (empty($data->autofinish)) {
             $data->autofinish = null;
         }
         if (empty($data->autofinishoffset)) {
             $data->autofinishoffset = 0;
+        }
+
+        // Same for this field too. Ensure it is really NULL if not set.
+        if (empty($data->extranotify)) {
+            $data->extranotify = null;
+        }
+        if (empty($data->extranotifyoffset)) {
+            $data->extranotifyoffset = 0;
         }
 
         // Validate any changes to the onactivescript, onextranotifyscript and oncompletescript.

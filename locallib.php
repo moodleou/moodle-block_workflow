@@ -319,18 +319,22 @@ function block_workflow_send_extra_notification() {
     $now = time();
 
     foreach ($activesteps as $key => $activestep) {
-        $state = new block_workflow_step_state($activestep->stateid);
-        $notificationtime = block_workflow_get_offset_time($activestep->courseshortname,
-                $activestep->courseid, $activestep->moduleid, $activestep->extranotify, $activestep->extranotifyoffset);
+        try {
+            $notificationtime = block_workflow_get_offset_time($activestep->courseshortname,
+                    $activestep->courseid, $activestep->moduleid, $activestep->extranotify, $activestep->extranotifyoffset);
 
-        // Is is the time to notify?
-        if ($notificationtime < $now) {
-            if ($state->step()->onextranotifyscript) {
-                $state->step()->process_script($state, $state->step()->onextranotifyscript);
+            // Is is the time to notify?
+            if ($notificationtime < $now) {
+                $state = new block_workflow_step_state($activestep->stateid);
+                if ($state->step()->onextranotifyscript) {
+                    $state->step()->process_script($state, $state->step()->onextranotifyscript);
+                }
 
                 // Cron setup user.
                 cron_setup_user();
             }
+        } catch (Exception $e) {
+            block_workflow_report_scheduled_task_error('send extra notifications', $e, $activestep);
         }
     }
 }
@@ -349,20 +353,49 @@ function block_workflow_autofinish_steps() {
     $now = time();
 
     foreach ($activesteps as $key => $activestep) {
-        $autofinishtime = block_workflow_get_offset_time($activestep->courseshortname,
-                $activestep->courseid, $activestep->moduleid, $activestep->autofinish, $activestep->autofinishoffset);
+        try {
+            $autofinishtime = block_workflow_get_offset_time($activestep->courseshortname,
+                    $activestep->courseid, $activestep->moduleid, $activestep->autofinish, $activestep->autofinishoffset);
 
-        // Is is the time to finish the step automayically?
-        if ($autofinishtime < $now) {
-            // Add a comment and finsh the step automatically.
-            $newcomment = get_string('finishstepautomatically',  'block_workflow',
-                                        date('H:i:s') . ' on ' . date('jS \of F Y'));
+            // Is is the time to finish the step automatically?
+            if ($autofinishtime < $now) {
+                // Add a comment and finish the step automatically.
+                $newcomment = get_string('finishstepautomatically',  'block_workflow',
+                                            date('H:i:s') . ' on ' . date('jS \of F Y'));
 
-            $state = new block_workflow_step_state($activestep->stateid);
-            $state->finish_step($newcomment, FORMAT_HTML);
+                $state = new block_workflow_step_state($activestep->stateid);
+                $state->finish_step($newcomment, FORMAT_HTML);
 
-            // Cron setup user.
-            cron_setup_user();
+                // Cron setup user.
+                cron_setup_user();
+            }
+        } catch (Exception $e) {
+            block_workflow_report_scheduled_task_error(
+                    'automatic step finisher', $e, $activestep);
         }
     }
+}
+
+/**
+ * Helper function used by both {@link block_workflow_autofinish_steps()}
+ * and {@link block_workflow_send_extra_notification()}.
+ *
+ * @param string $taskname which task - used in the debug output.
+ * @param Exception $e the exception.
+ * @param $activestep if this relates to a particular step state.
+ * Only the $activestep->stateid field is used (currently).
+ */
+function block_workflow_report_scheduled_task_error($taskname, Exception $e, $activestep = null) {
+
+    $message = "Workflow task $taskname failed: " . $e->getMessage() . " at " . date('H:i:s');
+    if ($activestep) {
+        $message .= ' while processing step state ' . $activestep->stateid;
+    }
+    mtrace($message);
+    if (!empty($e->debuginfo)) {
+        mtrace("Debug info:");
+        mtrace($e->debuginfo);
+    }
+    mtrace("Backtrace:");
+    mtrace(format_backtrace($e->getTrace(), true));
 }

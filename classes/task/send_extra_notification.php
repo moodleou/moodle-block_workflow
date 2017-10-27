@@ -44,9 +44,7 @@ class send_extra_notification extends \core\task\scheduled_task {
         try {
             block_workflow_send_extra_notification();
         } catch (\Exception $e) {
-            $error = $e->getMessage();
-            mtrace('Workflow Extra notify stopped at ' . date('H:i:s') );
-            mtrace($error);
+            block_workflow_report_scheduled_task_error('send extra notifications', $e);
         }
     }
 }
