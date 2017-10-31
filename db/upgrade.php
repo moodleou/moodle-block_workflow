@@ -113,5 +113,17 @@ function xmldb_block_workflow_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2015101500, 'workflow');
     }
 
+    if ($oldversion < 2017103100) {
+        // For a while we were missing code when the step settings were saved, so
+        // we need to fix up any bad data in the database.
+        $DB->execute("
+                UPDATE {block_workflow_steps}
+                   SET extranotify = NULL
+                 WHERE extranotify = ''
+                ");
+
+        upgrade_block_savepoint(true, 2017103100, 'workflow');
+    }
+
     return true;
 }
