@@ -227,6 +227,31 @@ at the next cron job the task will perform the automated task.
 1) 'Workflow step finisher' will finish the relevant workflow steps automatically
 2) 'Workflow setp extra notify' will send the notification to the users of the specified roles.
 
+Actions/commands within workflow steps
+--------------------------------------
+There are three area in each step where commands can be setup:
+Setp activation
+Setp extra notification
+Step completion
+There are following command feature in workflow system:
+assignrole
+email
+override
+setactivitylinksetting
+setactivityvisibility
+setcoursevisibility
+setgradeitemvisibility
+
+setgradeitemvisibility
+----------------------
+setgradeitemvisibility in a command that can be used a workflow step to set
+the grade item visibility for activities which support grading the valid
+command are:
+setgradeitemvisibility visible
+setgradeitemvisibility hidden
+
+TODO: Improve/restructure this document in bloks/workflow/internaldoc in an appropriate PBI
+
 How to run the cron
 -------------------
 On the acceptance or live server, the cron will be running regularly.
