@@ -292,11 +292,11 @@ function block_workflow_get_offset_time($courseshortname, $courseid, $moduleid, 
 
     $timestamp = 0;
     if ($dbtable === 'vl_v_crs_version_pres') {
-        $sql = "SELECT * FROM vl_v_crs_version_pres
-                WHERE vle_course_short_name = ?";
-        if ($rowofdata = $DB->get_record_sql($sql, array($courseshortname), MUST_EXIST)) {
-            $timestamp = strtotime($rowofdata->$dbfield);
-        }
+        $timestamp = $DB->get_field_sql("
+                SELECT MIN($dbfield)
+                  FROM vl_v_crs_version_pres
+                 WHERE vle_course_short_name = ?
+                ", array($courseshortname));
     } else if ($dbtable === 'course') {
         $timestamp = $DB->get_field('course', $dbfield, array('id' => $courseid));
     } else {
