@@ -169,6 +169,12 @@ Feature: Workflow block - create and edit workflows
       | Instructions                | Please setup extra notification. |
       | extranotifyoffset           | 1 day before                     |
       | extranotify                 | the course start date            |
+      | Notify while step is active | setgradeitemvisibility visible   |
+
+    And I press "Save changes"
+    Then I should see "The script you specified was invalid. The command setgradeitemvisibility may only be used with an activity"
+
+    When I set the following fields to these values:
       | Notify while step is active | email taskemail to teacher       |
 
     And I press "Save changes"
