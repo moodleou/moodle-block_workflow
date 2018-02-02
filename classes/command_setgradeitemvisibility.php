@@ -35,6 +35,13 @@ defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
  *
  */
 class block_workflow_command_setgradeitemvisibility extends block_workflow_command {
+
+    /** @var int Constant for hidden grade items */
+    const HIDDEN = 1;
+
+    /** @var int Constant for visible grade items */
+    const VISIBLE = 0;
+
     public function parse($args, $step, $state = null) {
         $data = new stdClass();
         $data->errors = array();
@@ -57,9 +64,9 @@ class block_workflow_command_setgradeitemvisibility extends block_workflow_comma
 
         // Check for the correct visibility option.
         if ($args === 'hidden') {
-            $data->visibility = 0;
+            $data->visibility = self::HIDDEN;
         } else if ($args === 'visible') {
-            $data->visibility = 1;
+            $data->visibility = self::VISIBLE;
         } else {
             $data->errors[] = get_string('invalidvisibilitysetting', 'block_workflow', $args);
         }
@@ -73,7 +80,7 @@ class block_workflow_command_setgradeitemvisibility extends block_workflow_comma
     }
 
     public function execute($args, $state) {
-        global $CFG, $DB;
+        global $CFG;
         require_once($CFG->dirroot . '/lib/grade/grade_item.php');
         $data = $this->parse($args, $state->step(), $state);
         if (!$data) {
