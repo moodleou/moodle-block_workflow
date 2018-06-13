@@ -21,7 +21,7 @@
  * @copyright 2012 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+global $CFG;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
 

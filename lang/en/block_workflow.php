@@ -244,6 +244,20 @@ $string['overviewtitle']                = 'Overview of {$a->workflowname} workfl
 
 $string['percentcomplete']              = '{$a}% complete';
 
+// GDPR.
+$string['privacy:metadata:block_workflow_state_changes'] = 'Changes to states.';
+$string['privacy:metadata:block_workflow_state_changes:userid'] = 'The user who caused the state change.';
+$string['privacy:metadata:block_workflow_state_changes:newstate'] = 'The state that this step changed to.';
+
+$string['privacy:metadata:block_workflow_todo_done'] = 'Changes to each step in the workflow.';
+$string['privacy:metadata:block_workflow_todo_done:userid'] = 'The user who caused the state change.';
+$string['privacy:metadata:block_workflow_todo_done:steptodoid'] = 'The todo step that user changed to.';
+$string['privacy:metadata'] = 'The Calendar block only displays existing calendar data.';
+
+$string['privacy_you'] = 'You';
+$string['privacy_somebodyelse'] = 'Somebody else';
+// End GDPR.
+
 $string['quizopendate']                 = 'the quiz open date';
 $string['quizclosedate']                = 'the quiz close date';
 
