@@ -99,7 +99,7 @@ Feature: Workflow block - create and edit workflows
     And I press "Save changes"
     And I click on "Edit step" "link" in the "Prepare your web site" "table_row"
     And I click on "Add role to step" "link" in the "Teacher" "table_row"
-        And I follow "Add task"
+    And I follow "Add task"
     And I set the field "Task" to "Add resources"
     And I press "Save changes"
     And I follow "Add task"

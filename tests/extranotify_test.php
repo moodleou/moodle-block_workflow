@@ -64,7 +64,7 @@ class block_workflow_extra_notify_test extends block_workflow_testlib {
                 'SELECT * FROM vl_v_crs_version_pres ' .
                 'WHERE vle_course_short_name = ?', array($courseshortname), MUST_EXIST);
 
-        // Create an email template
+        // Create an email template.
         $data  = new stdClass();
         $data->shortname = 'testing';
         $data->subject   = 'Workflow notification';

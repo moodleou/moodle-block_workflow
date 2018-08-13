@@ -32,6 +32,10 @@ require_once($CFG->dirroot.'/lib/grade/grade_item.php');
 
 class block_workflow_command_setgradeitemvisibility_test extends block_workflow_testlib {
     private function generate_module($modname) {
+        global $CFG;
+        if (!is_readable($CFG->dirroot . '/mod/externalquiz/tests/generator/lib.php')) {
+            $this->markTestSkipped('This test requires mod_externalquiz to be installed.');
+        }
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_' . $modname);
         return $generator->create_instance(array('course' => $this->courseid));
     }

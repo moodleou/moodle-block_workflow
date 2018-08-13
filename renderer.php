@@ -978,11 +978,12 @@ class block_workflow_renderer extends plugin_renderer_base {
         // Delete task.
         if ($task->isremovable) {
             $url    = new moodle_url('/blocks/workflow/deletetask.php', array('id' => $task->id));
-            $actions[] = html_writer::link($url, html_writer::empty_tag('img', array('src'   => $this->output->image_url('t/delete'),
-                                                                            'class' => 'iconsmall',
-                                                                            'title' => get_string('removetask', 'block_workflow'),
-                                                                            'alt'   => get_string('removetask', 'block_workflow')
-                                                                            )));
+            $actions[] = html_writer::link($url,
+                    html_writer::empty_tag('img', array('src' => $this->output->image_url('t/delete'),
+                            'class' => 'iconsmall',
+                            'title' => get_string('removetask', 'block_workflow'),
+                            'alt'   => get_string('removetask', 'block_workflow')
+                    )));
         }
 
         $actions = new html_table_cell(implode(' ', $actions));
@@ -1003,7 +1004,9 @@ class block_workflow_renderer extends plugin_renderer_base {
         $table->head[] = get_string('roles', 'block_workflow');
         $table->head[] = '';
 
-        $activedoers = array_map(create_function('$a', 'return $a->id;'), $doers);
+        $activedoers = array_map(function ($a) {
+            return $a->id;
+        }, $doers);
 
         foreach ($roles as $role) {
             if (in_array($role->id, $activedoers)) {

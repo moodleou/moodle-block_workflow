@@ -404,7 +404,9 @@ class block_workflow_step {
 
         // Retrieve a list of the step_states.
         $states = $DB->get_records('block_workflow_step_states', array('stepid' => $this->id), null, 'id');
-        $statelist = array_map(create_function('$a', 'return $a->id;'), $states);
+        $statelist = array_map(function ($a) {
+            return $a->id;
+        }, $states);
 
         // Remove all of the state_change history.
         $DB->delete_records_list('block_workflow_state_changes', 'stepstateid', $statelist);

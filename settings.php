@@ -22,5 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 $settings = new admin_externalpage('blocksettingworkflow', get_string('pluginname', 'block_workflow'),
                                    new moodle_url('/blocks/workflow/manage.php'), 'block/workflow:editdefinitions');

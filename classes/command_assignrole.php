@@ -60,7 +60,7 @@ class block_workflow_command_assignrole extends block_workflow_command {
         }
 
         // Break down the line. It should be in the format
-        //      {newrole} to {rolea} {roleb} {rolen}
+        // newrole to rolea roleb rolen
         // with any number of role shortnames.
         $line = preg_split('/[\s+]/', $args);
 

@@ -7,8 +7,12 @@ The specification was writted by Tim Hunt and Sharon Monie.
 
 You can install this block from the Moodle plugins database using the link above.
 
+Note that some of the functionality (e.g. the Privacy API implementation) may only work
+if you are using a Postgres database.)
+
 Alternatively, you can install it using git. Type this command in the top level
 of your Moodle install:
+
     git clone git://github.com/moodleou/moodle-block_workflow.git blocks/workflow
     echo '/blocks/workflow/' >> .git/info/exclude
 

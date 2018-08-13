@@ -253,10 +253,10 @@ class privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
         $tododone = $DB->get_records_sql($tododonesql, $params);
         $this->assertEquals(4, count($statechange));
         $this->assertEquals(2, count($tododone));
-        foreach ($statechange as $recordstatechange){
+        foreach ($statechange as $recordstatechange) {
             $this->assertEquals(get_admin()->id, $recordstatechange->userid);
         }
-        foreach ($tododone as $recordtodo){
+        foreach ($tododone as $recordtodo) {
             $this->assertEquals(get_admin()->id, $recordtodo->userid);
         }
     }

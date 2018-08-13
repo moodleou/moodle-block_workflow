@@ -175,7 +175,9 @@ if ($importform->is_cancelled()) {
 
         // Validate and assign required roles.
         $roles = block_workflow_contextlevel_roles($step->workflow()->context());
-        $roles = array_map(create_function('$a', 'return $a->shortname;'), $roles);
+        $roles = array_map(function ($a) {
+            return $a->shortname;
+        }, $roles);
         $roles = array_flip($roles);
         foreach ($importedstep->doer as $doer) {
             $doer = trim($doer);

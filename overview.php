@@ -54,7 +54,9 @@ $stepstates = $workflow->step_states($contextid, $workflowid);
 $tparams = array('contexttitle' => $context->get_context_name(), 'workflowname' => $workflow->name);
 
 // Check that this workflow is assigned to this context.
-$statelist = array_filter($stepstates, create_function('$a', 'return isset($a->stateid);'));
+$statelist = array_filter($stepstates, function ($a) {
+    return isset($a->stateid);
+});
 if (count($statelist) == 0) {
     throw new block_workflow_not_assigned_exception(get_string('workflownotassignedtocontext', 'block_workflow', $tparams));
 }

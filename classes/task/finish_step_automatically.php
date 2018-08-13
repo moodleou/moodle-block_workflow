@@ -21,7 +21,10 @@
  * @copyright 2015 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace block_workflow\task;
+defined('MOODLE_INTERNAL') || die();
+
 
 class finish_step_automatically extends \core\task\scheduled_task {
 

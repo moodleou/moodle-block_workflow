@@ -397,6 +397,11 @@ abstract class block_workflow_testlib extends advanced_testcase {
      */
     protected function create_version_pres_tables() {
         global $DB;
+
+        if ($DB->get_dbfamily() !== 'postgres') {
+            $this->markTestSkipped('This test only works with a Postgres database.');
+        }
+
         // Set that we have dataload tables.
         set_config('hasdataloadtables', 1);
 

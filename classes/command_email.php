@@ -49,7 +49,7 @@ class block_workflow_command_email extends block_workflow_command {
         $data->errors = array();
 
         // Break down the line. It should be in the format:
-        //      {email} to {rolea} {roleb} {rolen}
+        // email to rolea roleb rolen
         // with any number of role shortnames.
         $line = preg_split('/[\s+]/', $args);
 
@@ -251,7 +251,9 @@ class block_workflow_command_email extends block_workflow_command {
         $string = str_replace('%%coursename%%', $coursename, $string);
 
         // Replace %%usernames%%.
-        $usernames = array_map(create_function('$a', 'return fullname($a);'), $email->users);
+        $usernames = array_map(function($a) {
+            return fullname($a);
+        }, $email->users);
         $usernames = implode(', ', $usernames);
         $subject = str_replace('%%usernames%%', $usernames, $subject);
         $string = str_replace('%%usernames%%', $usernames, $string);

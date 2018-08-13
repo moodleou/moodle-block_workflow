@@ -64,7 +64,7 @@ class block_workflow_command_setactivitysetting extends block_workflow_command {
         }
 
         // Break down the line. It should be in the format:
-        //      {column} to {value}
+        // column to value
         // where column is a column in the activity settings table.
         $line = preg_split('/[\s+]/', $args);
 

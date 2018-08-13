@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
+defined('MOODLE_INTERNAL') || die();
 
 
 /**
@@ -375,7 +375,9 @@ class block_workflow_workflow {
 
         // First remove any steps and their associated doers and todos.
         $steps = $DB->get_records('block_workflow_step_states', array('id' => $this->id), null, 'id');
-        $steplist = array_map(create_function('$a', 'return $a->id;'), $steps);
+        $steplist = array_map(function ($a) {
+            return $a->id;
+        }, $steps);
 
         $DB->delete_records_list('block_workflow_step_doers', 'stepid', $steplist);
         $DB->delete_records_list('block_workflow_step_todos', 'stepid', $steplist);
@@ -390,7 +392,7 @@ class block_workflow_workflow {
      * Return an array of available workflows
      *
      * @param   String for  The context in which the workflow is for
-     * @return  Array of stdClass objects as returned by the database
+     * @return  array of stdClass objects as returned by the database
      *          abstraction layer
      */
     public static function available_workflows($for) {
@@ -417,7 +419,7 @@ class block_workflow_workflow {
             $step->load_active_step($contextid);
             $transaction->rollback(new block_workflow_exception(get_string('workflowalreadyassigned', 'block_workflow')));
 
-        } catch (block_workflow_not_assigned_exception $e) {
+        } catch (block_workflow_not_assigned_exception $e) { // @codingStandardsIgnoreLine
             // A workflow shouldn't be assigned to this context already. A
             // context may only have one workflow assigned at a time.
         }
@@ -480,7 +482,9 @@ class block_workflow_workflow {
 
         // Grab the current step_states and check that the workflow is assigned to this context.
         $stepstates = $this->step_states($contextid);
-        $used = array_filter($stepstates, create_function('$a', 'return isset($a->stateid);'));
+        $used = array_filter($stepstates, function ($a) {
+            return isset($a->stateid);
+        });
         if (count($used) == 0) {
             $transaction->rollback(new block_workflow_not_assigned_exception(
                     get_string('workflownotassigned', 'block_workflow', $this->name)));
@@ -494,12 +498,14 @@ class block_workflow_workflow {
             // Abort the step by jumping to no step at all.
             $state->jump_to_step();
 
-        } catch (block_workflow_not_assigned_exception $e) {
+        } catch (block_workflow_not_assigned_exception $e) { // @codingStandardsIgnoreLine
             // The workflow may be inactive so it's safe to catch this exception.
         }
 
         // Retrieve a list of the step_states.
-        $statelist = array_map(create_function('$a', 'return $a->stateid;'), $stepstates);
+        $statelist = array_map(function ($a) {
+            return $a->stateid;
+        }, $stepstates);
 
         // Remove all of the state_change history.
         $DB->delete_records_list('block_workflow_state_changes', 'stepstateid', $statelist);
