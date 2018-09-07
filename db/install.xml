@@ -65,7 +65,7 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="stepid" TYPE="foreign" FIELDS="stepid" REFTABLE="block_workflow_steps" REFFIELDS="id"/>
-        <KEY NAME="roleid" TYPE="foreign" FIELDS="stepid" REFTABLE="role" REFFIELDS="id"/>
+        <KEY NAME="roleid" TYPE="foreign" FIELDS="roleid" REFTABLE="role" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="block_workflow_step_todos" COMMENT="To-do checklist for a step">
