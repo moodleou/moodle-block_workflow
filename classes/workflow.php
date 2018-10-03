@@ -462,6 +462,10 @@ class block_workflow_workflow {
 
         $transaction->allow_commit();
 
+        // Trigger an event for the initial ACTIVE status.
+        $event = \block_workflow\event\step_activated::create_from_step_state($state, true);
+        $event->trigger();
+
         // This is a workaround for a limitation of the message_send system.
         // This must be called outside of a transaction.
         block_workflow_command_email::message_send();
