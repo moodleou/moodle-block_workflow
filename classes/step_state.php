@@ -254,6 +254,24 @@ class block_workflow_step_state {
                 break;
         }
 
+        // Trigger an event for the status change.
+        switch ($state->state) {
+            case BLOCK_WORKFLOW_STATE_ACTIVE:
+                $event = \block_workflow\event\step_activated::create_from_step_state($this);
+                $event->trigger();
+                break;
+            case BLOCK_WORKFLOW_STATE_COMPLETED:
+                $event = \block_workflow\event\step_completed::create_from_step_state($this);
+                $event->trigger();
+                break;
+            case BLOCK_WORKFLOW_STATE_ABORTED:
+                $event = \block_workflow\event\step_aborted::create_from_step_state($this);
+                $event->trigger();
+                break;
+            default:
+                break;
+        }
+
         $transaction->allow_commit();
 
         // This is a workaround for a limitation of the message_send system.
@@ -422,6 +440,11 @@ class block_workflow_step_state {
 
         // Try and pick up the current task.
         $todo = $DB->get_record('block_workflow_todo_done', array('stepstateid' => $this->id, 'steptodoid' => $todoid));
+
+        // Trigger an event for the toggled completed status of this to-do.
+        $event = \block_workflow\event\todo_triggered::create_from_step_state($this, $todoid, !$todo);
+        $event->trigger();
+
         if ($todo) {
             // Remove the current record. There is no past history at present.
             $DB->delete_records('block_workflow_todo_done', array('id' => $todo->id));
