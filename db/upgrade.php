@@ -127,25 +127,6 @@ function xmldb_block_workflow_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2017103100, 'workflow');
     }
 
-    if ($oldversion < 2018111200) {
-
-        // Because of previous issues, there may be a duplicate index
-        // o_blocworkstepdoer_ste2_ix. We drop this manually, not using
-        // $dbman->drop_key, because we want to be sure to drop the ...2... index.
-        $indexes = $DB->get_indexes('block_workflow_step_doers');
-        foreach ($indexes AS $indexname => $notused) {
-            if ($indexname === 'o_blocworkstepdoer_ste2_ix') {
-                $dropsql = $dbman->generator->drop_index_sql;
-                $dropsql = str_replace('TABLENAME', 'block_workflow_step_doers', $dropsql);
-                $dropsql = str_replace('INDEXNAME', 'o_blocworkstepdoer_ste2_ix', $dropsql);
-                $DB->change_database_structure($dropsql, ['block_workflow_step_doers']);
-            }
-        }
-
-        // Workflow savepoint reached.
-        upgrade_block_savepoint(true, 2018111200, 'workflow');
-    }
-
     if ($oldversion < 2018111201) {
 
         // Define key roleid (foreign) to be added to block_workflow_step_doers.
@@ -157,6 +138,27 @@ function xmldb_block_workflow_upgrade($oldversion) {
 
         // Workflow savepoint reached.
         upgrade_block_savepoint(true, 2018111201, 'workflow');
+    }
+
+    if ($oldversion < 2018111300) {
+
+        // Because of previous issues, there may be a duplicate index
+        // {blocworkstepdoer_ste2_ix}. We drop this manually, not using
+        // $dbman->drop_key, because we want to be sure to drop the ...2... index.
+        $tablename = $DB->get_prefix() . 'block_workflow_step_doers';
+        $indextoremove = $DB->get_prefix() . 'blocworkstepdoer_ste2_ix';
+        $indexes = $DB->get_indexes('block_workflow_step_doers');
+        foreach ($indexes AS $indexname => $notused) {
+            if ($indexname === $indextoremove) {
+                $dropsql = $dbman->generator->drop_index_sql;
+                $dropsql = str_replace('TABLENAME', $tablename, $dropsql);
+                $dropsql = str_replace('INDEXNAME', $indextoremove, $dropsql);
+                $DB->change_database_structure($dropsql);
+            }
+        }
+
+        // Workflow savepoint reached.
+        upgrade_block_savepoint(true, 2018111300, 'workflow');
     }
 
     return true;
