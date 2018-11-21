@@ -24,10 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018111300;
+$plugin->version   = 2018112100;
 $plugin->requires  = 2017111300;
 $plugin->component = 'block_workflow';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'v1.7 for Moodle 3.0+';
+$plugin->release   = 'v1.8 for Moodle 3.4+';
 
 $plugin->outestssufficient = true;

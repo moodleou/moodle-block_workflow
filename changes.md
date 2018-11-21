@@ -1,6 +1,14 @@
 # Change log for the Workflow block
 
 
+## Changes in 1.8
+
+* Add logging/Moodle events for workflow changes.
+  Thanks to Henrik Thorn from https://itkartellet.dk/.
+* Fix an incorrect database index definition.
+* Fix Behat tests for Moodle 3.6.
+
+
 ## Changes in 1.7
 
 * Privacy API implementation.
