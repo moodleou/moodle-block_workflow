@@ -148,7 +148,7 @@ function xmldb_block_workflow_upgrade($oldversion) {
         $tablename = $DB->get_prefix() . 'block_workflow_step_doers';
         $indextoremove = $DB->get_prefix() . 'blocworkstepdoer_ste2_ix';
         $indexes = $DB->get_indexes('block_workflow_step_doers');
-        foreach ($indexes AS $indexname => $notused) {
+        foreach ($indexes as $indexname => $notused) {
             if ($indexname === $indextoremove) {
                 $dropsql = $dbman->generator->drop_index_sql;
                 $dropsql = str_replace('TABLENAME', $tablename, $dropsql);
