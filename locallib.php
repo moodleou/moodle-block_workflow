@@ -329,7 +329,7 @@ function block_workflow_send_extra_notification() {
                 if ($state->step()->onextranotifyscript) {
                     $state->step()->process_script($state, $state->step()->onextranotifyscript);
 
-                    // Trigger an event for the extra notification
+                    // Trigger an event for the extra notification.
                     $event = \block_workflow\event\step_extra_notification_processed::create_from_step_state($state);
                     $event->trigger();
                 }
