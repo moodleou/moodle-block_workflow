@@ -7,7 +7,7 @@ Feature: Workflow block - email templates
   @javascript
   Scenario: Create edit then delete an email template
     When I log in as "admin"
-    And I navigate to "Workflows" node in "Site administration > Plugins > Blocks"
+    And I navigate to "Plugins > Blocks > Workflows" in site administration
     Then I should see "Manage email templates"
 
     When I follow "Add email template"

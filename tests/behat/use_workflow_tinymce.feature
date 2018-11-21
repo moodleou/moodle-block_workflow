@@ -30,11 +30,11 @@ Feature: Workflow block - follow a workflow using TinyMCE
   @javascript
   Scenario: Add a workflow to a course and step through it using TinyMCE
     When I log in as "admin"
-    And I navigate to "Workflows" node in "Site administration > Plugins > Blocks"
+    And I navigate to "Plugins > Blocks > Workflows" in site administration
     And I follow "Import workflow"
     And I upload "blocks/workflow/tests/fixtures/testworkflow.workflow.xml" file to "File" filemanager
     And I press "Import workflow"
-    And I navigate to "Manage editors" node in "Site administration > Plugins > Text editors"
+    And I navigate to "Plugins > Text editors > Manage editors" in site administration
     And I click on "Disable" "link" in the "Atto HTML editor" "table_row"
     And I log out
 
@@ -56,7 +56,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
     And I should see "Tasks for completion"
 
     # Check that the finish step script did the right thing.
-    When I navigate to "Edit settings" node in "Course administration"
+    When I navigate to "Edit settings" in current page administration
     Then the field "Course visibility" matches value "Hide"
     And I press "Cancel"
 
@@ -119,7 +119,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
     And "Workflow overview" "button" in the "Workflow" "block" should be visible
 
     # Check that the finish step script did the right thing.
-    When I navigate to "Edit settings" node in "Course administration"
+    When I navigate to "Edit settings" in current page administration
     Then the field "Course visibility" matches value "Show"
 
     When I log out

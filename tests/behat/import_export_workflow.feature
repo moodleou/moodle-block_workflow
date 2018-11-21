@@ -7,7 +7,7 @@ Feature: Workflow block - import and export workflows
   @javascript @_file_upload
   Scenario: Import and export workflows
     When I log in as "admin"
-    And I navigate to "Workflows" node in "Site administration > Plugins > Blocks"
+    And I navigate to "Plugins > Blocks > Workflows" in site administration
     And I follow "Import workflow"
     And I upload "blocks/workflow/tests/fixtures/testworkflow.workflow.xml" file to "File" filemanager
     And I press "Import workflow"

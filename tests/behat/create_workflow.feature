@@ -6,7 +6,7 @@ Feature: Workflow block - create and edit workflows
 
   Background:
     Given I log in as "admin"
-    And I navigate to "Workflows" node in "Site administration > Plugins > Blocks"
+    And I navigate to "Plugins > Blocks > Workflows" in site administration
     And I follow "Add email template"
     And I set the following fields to these values:
       | Shortname | taskemail                                                        |

@@ -30,7 +30,7 @@ Feature: Workflow block - follow a workflow
   @javascript
   Scenario: Add a workflow to a course and step through it.
     When I log in as "admin"
-    And I navigate to "Workflows" node in "Site administration > Plugins > Blocks"
+    And I navigate to "Plugins > Blocks > Workflows" in site administration
     And I follow "Import workflow"
     And I upload "blocks/workflow/tests/fixtures/testworkflow.workflow.xml" file to "File" filemanager
     And I press "Import workflow"
@@ -54,7 +54,7 @@ Feature: Workflow block - follow a workflow
     And I should see "Tasks for completion"
 
     # Check that the finish step script did the right thing.
-    When I navigate to "Edit settings" node in "Course administration"
+    When I navigate to "Edit settings" in current page administration
     Then the field "Course visibility" matches value "Hide"
     And I press "Cancel"
 
@@ -123,7 +123,7 @@ Feature: Workflow block - follow a workflow
     When I log out
     And I log in as "manager1"
     And I am on "Course 1" course homepage
-    And I navigate to "Edit settings" node in "Course administration"
+    And I navigate to "Edit settings" in current page administration
     Then the field "Course visibility" matches value "Show"
 
     And I am on "Course 1" course homepage
