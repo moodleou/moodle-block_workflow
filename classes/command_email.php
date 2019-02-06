@@ -210,11 +210,11 @@ class block_workflow_command_email extends block_workflow_command {
      * - %%comment%%        If the specified state is active, then the comment for the current
      *                      state, otherwise the comment for the previous state.
      *
-     * @param   stdClass &$email The incoming email
+     * @param   stdClass $email The email template
      * @param   block_workflow_step_state $state    The block_workflow_step_state for the message being sent
      * @return  void
      */
-    private function email_params(&$email, $state) {
+    private function email_params($email, $state) {
         global $USER;
 
         // Shorter accessors.

@@ -66,7 +66,7 @@ abstract class block_workflow_testlib extends advanced_testcase {
      */
     public function setUp() {
         global $DB;
-        $this->resetAfterTest(true);
+        $this->resetAfterTest();
         $this->setAdminUser();
         $generator = $this->getDataGenerator();
 
@@ -141,47 +141,8 @@ abstract class block_workflow_testlib extends advanced_testcase {
             $this->users[$username] = $user->id;
         }
 
-        // Set up the modules.
-        $this->set_up_modules();
-    }
-
-    protected function set_up_modules() {
-        global $DB;
-
-        $modules = array(
-            'quiz'  => array(
-                'questions' => '0',
-            ),
-            'chat'  => array(),
-        );
-
-        // Modules need to exist in the modules table.
-        foreach ($modules as $m => $additional) {
-            $module = new stdClass();
-            $module->name = $m;
-            $module->id   = $DB->insert_record('modules', $module);
-
-            // Insert an instance into the instance table.
-            $instance = new stdClass();
-            $instance->course = $this->courseid;
-            $instance->name   = $m;
-            $instance->intro  = '';
-            foreach ($additional as $o => $v) {
-                $instance->$o = $v;
-            }
-            $instance->id     = $DB->insert_record($m, $instance);
-
-            // And add this to our default course.
-            $cm = new stdClass();
-            $cm->course     = $this->courseid;
-            $cm->instance   = $instance->id;
-            $cm->module     = $module->id;
-            $cm->section    = 1;
-            $cm->id         = $DB->insert_record('course_modules', $cm);
-
-            // And create a context for it.
-            context_module::instance($cm->id);
-        }
+        $generator->get_plugin_generator('mod_quiz')->create_instance(['course' => $course->id]);
+        $generator->get_plugin_generator('mod_chat')->create_instance(['course' => $course->id]);
     }
 
     /**
