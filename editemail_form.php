@@ -51,6 +51,9 @@ class email_edit extends moodleform {
         $mform->addRule('message', null, 'required', null, 'client');
         $mform->setType('message', PARAM_RAW);
 
+        $helpinfo = get_formatted_help_string('emailmessage', 'block_workflow');
+        $mform->addElement('static', 'emailplaceholderhelp', '', $helpinfo->text);
+
         $mform->addElement('hidden', 'emailid');
         $mform->setType('emailid', PARAM_INT);
         $this->add_action_buttons();

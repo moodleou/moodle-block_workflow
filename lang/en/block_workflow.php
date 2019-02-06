@@ -132,6 +132,21 @@ $string['emaildescription']             = 'E-mail templates may be used by the v
 $string['emailfrom']                    = '{$a} workflow system';
 $string['emaillist']                    = 'Email email templates';
 $string['emailmessage']                 = 'Message';
+$string['emailmessage_help']            = 'The following placeholders can be used in the subject line and message:
+
+* %%workflowname%% - the name of the workflow.
+* %%stepname%% - the name of the current step.
+* %%contextname%% - the name of the thing the workflow applies to, for example the website or quiz name.
+* %%contexturl%% - link to the thing the workflow applies to.
+* %coursename%% - the course that the thing is in (only really useful for activity workflows)
+* %%usernames%% - the names of all the people this email will be sent to, as a comma-separated list.
+* %%currentusername%% - the name of the person whose action triggered the current email. This will only work for task finished emails, not one sent on a schedule.
+
+The following tokens can be used only in the message body:
+
+* %%instructions%% - the instructions from this workflow step.
+* %%tasks%% - the list of todo checkboxes, formatted as a list of bullet points.
+* %%comment%% - the workflow comment. Normally the comment from the current task, but sometimes the comment from the previous task, when that makes more sense.';
 $string['emailsettings']                = 'E-mail template settings';
 $string['emailsubject']                 = 'Subject';
 $string['emailtemplateexists']          = 'Email template \'{$a}\' which was attempted to import already exists. Existing template is preserved.';
