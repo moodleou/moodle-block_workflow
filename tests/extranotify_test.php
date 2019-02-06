@@ -121,4 +121,52 @@ class block_workflow_extra_notify_test extends block_workflow_testlib {
         $stateafterfinish = $DB->get_record('block_workflow_step_states', array('id' => $state1->id));
         $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $stateafterfinish->state);
     }
+
+    public function test_block_workflow_get_offset_time_relative_to_course() {
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(['shortname' => 'M123-19B', 'startdate' => strtotime('2019-02-06')]);
+
+        $timestamp = block_workflow_get_offset_time('M123-19B', $course->id, null, 'course;startdate', $this->get_days(5));
+        $this->assertEquals(strtotime('2019-02-11'), $timestamp);
+
+        $timestamp = block_workflow_get_offset_time('M123-19B', $course->id, null, 'course;startdate', $this->get_days(5, 'before'));
+        $this->assertEquals(strtotime('2019-02-01'), $timestamp);
+    }
+
+    public function test_block_workflow_get_offset_time_relative_to_quiz() {
+        global $SITE;
+        $this->resetAfterTest();
+
+        $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
+        $quiz = $quizgenerator->create_instance(['course' => $SITE->id, 'timeclose' => strtotime('2019-02-06')]);
+
+        $timestamp = block_workflow_get_offset_time('M123-19B', $quiz->course, $quiz->id, 'quiz;timeclose', $this->get_days(5));
+        $this->assertEquals(strtotime('2019-02-11'), $timestamp);
+
+        $timestamp = block_workflow_get_offset_time('M123-19B', $quiz->course, $quiz->id, 'quiz;timeclose', $this->get_days(5, 'before'));
+        $this->assertEquals(strtotime('2019-02-01'), $timestamp);
+    }
+
+    public function test_block_workflow_get_offset_time_relative_to_crs_version_pres() {
+        $this->resetAfterTest();
+
+        if (!class_exists('\local_oudataload\util') || !class_exists('local_createwebsite_utils')) {
+            $this->markTestSkipped('This test is only relevant in an ou-specific Moodle site.');
+        }
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(['shortname' => 'M123-19B', 'startdate' => strtotime('2019-02-03')]);
+
+        // To variants. Should use the earlier date.
+        local_createwebsite_utils::create_fake_crs_version_pres_entry('M123', '19B', 'M123-19B', '2019-02-09');
+        local_createwebsite_utils::create_fake_crs_version_pres_entry('MZX123', '19B', 'M123-19B', '2019-02-06');
+
+        $timestamp = block_workflow_get_offset_time('M123-19B', $course->id, null, 'vl_v_crs_version_pres;vle_student_open_date', $this->get_days(5));
+        $this->assertEquals(strtotime('2019-02-11'), $timestamp);
+
+        $timestamp = block_workflow_get_offset_time('M123-19B', $course->id, null, 'vl_v_crs_version_pres;vle_student_open_date', $this->get_days(5, 'before'));
+        $this->assertEquals(strtotime('2019-02-01'), $timestamp);
+    }
 }

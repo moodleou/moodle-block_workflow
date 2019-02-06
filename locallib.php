@@ -290,19 +290,27 @@ function block_workflow_get_offset_time($courseshortname, $courseid, $moduleid, 
     global $DB;
     list($dbtable, $dbfield) = explode(';', $offsettype);
 
-    $timestamp = 0;
     if ($dbtable === 'vl_v_crs_version_pres') {
-        $timestamp = $DB->get_field_sql("
+        $table = \local_oudataload\util::table('vl_v_crs_version_pres');
+        $date = $DB->get_field_sql("
                 SELECT MIN($dbfield)
-                  FROM vl_v_crs_version_pres
+                  FROM $table
                  WHERE vle_course_short_name = ?
                 ", array($courseshortname));
+        $timestamp = 0;
+        if ($date) {
+            $timestamp = strtotime($date);
+        }
     } else if ($dbtable === 'course') {
         $timestamp = $DB->get_field('course', $dbfield, array('id' => $courseid));
     } else {
         $timestamp = $DB->get_field($dbtable, $dbfield, array('id' => $moduleid));
     }
-    return $timestamp + $offset;
+    if ($timestamp) {
+        return $timestamp + $offset;
+    } else {
+        return null;
+    }
 }
 
 /**
@@ -324,7 +332,7 @@ function block_workflow_send_extra_notification() {
                     $activestep->courseid, $activestep->moduleid, $activestep->extranotify, $activestep->extranotifyoffset);
 
             // Is is the time to notify?
-            if ($notificationtime < $now) {
+            if ($notificationtime && $notificationtime < $now) {
                 $state = new block_workflow_step_state($activestep->stateid);
                 if ($state->step()->onextranotifyscript) {
                     $state->step()->process_script($state, $state->step()->onextranotifyscript);
