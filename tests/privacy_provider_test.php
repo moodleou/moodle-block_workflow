@@ -25,8 +25,10 @@
 namespace block_workflow;
 
 use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\writer;
 use block_workflow\privacy\provider;
+use core_privacy\local\request\userlist;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -137,6 +139,19 @@ class privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
     }
 
     /**
+     * Test for provider::get_users_in_context().
+     *
+     * @throws coding_exception
+     */
+    public function test_get_users_in_context() {
+        $userlist = new userlist($this->coursecontext, 'block_workflow');
+        $this->assertCount(0, $userlist);
+        provider::get_users_in_context($userlist);
+        $this->assertCount(1, $userlist);
+        $this->assertEquals([$this->student1->id], $userlist->get_userids());
+    }
+
+    /**
      * Test for provider::export_user_data().
      *
      * @throws coding_exception
@@ -192,6 +207,28 @@ class privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
         $contextlist = new approved_contextlist($this->student1, 'block_workflow', $contextids);
 
         provider::delete_data_for_user($contextlist);
+
+        // State change by student 1 should be updated to admin user id.
+        $this->assertCount(0, $DB->get_records('block_workflow_state_changes', ['userid' => $this->student1->id]));
+        $this->assertCount(2, $DB->get_records('block_workflow_state_changes', ['userid' => get_admin()->id]));
+
+        // To_do done change by student 1 should be updated to admin user id.
+        $this->assertCount(0, $DB->get_records('block_workflow_todo_done', ['userid' => $this->student1->id]));
+        $this->assertCount(1, $DB->get_records('block_workflow_todo_done', ['userid' => get_admin()->id]));
+    }
+
+    /**
+     * Test for provider::test_delete_data_for_users().
+     *
+     * @throws coding_exception
+     */
+    public function test_delete_data_for_users() {
+        global $DB;
+        // Get workflow context for student1.
+        $approveduserids = [$this->student1->id];
+        $approvedlist = new approved_userlist($this->coursecontext, 'block_workflow', $approveduserids);
+
+        provider::delete_data_for_users($approvedlist);
 
         // State change by student 1 should be updated to admin user id.
         $this->assertCount(0, $DB->get_records('block_workflow_state_changes', ['userid' => $this->student1->id]));

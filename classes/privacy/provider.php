@@ -29,7 +29,8 @@ use \core_privacy\local\request\contextlist;
 use \core_privacy\local\request\writer;
 use \core_privacy\local\request\helper;
 use \core_privacy\local\metadata\collection;
-
+use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\userlist;
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -43,7 +44,8 @@ class provider implements
         \core_privacy\local\metadata\provider,
 
         // This plugin currently implements the original plugin\provider interface.
-        \core_privacy\local\request\plugin\provider {
+        \core_privacy\local\request\plugin\provider,
+        \core_privacy\local\request\core_userlist_provider {
 
     /**
      * Returns meta data about this system.
@@ -94,6 +96,37 @@ class provider implements
 
         $contextlist->add_from_sql($sql, $params);
         return $contextlist;
+    }
+
+    /**
+     * Get the list of users who have data within a context.
+     *
+     * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+        $context = $userlist->get_context();
+
+        if (!($context instanceof \context_course || $context instanceof \context_module || $context instanceof \context_user)) {
+            return;
+        }
+
+        $sql = "SELECT statechanges.userid as userid
+                  FROM {context} c
+             LEFT JOIN {block_instances} b ON b.id = c.instanceid OR b.parentcontextid = c.id
+             LEFT JOIN {block_workflow_step_states} states ON states.contextid = c.id
+             LEFT JOIN {block_workflow_steps} steps ON steps.id = states.stepid
+             LEFT JOIN {block_workflow_state_changes} statechanges ON statechanges.stepstateid = states.id
+             LEFT JOIN {block_workflow_step_todos} todos ON todos.stepid = steps.id
+             LEFT JOIN {block_workflow_todo_done} done ON done.steptodoid = todos.id
+                 WHERE b.blockname = 'workflow'
+                       AND c.instanceid = :instanceid";
+
+        $params = [
+                'instanceid' => $context->instanceid,
+        ];
+
+        $userlist->add_from_sql('userid', $sql, $params);
+
     }
 
     /**
@@ -206,6 +239,24 @@ class provider implements
     }
 
     /**
+     * Delete multiple users within a single context.
+     *
+     * @param approved_userlist $userlist The approved context and user information to delete information for.
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+        $context = $userlist->get_context();
+        $userids = $userlist->get_userids();
+
+        if (!($context instanceof \context_course || $context instanceof \context_module || $context instanceof \context_user)) {
+            return;
+        }
+
+        foreach ($userids as $userid) {
+            self::delete_user_data($context, $userid);
+        }
+    }
+
+    /**
      * Delete all data for all users in the specified context.
      *
      * @param \context $context The specific context to delete data for.
@@ -248,7 +299,6 @@ class provider implements
      * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
-        global $DB;
 
         if (empty($contextlist->count())) {
             return;
@@ -256,15 +306,27 @@ class provider implements
         $userid = $contextlist->get_user()->id;
 
         foreach ($contextlist->get_contexts() as $context) {
-            $params = [
+            self::delete_user_data($context, $userid);
+        }
+    }
+
+    /**
+     * Delete a user's data.
+     *
+     * @param $context
+     * @param int $userid The user ID.
+     */
+    protected static function delete_user_data($context, $userid) {
+        global $DB;
+        $params = [
                 'statescontextid' => $context->id,
                 'userid' => $userid,
                 'adminuserid' => get_admin()->id
-            ];
+        ];
 
-            // Delete block_workflow_todo_done owned by user.
-            // To_do done task is shared thing. Update userid to admin user.
-            $tododonesql = "UPDATE {block_workflow_todo_done}
+        // Delete block_workflow_todo_done owned by user.
+        // To_do done task is shared thing. Update userid to admin user.
+        $tododonesql = "UPDATE {block_workflow_todo_done}
                                SET userid = :adminuserid
                              WHERE id IN (SELECT done.id
                                             FROM {block_workflow_todo_done} done
@@ -273,12 +335,12 @@ class provider implements
                                            WHERE done.userid = :userid
                                                  AND states.contextid = :statescontextid)";
 
-            $DB->execute($tododonesql, $params);
+        $DB->execute($tododonesql, $params);
 
-            // To delete block_workflow_state_changes caused by user. 
-            // Workflow is shared thing. Do not go back to earlier step. 
-            // So change the userid to admin user.
-            $statechangesql = "UPDATE {block_workflow_state_changes}
+        // To delete block_workflow_state_changes caused by user. 
+        // Workflow is shared thing. Do not go back to earlier step. 
+        // So change the userid to admin user.
+        $statechangesql = "UPDATE {block_workflow_state_changes}
                                   SET userid = :adminuserid
                                 WHERE id IN (SELECT statechanges.id
                                                FROM {block_workflow_state_changes} statechanges
@@ -287,7 +349,6 @@ class provider implements
                                               WHERE statechanges.userid = :userid
                                                     AND states.contextid = :statescontextid)";
 
-            $DB->execute($statechangesql, $params);
-        }
+        $DB->execute($statechangesql, $params);
     }
 }
