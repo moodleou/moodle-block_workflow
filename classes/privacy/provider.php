@@ -106,7 +106,7 @@ class provider implements
     public static function get_users_in_context(userlist $userlist) {
         $context = $userlist->get_context();
 
-        if (!($context instanceof \context_course || $context instanceof \context_module || $context instanceof \context_user)) {
+        if (!($context instanceof \context_course || $context instanceof \context_module)) {
             return;
         }
 
@@ -247,7 +247,7 @@ class provider implements
         $context = $userlist->get_context();
         $userids = $userlist->get_userids();
 
-        if (!($context instanceof \context_course || $context instanceof \context_module || $context instanceof \context_user)) {
+        if (!($context instanceof \context_course || $context instanceof \context_module)) {
             return;
         }
 
