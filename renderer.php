@@ -1436,7 +1436,7 @@ class block_workflow_renderer extends plugin_renderer_base {
     protected function get_popup_button($roles, $context, $stepno = 0) {
         $steptate = new block_workflow_step_state();
         $users = $steptate->get_all_users_and_their_roles($roles, $context);
-        $numberofusers = count($users);
+        $numberofusers = $users === null ? 0 : count($users);
         list ($header, $body) = $this->get_popup_table($users, $stepno);
         $options = array('class' => 'userinfoclass', 'header' => $header, 'body' => $body, 'stepno' => $stepno);
 
