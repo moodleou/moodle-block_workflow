@@ -1,6 +1,14 @@
 # Change log for the Workflow block
 
 
+## Changes in 1.9
+
+* When creating an email templates, you are shown a list of available placeholder.
+* Extended privacy provider support for Moodle 3.6.
+* Fix compatibility with PHP 7.3.
+* Coding style fixes.
+
+
 ## Changes in 1.8
 
 * Add logging/Moodle events for workflow changes.
