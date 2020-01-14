@@ -4,7 +4,7 @@ Feature: Workflow block - clone a workflow
   As a manager
   I need to ble able to clone them
 
-  @javascript
+  @javascript @_file_upload
   Scenario: Duplicate a workflow
     When I log in as "admin"
     And I navigate to "Plugins > Blocks > Workflows" in site administration

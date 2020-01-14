@@ -27,7 +27,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
     And I add the "Workflows" block
     Then I should see "There is currently no workflow assigned for this page"
 
-  @javascript
+  @javascript @_file_upload
   Scenario: Add a workflow to a course and step through it using TinyMCE
     When I log in as "admin"
     And I navigate to "Plugins > Blocks > Workflows" in site administration
