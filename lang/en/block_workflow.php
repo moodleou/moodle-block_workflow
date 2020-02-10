@@ -138,7 +138,11 @@ $string['emailmessage_help']            = 'The following placeholders can be use
 * %%stepname%% - the name of the current step.
 * %%contextname%% - the name of the thing the workflow applies to, for example the website or quiz name.
 * %%contexturl%% - link to the thing the workflow applies to.
-* %coursename%% - the course that the thing is in (only really useful for activity workflows)
+* %%coursename%% - the name of the website that the thing is in (only really useful for activity workflows)
+* %%coursestartdate%% - the date the course starts.
+* %%courseenddate%% - the date the course ends.
+* %%activityopendate%% - for activities with an open date (e.g. Quiz) that date.
+* %%activityclosedate%% - for activities with an close date (e.g. Quiz) that date.
 * %%usernames%% - the names of all the people this email will be sent to, as a comma-separated list.
 * %%currentusername%% - the name of the person whose action triggered the current email. This will only work for task finished emails, not one sent on a schedule.
 

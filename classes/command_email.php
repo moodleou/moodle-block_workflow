@@ -198,30 +198,24 @@ class block_workflow_command_email extends block_workflow_command {
     }
 
     /**
-     * Substitute the standard email parameters. The following parameters are substituted:
-     * - %%workflowname%%   The name of the workflow
-     * - %%stepname%%       The name of the step
-     * - %%contextname%%    The name of the context for the specified $state
-     * - %%coursename%%     The name of the course for the specified $state
-     * - %%usernames%%      The list of users to whom this e-mail will be sent
-     * - %%currentusername%% The name of the user who caused the state transition.
-     * - %%instructions%%   The set of instructions in the step
-     * - %%tasks%%          A comma-separated list of todo tasks
-     * - %%comment%%        If the specified state is active, then the comment for the current
-     *                      state, otherwise the comment for the previous state.
+     * Substitute the standard email parameters.
+     *
+     * The tokens replaced are documented in the lang string emailmessage_help.
      *
      * @param   stdClass $email The email template
      * @param   block_workflow_step_state $state    The block_workflow_step_state for the message being sent
      * @return  void
      */
     private function email_params($email, $state) {
-        global $USER;
+        global $DB, $USER;
 
         // Shorter accessors.
         $string   = $email->email->message;
         $subject  = $email->email->subject;
         $step     = $state->step();
         $workflow = $step->workflow();
+
+        $course = get_course($email->context->get_course_context()->instanceid);
 
         // Replace %%workflowname%%.
         $subject = str_replace('%%workflowname%%', $workflow->name, $subject);
@@ -242,13 +236,33 @@ class block_workflow_command_email extends block_workflow_command {
         $string = str_replace('%%contexturl%%', $contexturl->out(true), $string);
 
         // Replace %%coursename%%.
-        if ($email->context->contextlevel == CONTEXT_COURSE) {
-            $coursename = $contextname;
-        } else {
-            $coursename = $email->context->get_parent_context()->get_context_name(false, true);
-        }
+        $coursename = get_course_display_name_for_list($course);
         $subject = str_replace('%%coursename%%', $coursename, $subject);
-        $string = str_replace('%%coursename%%', $coursename, $string);
+        $string = str_replace('%%coursename%%', format_string($coursename), $string);
+
+        // Course start and end dates.
+        $startdate = userdate($course->startdate);
+        $enddate = userdate($course->enddate);
+        $subject = str_replace('%%coursestartdate%%', $startdate, $subject);
+        $string = str_replace('%%coursestartdate%%', $startdate, $string);
+        $subject = str_replace('%%courseenddate%%', $enddate, $subject);
+        $string = str_replace('%%courseenddate%%', $enddate, $string);
+
+        // Activity open and close dates.
+        if ($email->context->contextlevel == CONTEXT_MODULE) {
+            $cm = get_fast_modinfo($course)->get_cm($email->context->instanceid);
+            $activity = $DB->get_record($workflow->appliesto, ['id' => $cm->instance]);
+            if (isset($activity->timeopen)) {
+                $timeopen = userdate($activity->timeopen);
+                $subject = str_replace('%%activityopendate%%', $timeopen, $subject);
+                $string = str_replace('%%activityopendate%%', $timeopen, $string);
+            }
+            if (isset($activity->timeclose)) {
+                $timeclose = userdate($activity->timeclose);
+                $subject = str_replace('%%activityclosedate%%', $timeclose, $subject);
+                $string = str_replace('%%activityclosedate%%', $timeclose, $string);
+            }
+        }
 
         // Replace %%usernames%%.
         $usernames = array_map(function($a) {
