@@ -367,6 +367,9 @@ class block_workflow_renderer extends plugin_renderer_base {
     protected function workflow_row(stdClass $workflow) {
         $row = new html_table_row();
         $row->attributes['class']   = 'workflow';
+        if ($workflow->obsolete != BLOCK_WORKFLOW_ENABLED) {
+            $row->attributes['class'] .= ' dimmed_text';
+        }
 
         // Shortname.
         $cell = new html_table_cell(s($workflow->shortname));
