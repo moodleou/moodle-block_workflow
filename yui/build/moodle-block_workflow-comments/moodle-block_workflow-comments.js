@@ -249,11 +249,13 @@ Y.extend(COMMENTS, Y.Base, {
         this._loadingNode.addClass(CSS.HIDDEN);
     },
     attachEvents: function() {
-        var commentbutton = Y.one('.' + CSS.BLOCKCOMMBTN + ' input');
+        var commentbutton = Y.one('.' + CSS.BLOCKCOMMBTN + ' button, .' +
+                CSS.BLOCKCOMMBTN + ' input[type=submit]');
         if (commentbutton) {
             commentbutton.on('click', this.show, this, false);
         }
-        var finishbutton = Y.one('.' + CSS.BLOCKFINISHBTN + ' input');
+        var finishbutton = Y.one('.' + CSS.BLOCKFINISHBTN + ' button, .' +
+                CSS.BLOCKFINISHBTN + ' input[type=submit]');
         if (finishbutton) {
             finishbutton.on('click', this.show, this, true);
         }
