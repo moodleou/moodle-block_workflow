@@ -69,9 +69,9 @@ Feature: Workflow block - follow a workflow
     Then I should see "Set the course format" in the "ul.block_workflow_todolist li" "css_element"
 
     When I press "Edit comments"
-    Then I should see "Update comment"
+    Then I should see "Edit comments"
     And I set the field "Update workflow comment" to "This is a comment"
-    And I click on "#id_submitbutton" "css_element"
+    And I click on "Save changes" "button" in the "Edit comments" "dialogue"
     And I should see "This is a comment"
 
     # Finish task
@@ -79,7 +79,7 @@ Feature: Workflow block - follow a workflow
     Then I should see "Finish step"
     And I should see "Test course workflow"
     And I set the field "Update workflow comment" to "This is the comment set on finishing the step"
-    And I click on "#id_submitbutton" "css_element"
+    And I click on "Finish step" "button" in the "Finish step" "dialogue"
     Then I should see "Prepare your web site"
     And I should see "Any Teacher"
 
@@ -112,7 +112,7 @@ Feature: Workflow block - follow a workflow
 
     # Finish task & course visiblility again.
     When I press "Finish step"
-    And I click on "#id_submitbutton" "css_element"
+    And I click on "Finish step" "button" in the "Finish step" "dialogue"
     Then I should see "The workflow has been completed."
     And I should see "Workflow overview"
     And I reload the page

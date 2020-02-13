@@ -229,10 +229,19 @@ Y.extend(COMMENTS, Y.Base, {
                             M.blocks_workflow.init_todolist({"stateid":result.response.stateid});
                         }
                         if (result.response.listworkflows) {
-                            // Last step, avialable workflows are listed
+                            // Last step, available workflows are listed
                             var select_id = workflowblock.one('.singleselect form select').getAttribute('id');
                             // Reinit single_select event
-                            M.core.init_formautosubmit({selectid: select_id, nothing: ''});
+                            // This is horrible, but the core JS we need is now inline in the template,
+                            // so we have to copy it.
+                            require(['jquery'], function($) {
+                                $('#' + select_id).change(function() {
+                                    var ignore = $(this).find(':selected').attr('data-ignore');
+                                    if (typeof ignore === typeof undefined) {
+                                        $('#' + select_id).closest('form').submit();
+                                    }
+                                });
+                            });
                         }
                     }
                 },
