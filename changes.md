@@ -1,6 +1,16 @@
 # Change log for the Workflow block
 
 
+## Changes in 2.0
+
+* New tokens %%coursestartdate%%, %%courseenddate%%, %%activityopendate%%
+  and %%activityclosedate%% which can be used in email templates.
+* On the admin screens, the styling has been improved, so it is
+  more obvious which workflows are inactive.
+* Fix issue with the styling of popups.
+* Fix failing Behat tests.
+
+
 ## Changes in 1.9
 
 * When creating an email templates, you are shown a list of available placeholder.

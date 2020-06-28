@@ -30,10 +30,7 @@ require_once($CFG->libdir . '/formslib.php');
 class email_edit extends moodleform {
     protected function definition() {
         $mform = $this->_form;
-        $state = $this->_customdata['state'];
         $mform->addElement('header', 'general', get_string('emailsettings', 'block_workflow'));
-
-        $editoroptions = $this->_customdata['editoroptions'];
 
         // Template data.
         $mform->addElement('text',      'shortname',    get_string('shortname', 'block_workflow'));
