@@ -1,6 +1,11 @@
 # Change log for the Workflow block
 
 
+## Changes in 2.1
+
+* Fix malformed HTML.
+
+
 ## Changes in 2.0
 
 * New tokens %%coursestartdate%%, %%courseenddate%%, %%activityopendate%%
