@@ -32,7 +32,6 @@ use core_privacy\local\request\userlist;
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
 require_once(dirname(__FILE__) . '/../locallib.php');
 
 /**
@@ -43,29 +42,26 @@ require_once(dirname(__FILE__) . '/../locallib.php');
  */
 class privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
 
-    /** @var stdClass A student who is enrolled in course */
+    /** @var \stdClass A student who is enrolled in course */
     protected $student1;
-    /** @var stdClass A student who is enrolled in course */
+    /** @var \stdClass A student who is enrolled in course */
     protected $student2;
-    /** @var stdClass A course context */
+    /** @var \stdClass A course context */
     protected $coursecontext;
-    /** @var stdClass A workflow block created in course */
+    /** @var \stdClass A workflow block created in course */
     protected $workflowblock;
-    /** @var stdClass A workflow object created in course */
+    /** @var \stdClass A workflow object created in course */
     protected $workflow;
-    /** @var stdClass A step created in workflow */
+    /** @var \stdClass A step created in workflow */
     protected $step;
-    /** @var stdClass A to-do task created in step */
+    /** @var \stdClass A to-do task created in step */
     protected $todo;
-    /** @var stdClass */
+    /** @var \stdClass */
     protected $generator;
 
     /**
      * All tests make database changes.
      * Set up for each test
-     *
-     * @throws coding_exception
-     * @throws dml_exception
      */
     public function setUp() {
         $this->resetAfterTest(true);
@@ -126,9 +122,6 @@ class privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
 
     /**
      * Test for provider::get_contexts_for_userid().
-     *
-     * @throws coding_exception
-     * @throws dml_exception
      */
     public function test_get_contexts_for_userid() {
         // Get workflow context for student1.
@@ -140,8 +133,6 @@ class privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
 
     /**
      * Test for provider::get_users_in_context().
-     *
-     * @throws coding_exception
      */
     public function test_get_users_in_context() {
         $userlist = new userlist($this->coursecontext, 'block_workflow');
@@ -153,9 +144,6 @@ class privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
 
     /**
      * Test for provider::export_user_data().
-     *
-     * @throws coding_exception
-     * @throws dml_exception
      */
     public function test_export_user_data() {
         // Get workflow context for student1.
@@ -196,9 +184,6 @@ class privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
 
     /**
      * Test for delete_data_for_user().
-     *
-     * @throws coding_exception
-     * @throws dml_exception
      */
     public function test_delete_data_for_user() {
         global $DB;
@@ -219,8 +204,6 @@ class privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
 
     /**
      * Test for provider::test_delete_data_for_users().
-     *
-     * @throws coding_exception
      */
     public function test_delete_data_for_users() {
         global $DB;
@@ -241,9 +224,6 @@ class privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
 
     /**
      * Test for delete_data_for_all_users_in_context().
-     *
-     * @throws coding_exception
-     * @throws dml_exception
      */
     public function test_delete_data_for_all_users_in_context() {
         global $DB;

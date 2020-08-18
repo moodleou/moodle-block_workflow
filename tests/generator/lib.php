@@ -30,34 +30,57 @@ require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
 
 class block_workflow_generator extends testing_block_generator {
 
-    protected function create_workflow($createstep = true) {
-        // Create a new workflow.
-        $data = new stdClass();
-        $data->shortname            = 'courseworkflow';
-        $data->name                 = 'First Course Workflow';
-        $data->description          = 'This is a test workflow applying to a course for the unit test';
+    /**
+     * Create a workflow.
+     *
+     * @param array $record workflow data. All optional. Defaults are used.
+     * @return block_workflow_workflow
+     */
+    public function create_workflow(array $record): block_workflow_workflow {
+        $data = (object) $record;
 
-        // Create a new workflow object.
+        // Supply default vaues where needed.
+        if (!isset($data->shortname)) {
+            $data->shortname = 'courseworkflow';
+        }
+        if (!isset($data->name)) {
+            $data->name = 'First Course Workflow';
+        }
+        if (!isset($data->description)) {
+            $data->description = 'This is a test workflow applying to a course for the unit test';
+        }
+
+        // Extract createstep option.
+        $createstep = !empty($data->createstep);
+        unset($data->createstep);
+
+        // Create the workflow.
         $workflow = new block_workflow_workflow();
-
-        // The method create_workflow will return a completed workflow object.
         $workflow->create_workflow($data, $createstep);
         return $workflow;
     }
 
-    protected function create_step($workflow) {
+    public function create_workflow_step(array $record) {
+        $data = (object) $record;
+
+        if (!isset($data->workflowid)) {
+            throw new coding_exception('workflowid is required when creating a workflow step');
+        }
+        if (!isset($data->name)) {
+            $data->name = 'STEP_ONE';
+        }
+        if (!isset($data->instructions)) {
+            $data->instructions = '';
+        }
+
         // Create a new step.
         $step = new block_workflow_step();
-        $data = new stdClass();
-        $data->workflowid = $workflow->id;
-        $data->name = 'STEP_ONE';
-        $data->instructions = '';
         $step->create_step($data);
         return $step;
     }
 
-    protected function create_email($shortname = 'TESTMAIL') {
-        // Create a new todo.
+    public function create_email($shortname = 'TESTMAIL') {
+        // Create a new email template.
         $email  = new block_workflow_email();
         $data   = new stdClass();
         $data->shortname   = $shortname;
@@ -67,7 +90,7 @@ class block_workflow_generator extends testing_block_generator {
         return $email;
     }
 
-    protected function create_todo($step) {
+    public function create_todo($step) {
         // Create a new todo.
         $todo = new block_workflow_todo();
         $data = new stdClass();
