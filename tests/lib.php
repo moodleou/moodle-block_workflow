@@ -64,7 +64,7 @@ abstract class block_workflow_testlib extends advanced_testcase {
      *
      * This will also call {@link parent::setUp}
      */
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
         $this->resetAfterTest();
         $this->setAdminUser();

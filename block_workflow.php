@@ -54,7 +54,6 @@ class block_workflow extends block_base {
      * @return  stdClass    containing the block's content
      */
     public function get_content() {
-        global $PAGE;
 
         // Save loops if we have generated the content already.
         if ($this->content !== null) {
@@ -79,8 +78,8 @@ class block_workflow extends block_base {
 
             // Include the javascript libraries:
             // Add language strings.
-            $PAGE->requires->strings_for_js(array('editcomments', 'nocomments', 'finishstep'), 'block_workflow');
-            $PAGE->requires->strings_for_js(array('savechanges'), 'moodle');
+            $this->page->requires->strings_for_js(['editcomments', 'nocomments', 'finishstep'], 'block_workflow');
+            $this->page->requires->strings_for_js(['savechanges'], 'moodle');
 
             // Initialise the YUI module.
             $arguments = array(
@@ -88,10 +87,10 @@ class block_workflow extends block_base {
                 'editorid'   => 'wkf-comment-editor',
                 'editorname' => 'comment_editor',
             );
-            $PAGE->requires->yui_module('moodle-block_workflow-comments', 'M.blocks_workflow.init_comments',
-                array($arguments));
-            $PAGE->requires->yui_module('moodle-block_workflow-todolist', 'M.blocks_workflow.init_todolist',
-                array(array('stateid' => $state->id)));
+            $this->page->requires->yui_module('moodle-block_workflow-comments', 'M.blocks_workflow.init_comments',
+                    [$arguments]);
+            $this->page->requires->yui_module('moodle-block_workflow-todolist', 'M.blocks_workflow.init_todolist',
+                    [['stateid' => $state->id]]);
 
             // Display the block for this state.
             $this->content->text = $renderer->block_display($state);
@@ -102,8 +101,8 @@ class block_workflow extends block_base {
 
             // If this is a module, retrieve it's name, otherwise try the pagelayout to confirm
             // that this is a course.
-            if ($PAGE->cm) {
-                $appliesto = $PAGE->cm->modname;
+            if ($this->page->cm) {
+                $appliesto = $this->page->cm->modname;
             } else {
                 $appliesto = 'course';
             }
