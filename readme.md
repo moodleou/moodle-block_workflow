@@ -1,6 +1,6 @@
-# Edit roles by capability tool [![Build Status](https://travis-ci.com/moodleou/moodle-block_workflow.svg?branch=master)](https://travis-ci.com/moodleou/moodle-block_workflow)
+# Workflow block
 
-Administrators can define workflows which can then be applied to Courses of activities.
+Administrators can define workflows which can then be applied to courses or activities.
 A workflow is a sequence of steps. Each step has a role who is responsible
 for doing it, some instructions, and possibly some tasks to tick off.
 When one task is complete, the people responsible for the next task can be notified.

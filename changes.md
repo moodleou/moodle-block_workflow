@@ -1,5 +1,9 @@
 # Change log for the Workflow block
 
+## Changes in 2.2
+
+* Improved test data generators (mainly for the benefit of other OU plugins which integrate with this).
+
 
 ## Changes in 2.1
 
