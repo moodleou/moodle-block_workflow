@@ -11,7 +11,7 @@ Feature: Workflow block - import and export workflows
     And I follow "Import workflow"
     And I upload "blocks/workflow/tests/fixtures/testworkflow.workflow.xml" file to "File" filemanager
     And I press "Import workflow"
-    Then I should see "Importing was sucessful. You will be redirected to workflow editing page shortly."
+    Then I should see "Importing was successful. You will be redirected to workflow editing page shortly."
 
     Then I should see "testworkflow" in the "Shortname" "table_row"
     And I should see "Test course workflow" in the "Name" "table_row"
@@ -29,7 +29,7 @@ Feature: Workflow block - import and export workflows
     And I upload "blocks/workflow/tests/fixtures/testworkflow.workflow.xml" file to "File" filemanager
     And I press "Import workflow"
     Then I should see "Email template 'taskemail' which was attempted to import already exists. Existing template is preserved."
-    Then I should see "Importing was sucessful. You will be redirected to workflow editing page shortly."
+    Then I should see "Importing was successful. You will be redirected to workflow editing page shortly."
 
     Then I should see "testworkflow1" in the "Shortname" "table_row"
     And I should see "Test course workflow1" in the "Name" "table_row"
