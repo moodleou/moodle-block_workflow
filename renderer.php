@@ -1373,25 +1373,19 @@ class block_workflow_renderer extends plugin_renderer_base {
      * @param object $users, array of users who have roles
      */
     protected function get_popup_table($users, $stepno) {
-        global $CFG, $DB;
+        global $CFG;
 
         if (!$users) {
             return null;
         }
 
         // Get extra user information from the user policies settings.
-        $extrafields = array();
-        if ($CFG->showuseridentity) {
-            $extrafields = explode(',', $CFG->showuseridentity);
-        }
+        $extrafields = \core_user\fields::get_identity_fields($this->page->context, true);
         // Set up the table header.
         $tableheader = array();
         $tableheader[] = get_string('name');
         foreach ($extrafields as $field) {
-            if ($field === 'phone1') {
-                $field = 'phone';
-            }
-            $tableheader[] = get_string($field);
+            $tableheader[] = \core_user\fields::get_display_name($field);
         }
         $tableheader[] = get_string('roles');
 
