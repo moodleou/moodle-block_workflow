@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
-class block_workflow_command_addrolemember extends block_workflow_command {
+class block_workflow_command_groupsadd extends block_workflow_command {
     /**
      * Validate the syntax of this line, and ensure that it is correct for
      * this context
