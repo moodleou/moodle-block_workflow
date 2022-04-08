@@ -23,6 +23,10 @@
  * @group block_workflow
  * */
 
+namespace block_workflow;
+
+use block_workflow_email;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Make sure the code being tested is accessible.
@@ -30,7 +34,7 @@ global $CFG;
 require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
 require_once($CFG->dirroot . '/blocks/workflow/tests/lib.php');
 
-class block_workflow_extra_notify_test extends block_workflow_testlib {
+class extranotify_test extends \block_workflow_testlib {
     public function test_extra_notify() {
         global $CFG, $DB;
         $now = time();
@@ -45,11 +49,11 @@ class block_workflow_extra_notify_test extends block_workflow_testlib {
 
         // Create a course object.
         $course1 = $generator->create_course(array('shortname' => 'M123-12J', 'startdate' => $timestamp1));
-        $coursecontext1 = context_course::instance($course1->id);
+        $coursecontext1 = \context_course::instance($course1->id);
 
         // Create another course object.
         $course2 = $generator->create_course(array('shortname' => 'K123-12J', 'startdate' => $timestamp2));
-        $coursecontext2 = context_course::instance($course2->id);
+        $coursecontext2 = \context_course::instance($course2->id);
 
         // Generate a vl_v_crs_version_pres table.
         $this->create_version_pres_tables();
@@ -65,7 +69,7 @@ class block_workflow_extra_notify_test extends block_workflow_testlib {
                 'WHERE vle_course_short_name = ?', array($courseshortname), MUST_EXIST);
 
         // Create an email template.
-        $data = new stdClass();
+        $data = new \stdClass();
         $data->shortname = 'testing';
         $data->subject   = 'Workflow notification';
         $data->message   = 'This is a notification message';
@@ -164,8 +168,8 @@ class block_workflow_extra_notify_test extends block_workflow_testlib {
         $course = $generator->create_course(['shortname' => 'M123-19B', 'startdate' => strtotime('2019-02-03')]);
 
         // To variants. Should use the earlier date.
-        local_createwebsite_utils::create_fake_crs_version_pres_entry('M123', '19B', 'M123-19B', '2019-02-09');
-        local_createwebsite_utils::create_fake_crs_version_pres_entry('MZX123', '19B', 'M123-19B', '2019-02-06');
+        \local_createwebsite_utils::create_fake_crs_version_pres_entry('M123', '19B', 'M123-19B', '2019-02-09');
+        \local_createwebsite_utils::create_fake_crs_version_pres_entry('MZX123', '19B', 'M123-19B', '2019-02-06');
 
         $timestamp = block_workflow_get_offset_time('M123-19B', $course->id, null,
                 'vl_v_crs_version_pres;vle_student_open_date', $this->get_days(5));

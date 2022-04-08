@@ -23,8 +23,6 @@
  */
 
 namespace block_workflow\event;
-defined('MOODLE_INTERNAL') || die();
-
 
 /**
  * This event is triggered when the workflow-block processes the extra-notification script of a step.

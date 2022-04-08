@@ -27,6 +27,8 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
+use Behat\Mink\Exception\ExpectationException;
+
 /**
  * Steps definitions related to the workflow block.
  */
@@ -87,5 +89,21 @@ class behat_block_workflow extends behat_base {
         $curretstate = new block_workflow_step_state();
         $curretstate->load_active_state($context->id);
         $curretstate->jump_to_step(null, $step->id);
+    }
+
+    /**
+     * Check the course visibility.
+     *
+     * @Then /^course "(?P<coursefullname_string>(?:[^"]|\\")*)" is (hidden|visible) for block_workflow$/
+     * @param string $coursefullname The full name of the course.
+     * @param string $isvisible Visible|Hidden.
+     */
+    public function test_course_visibility(string $coursefullname, string $isvisible): void {
+        global $DB;
+        $course = $DB->get_record("course", array("fullname" => $coursefullname), 'visible', MUST_EXIST);
+        $expectedvisibility = $isvisible == 'visible';
+        if ($course->visible != $expectedvisibility) {
+            throw new ExpectationException('"' . $coursefullname . '" should be ' . $isvisible . ' but isn\'t.', $this->getSession());
+        }
     }
 }

@@ -23,6 +23,8 @@
  * @group block_workflow
  * */
 
+namespace block_workflow;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Make sure the code being tested is accessible.
@@ -30,7 +32,7 @@ global $CFG;
 require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
 require_once($CFG->dirroot . '/blocks/workflow/tests/lib.php');
 
-class block_workflow_automatic_step_finisher_test extends block_workflow_testlib {
+class autostepfinisher_test extends \block_workflow_testlib {
 
     public function test_automatic_step_finisher() {
         global $CFG, $DB;
@@ -46,11 +48,11 @@ class block_workflow_automatic_step_finisher_test extends block_workflow_testlib
 
         // Create a course object.
         $course1 = $generator->create_course(array('shortname' => 'M123-12J', 'startdate' => $timestamp1));
-        $coursecontext1 = context_course::instance($course1->id);
+        $coursecontext1 = \context_course::instance($course1->id);
 
         // Create another course object.
         $course2 = $generator->create_course(array('shortname' => 'K123-12J', 'startdate' => $timestamp2));
-        $coursecontext2 = context_course::instance($course2->id);
+        $coursecontext2 = \context_course::instance($course2->id);
 
         // Generate a vl_v_crs_version_pres table.
         $this->create_version_pres_tables();

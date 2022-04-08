@@ -22,6 +22,12 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @group block_workflow
  */
+namespace block_workflow;
+
+use block_workflow_workflow;
+use stdClass;
+use block_workflow_step;
+use block_workflow_step_state;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -29,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class block_workflow_lib_test extends block_workflow_testlib {
+class lib_test extends \block_workflow_testlib {
 
     /**
      * Test that each of the defined variables are set correctly

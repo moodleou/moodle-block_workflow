@@ -31,7 +31,6 @@ use \core_privacy\local\request\helper;
 use \core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\userlist;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Privacy subsystem implementation for block_workflow.

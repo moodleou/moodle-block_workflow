@@ -22,9 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-
 /**
  * Workflow class
  *
@@ -755,7 +752,7 @@ class block_workflow_workflow {
 
         // The 'complete' subquery below is written in a more complex way than
         // necessary to work around a MyQSL short-coming.
-        // (It was not possible to refer to states.id in an ON clause, only in a WHERE clause.)
+        // (It was not possible to refer to states.id in an ON clause, only in a WHERE clause).
         $sql = "SELECT steps.id,
                        steps.stepno,
                        steps.name,

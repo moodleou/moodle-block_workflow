@@ -56,9 +56,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
     And I should see "Tasks for completion"
 
     # Check that the finish step script did the right thing.
-    When I navigate to "Edit settings" in current page administration
-    Then the field "Course visibility" matches value "Hide"
-    And I press "Cancel"
+    Then course "Course 1" is hidden for block_workflow
 
     When I press "Show names (1)"
     Then I should see "People who can do this task"
@@ -119,8 +117,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
     And "Workflow overview" "button" in the "Workflow" "block" should be visible
 
     # Check that the finish step script did the right thing.
-    When I navigate to "Edit settings" in current page administration
-    Then the field "Course visibility" matches value "Show"
+    Then course "Course 1" is visible for block_workflow
 
     When I log out
     And I log in as "manager1"

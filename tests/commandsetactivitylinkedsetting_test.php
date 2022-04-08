@@ -23,6 +23,11 @@
  * @group block_workflow
  */
 
+namespace block_workflow;
+
+use block_workflow_command;
+use block_workflow_command_setactivitylinkedsetting;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Include our test library so that we can use the same mocking system for all tests.
@@ -38,7 +43,7 @@ require_once(dirname(__FILE__) . '/lib.php');
  * @copyright 2012 the Open University.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_workflow_command_setactivitylinkedsetting_test extends block_workflow_testlib {
+class commandsetactivitylinkedsetting_test extends \block_workflow_testlib {
     public function test_setcoursevisibility() {
         $command = $this->make_command();
         $this->assertInstanceOf('block_workflow_command', $command);
