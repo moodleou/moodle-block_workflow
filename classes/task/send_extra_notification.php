@@ -23,8 +23,6 @@
  */
 
 namespace block_workflow\task;
-defined('MOODLE_INTERNAL') || die();
-
 
 class send_extra_notification extends \core\task\scheduled_task {
 

@@ -40,7 +40,7 @@ require_once(dirname(__FILE__) . '/../locallib.php');
  * @copyright 2018 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
+class privacy_provider_test extends \core_privacy\tests\provider_testcase {
 
     /** @var \stdClass A student who is enrolled in course */
     protected $student1;

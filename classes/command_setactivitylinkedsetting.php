@@ -22,9 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-
 /**
  * The command to set an activity setting that is stored in a linked table.
  * For example, the quizaccess_honestycheck setting is stored in a table

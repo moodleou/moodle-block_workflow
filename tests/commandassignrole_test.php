@@ -23,13 +23,18 @@
  * @group block_workflow
  */
 
+namespace block_workflow;
+
+use block_workflow_command_assignrole;
+use block_workflow_command;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Include our test library so that we can use the same mocking system for all tests.
 global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class block_workflow_command_assignrole_test extends block_workflow_testlib {
+class commandassignrole_test extends \block_workflow_testlib {
 
     public function test_assignrole() {
         $command = new block_workflow_command_assignrole();

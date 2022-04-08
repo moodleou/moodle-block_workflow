@@ -22,6 +22,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @group block_workflow
  */
+namespace block_workflow;
+
+use block_workflow_command;
+use block_workflow_workflow;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -29,8 +33,7 @@ global $CFG;
 require_once(dirname(__FILE__) . '/../locallib.php');
 require_once(dirname(__FILE__) . '/lib.php');
 
-
-class block_workflow_command_test extends block_workflow_testlib {
+class command_test extends \block_workflow_testlib {
 
     /**
      * Test the role_exists function
@@ -66,7 +69,7 @@ class block_workflow_command_test extends block_workflow_testlib {
         $this->resetAfterTest(true);
 
         // Create a new workflow.
-        $data = new stdClass();
+        $data = new \stdClass();
         $data->shortname            = 'sampleworkflow';
         $data->name                 = 'sampleworkflow';
         $data->appliesto            = 'quiz';
@@ -83,7 +86,7 @@ class block_workflow_command_test extends block_workflow_testlib {
         $this->assertTrue($result);
 
         // Modify the workflow to be a course workflow.
-        $data = new stdClass();
+        $data = new \stdClass();
         $data->appliesto            = 'course';
         $workflow->update($data);
 

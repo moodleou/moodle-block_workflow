@@ -23,6 +23,11 @@
  * @group block_workflow
  */
 
+namespace block_workflow;
+
+use block_workflow_command_setgradeitemvisibility;
+use block_workflow_command;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Include our test library so that we can use the same mocking system for all tests.
@@ -30,7 +35,7 @@ global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 require_once($CFG->dirroot.'/lib/grade/grade_item.php');
 
-class block_workflow_command_setgradeitemvisibility_test extends block_workflow_testlib {
+class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
     private function generate_module($modname) {
         global $CFG;
         if (!is_readable($CFG->dirroot . '/mod/externalquiz/tests/generator/lib.php')) {

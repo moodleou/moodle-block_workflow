@@ -23,13 +23,19 @@
  * @group block_workflow
  */
 
+namespace block_workflow;
+
+use block_workflow_email;
+use stdClass;
+use block_workflow_step;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Include our test library so that we can use the same mocking system for all tests.
 global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class block_workflow_emails_test extends block_workflow_testlib {
+class emails_test extends \block_workflow_testlib {
     public function test_email_validation() {
         $data  = new stdClass();
         $email = new block_workflow_email();

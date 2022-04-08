@@ -23,13 +23,18 @@
  * @group block_workflow
  */
 
+namespace block_workflow;
+
+use block_workflow_command_setactivityvisibility;
+use block_workflow_command;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Include our test library so that we can use the same mocking system for all tests.
 global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class block_workflow_command_setactivityvisibility_test extends block_workflow_testlib {
+class commandsetactivityvisibility_test extends \block_workflow_testlib {
     public function test_setactivityvisibility() {
         $command = new block_workflow_command_setactivityvisibility();
         $this->assertInstanceOf('block_workflow_command', $command);

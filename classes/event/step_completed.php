@@ -23,8 +23,6 @@
  */
 
 namespace block_workflow\event;
-defined('MOODLE_INTERNAL') || die();
-
 
 /**
  * This event is triggered when the state of a workflow-step is set to completed.

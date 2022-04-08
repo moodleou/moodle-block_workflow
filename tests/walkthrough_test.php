@@ -24,6 +24,11 @@
  * @group block_workflow
  */
 
+namespace block_workflow;
+
+use block_workflow_workflow;
+use block_workflow_step;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -38,7 +43,7 @@ require_once(dirname(__FILE__) . '/../locallib.php');
  * @copyright  2011 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_workflow_walkthrough_test extends advanced_testcase {
+class walkthrough_test extends \advanced_testcase {
 
     /**
      * Test some of the basic workflow actions including:
@@ -60,7 +65,7 @@ class block_workflow_walkthrough_test extends advanced_testcase {
         $u2 = $generator->create_user(array('username' => 'u2'));
 
         $course = $generator->create_course(array('shortname' => 'X943-12K'));
-        $coursecontext = context_course::instance($course->id);
+        $coursecontext = \context_course::instance($course->id);
 
         $manualenrol = enrol_get_plugin('manual');
         $manualenrol->add_default_instance($course);

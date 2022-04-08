@@ -23,8 +23,6 @@
  */
 
 namespace block_workflow\task;
-defined('MOODLE_INTERNAL') || die();
-
 
 class finish_step_automatically extends \core\task\scheduled_task {
 

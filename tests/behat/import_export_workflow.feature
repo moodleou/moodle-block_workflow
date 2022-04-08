@@ -13,7 +13,7 @@ Feature: Workflow block - import and export workflows
     And I press "Import workflow"
     Then I should see "Importing was successful. You will be redirected to workflow editing page shortly."
 
-    Then I should see "testworkflow" in the "Shortname" "table_row"
+    And I should see "testworkflow" in the "Shortname" "table_row"
     And I should see "Test course workflow" in the "Name" "table_row"
     And I should see "This workflow manages course creation." in the "Description" "table_row"
     And I should see "Course" in the "This workflow applies to" "table_row"
@@ -24,14 +24,14 @@ Feature: Workflow block - import and export workflows
     And I should see "Teacher" in the "Prepare your web site" "table_row"
 
     # Import the same workflow again, and verify the name is made unique.
-    And I follow "Workflows"
+    And I navigate to "Plugins > Blocks > Workflows" in site administration
     And I follow "Import workflow"
     And I upload "blocks/workflow/tests/fixtures/testworkflow.workflow.xml" file to "File" filemanager
     And I press "Import workflow"
-    Then I should see "Email template 'taskemail' which was attempted to import already exists. Existing template is preserved."
-    Then I should see "Importing was successful. You will be redirected to workflow editing page shortly."
+    And I should see "Email template 'taskemail' which was attempted to import already exists. Existing template is preserved."
+    And I should see "Importing was successful. You will be redirected to workflow editing page shortly."
 
-    Then I should see "testworkflow1" in the "Shortname" "table_row"
+    And I should see "testworkflow1" in the "Shortname" "table_row"
     And I should see "Test course workflow1" in the "Name" "table_row"
     And I should see "This workflow manages course creation." in the "Description" "table_row"
     And I should see "Course" in the "This workflow applies to" "table_row"
@@ -42,12 +42,12 @@ Feature: Workflow block - import and export workflows
     And I should see "Teacher" in the "Prepare your web site" "table_row"
 
     # Test deleting the second workflow.
-    When I follow "Delete"
-    Then I should see "Are you absolutely sure that you want to completely delete the workflow Test course workflow1?"
-    When I press "Cancel"
+    And I follow "Delete"
+    And I should see "Are you absolutely sure that you want to completely delete the workflow Test course workflow1?"
+    And I press "Cancel"
     And I click on "Remove workflow" "link" in the "testworkflow1" "table_row"
     And I press "Continue"
-    Then I should not see "testworkflow1"
+    And I should not see "testworkflow1"
 
     # Export the workflow.
     # TODO update the next step once MDL-47497 is available in OUVLE.

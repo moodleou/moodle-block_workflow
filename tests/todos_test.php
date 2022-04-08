@@ -23,13 +23,18 @@
  * @group block_workflow
  */
 
+namespace block_workflow;
+
+use block_workflow_todo;
+use stdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Include our test library so that we can use the same mocking system for all tests.
 global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class block_workflow_todos_test extends block_workflow_testlib {
+class todos_test extends \block_workflow_testlib {
     public function test_todo_validation() {
         // Create a new workflow.
         $workflow = $this->create_workflow();
