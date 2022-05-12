@@ -245,7 +245,7 @@ abstract class block_workflow_testlib extends advanced_testcase {
      * @param   string  $command The function to run on $object
      * @param   mixed   $args    Any arguments to pass to the function
      */
-    protected function expect_exception_without_halting($et, $class = null, $command) {
+    protected function expect_exception_without_halting($et, $class, $command) {
         $args = func_get_args();
         array_shift($args);
         array_shift($args);
