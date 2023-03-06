@@ -76,18 +76,6 @@ Y.extend(COMMENTS, Y.Base, {
             action:  'getcomment',
             stateid: this.get(STATEID)
         };
-
-        if (typeof tinyMCE !== 'undefined') {
-            var ed = tinyMCE.get(this.get(EDITORID));
-
-            // Resize then editor when first shown if it would otherwise be too small.
-            var ifr = tinymce.DOM.get(this.get(EDITORID) + '_ifr');
-            var size = tinymce.DOM.getSize(ifr);
-            if (size.h === 30) {
-                ed.theme.resizeTo(size.w, 90);
-            }
-        }
-
         // Fetch the comment and update the form
         Y.io(M.cfg.wwwroot + AJAXURL, {
             method:'POST',
@@ -104,17 +92,13 @@ Y.extend(COMMENTS, Y.Base, {
                     } catch (e) {
                         new M.core.exception(e);
                     }
-                    if (typeof tinyMCE !== 'undefined') {
-                        ed.setContent(result.response.comment);
-                    } else {
-                        var editorid = this.get(EDITORID);
-                        var editor = Y.one(document.getElementById(editorid + 'editable'));
-                        if (editor) {
-                            editor.setHTML(result.response.comment);
-                        }
-                        Y.one(document.getElementById(editorid)).set(
-                                'value', result.response.comment);
+                    var editorid = this.get(EDITORID);
+                    var editor = Y.one(document.getElementById(editorid + 'editable'));
+                    if (editor) {
+                        editor.setHTML(result.response.comment);
                     }
+                    Y.one(document.getElementById(editorid)).set(
+                            'value', result.response.comment);
                 },
                 end: this.removeLoading
             },
@@ -138,13 +122,7 @@ Y.extend(COMMENTS, Y.Base, {
         }
     },
     save: function () {
-        var comment;
-        if (typeof tinyMCE !== 'undefined') {
-            comment = tinyMCE.get(this.get(EDITORID)).getContent();
-        } else {
-            comment = Y.one(document.getElementById(this.get(EDITORID))).get('value');
-        }
-
+        var comment = Y.one(document.getElementById(this.get(EDITORID))).get('value');
         var commentsblock = Y.one('.' + CSS.BLOCKWORKFLOW + ' .' + CSS.BLOCKCOMMENTS);
         // Build the data for submission
         var data = {
@@ -183,13 +161,7 @@ Y.extend(COMMENTS, Y.Base, {
         this.hide();
     },
     finishstep: function () {
-        var comment;
-        if (typeof tinyMCE !== 'undefined') {
-            comment = tinyMCE.get(this.get(EDITORID)).getContent();
-        } else {
-            comment = Y.one(document.getElementById(this.get(EDITORID))).get('value');
-        }
-
+        var comment = Y.one(document.getElementById(this.get(EDITORID))).get('value');
         var workflowblock = Y.one('.' + CSS.BLOCKWORKFLOW + ' .' + CSS.CONTENT);
         // Build the data for submission
         var data = {
