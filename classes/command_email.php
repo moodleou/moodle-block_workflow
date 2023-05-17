@@ -48,7 +48,7 @@ class block_workflow_command_email extends block_workflow_command {
         // Break down the line. It should be in the format:
         // email to rolea roleb rolen
         // with any number of role shortnames.
-        $line = preg_split('/[\s+]/', $args);
+        $line = preg_split('/[\s+]/', $args ?? '');
 
         // Grab the email name.
         $data->emailname = array_shift($line);

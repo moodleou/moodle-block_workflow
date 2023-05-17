@@ -639,7 +639,7 @@ class block_workflow_step {
         $return->commands   = array();
 
         // Break the script into lines.
-        $lines = preg_split('~[\r\n]+~', $script, null, PREG_SPLIT_NO_EMPTY);
+        $lines = preg_split('~[\r\n]+~', $script, -1, PREG_SPLIT_NO_EMPTY);
 
         foreach ($lines as $line) {
             $c = new stdClass();

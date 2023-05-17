@@ -143,5 +143,5 @@ send_file($dom->saveXML(), $filename, 0, 0, true, true);
  * @return  string      The checked and (potentially) modified text
  */
 function check_output_text($raw) {
-    return htmlspecialchars($raw, ENT_NOQUOTES, 'UTF-8');
+    return htmlspecialchars($raw ?? '', ENT_NOQUOTES, 'UTF-8');
 }
