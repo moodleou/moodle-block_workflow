@@ -343,7 +343,7 @@ function block_workflow_send_extra_notification() {
                 }
 
                 // Cron setup user.
-                cron_setup_user();
+                \core\cron::setup_user();
             }
         } catch (Exception $e) {
             block_workflow_report_scheduled_task_error('send extra notifications', $e, $activestep);
@@ -379,7 +379,7 @@ function block_workflow_autofinish_steps() {
                 $state->finish_step($newcomment, FORMAT_HTML);
 
                 // Cron setup user.
-                cron_setup_user();
+                \core\cron::setup_user();
             }
         } catch (Exception $e) {
             block_workflow_report_scheduled_task_error(
