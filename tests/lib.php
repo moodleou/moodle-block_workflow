@@ -132,6 +132,7 @@ abstract class block_workflow_testlib extends advanced_testcase {
             $user->username     = $username;
             $user->firstname    = $username;
             $user->lastname     = $username;
+            $user->email        = $username . '@localhost.com';
             $user->id = $DB->insert_record('user', $user);
             $assignment = new stdClass();
             $assignment->roleid = $this->roles[$role];

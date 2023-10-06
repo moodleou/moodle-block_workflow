@@ -154,6 +154,7 @@ The following tokens can be used only in the message body:
 $string['emailsettings']                = 'E-mail template settings';
 $string['emailsubject']                 = 'Subject';
 $string['emailtemplateexists']          = 'Email template \'{$a}\' which was attempted to import already exists. Existing template is preserved.';
+$string['emailfailed']                  = 'Failed send email \'{$a->subject}\' to {$a->email}';
 $string['emptyfield']                   = 'The required field is empty: {$a}';
 $string['enabled']                      = 'Enabled';
 $string['enabledworkflow']              = 'Enabled';

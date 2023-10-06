@@ -381,4 +381,31 @@ class emails_test extends \block_workflow_testlib {
         // And we shouldn't throw an exception when deleting.
         $email->delete();
     }
+
+    /*
+     * Test show correct error message when we can't send the email.
+     */
+    public function test_email_send_failed(): void {
+        // The workflow system has some logic (which I think is no longer required)
+        // which stops it from sending messages if a transaction is in progress.
+        // We should probably untangle that one day, but for now.
+        $this->preventResetByRollback();
+
+        // Disable the send email feature so message_send function will always fail.
+        set_config('block_workflow_notification_disable', 1, 'message');
+
+        // Create a new template e-mail.
+        $this->create_email('shortname');
+
+        $workflow = $this->create_workflow(false);
+        $this->create_step($workflow);
+        $state = $this->assign_workflow($workflow);
+
+        // This command should assign an send email template to student.
+        $command = 'shortname to student';
+        $emailcommand = \block_workflow_command::create('block_workflow_command_email');
+        // Check that we throw an exception with correct error message.
+        $this->expectExceptionMessage("Failed send email 'Example subject' to egstudent@localhost.com");
+        $emailcommand->execute($command, $state);
+    }
 }

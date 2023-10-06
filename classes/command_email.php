@@ -321,10 +321,9 @@ class block_workflow_command_email extends block_workflow_command {
      *
      * @access  public
      * @param   object  $eventdata  The message to send
-     * @return  void
      */
     public static function message_send($eventdata = null) {
-        global $DB, $SITE;
+        global $DB;
 
         static $mailqueue = array();
 
@@ -337,7 +336,9 @@ class block_workflow_command_email extends block_workflow_command {
             while ($eventdata = array_shift($mailqueue)) {
                 // Send each message in the array.
                 if (!message_send($eventdata)) {
-                    throw new workflow_command_failed_exception(get_string('emailfailed', 'block_workflow'));
+                    throw new block_workflow_exception(
+                        get_string('emailfailed', 'block_workflow',
+                            ['email' => $eventdata->userto->email, 'subject' => $eventdata->subject]));
                 }
             }
         }
