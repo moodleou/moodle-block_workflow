@@ -81,16 +81,14 @@ class block_workflow extends block_base {
             $this->page->requires->strings_for_js(['editcomments', 'nocomments', 'finishstep'], 'block_workflow');
             $this->page->requires->strings_for_js(['savechanges'], 'moodle');
 
-            // Initialise the YUI module.
             $arguments = array(
                 'stateid'    => $state->id,
-                'editorid'   => 'wkf-comment-editor',
+                'editorid'   => 'id_wkf-comment-editor',
                 'editorname' => 'comment_editor',
+                'contextid' => $this->instance->parentcontextid,
             );
-            $this->page->requires->yui_module('moodle-block_workflow-comments', 'M.blocks_workflow.init_comments',
-                    [$arguments]);
-            $this->page->requires->yui_module('moodle-block_workflow-todolist', 'M.blocks_workflow.init_todolist',
-                    [['stateid' => $state->id]]);
+            $this->page->requires->js_call_amd('block_workflow/comments', 'initComments', [$arguments]);
+            $this->page->requires->js_call_amd('block_workflow/todolist', 'initTodolist', [['stateid' => $state->id]]);
 
             // Display the block for this state.
             $this->content->text = $renderer->block_display($state);
@@ -99,7 +97,7 @@ class block_workflow extends block_base {
             $previous = $workflows->load_context_workflows($this->instance->parentcontextid);
             $canadd = has_capability('block/workflow:manage', $this->context);
 
-            // If this is a module, retrieve it's name, otherwise try the pagelayout to confirm
+            // If this is a module, retrieve its name, otherwise try the pagelayout to confirm
             // that this is a course.
             if ($this->page->cm) {
                 $appliesto = $this->page->cm->modname;

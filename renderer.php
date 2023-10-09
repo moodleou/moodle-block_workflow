@@ -36,10 +36,11 @@ class block_workflow_renderer extends plugin_renderer_base {
     /**
      * Render the block for the specified state
      *
-     * @param   object  $state  The block_workflow_step_state to render for
-     * @return  string          The rendered content
+     * @param object $state  The block_workflow_step_state to render for
+     * @param bool $renderforajax are we rendering this for an ajx request? (Default false: display directly in the block.)
+     * @return string The rendered HTML content
      */
-    public function block_display(block_workflow_step_state $state, $ajax = false) {
+    public function block_display(block_workflow_step_state $state, $renderforajax = false) {
         global $USER;
 
         $canmakechanges = block_workflow_can_make_changes($state);
@@ -88,7 +89,7 @@ class block_workflow_renderer extends plugin_renderer_base {
 
             $output .= html_writer::tag('span', $who);
             $output .= $this->get_popup_button($roles, $context);
-            $this->page->requires->yui_module('moodle-block_workflow-userinfo', 'M.block_workflow.userinfo.init');
+            $this->page->requires->js_call_amd('block_workflow/userinfo', 'init');
         }
 
         // Instructions.
@@ -129,27 +130,12 @@ class block_workflow_renderer extends plugin_renderer_base {
 
             $output .= html_writer::tag('div', $this->output->render($editbutton));
 
-            if (!$ajax) {
-                // Output the contents of the edit comment dialogue, hidden.
-                // Prepare editor.
-                $editor = new MoodleQuickForm_editor('comment_editor', get_string('commentlabel', 'block_workflow'),
-                        array('id' => 'wkf-comment-editor'), block_workflow_editor_options());
-                $editor->setValue(array('text' => $state->comment));
+            if (!$renderforajax) {
 
-                $output .= '<div class="block-workflow-panel">
-                                <form class="wkf-comments" action=".">
-                                    <div class="wfk-textarea">' .
-                                        html_writer::label(get_string('commentlabel', 'block_workflow'),
-                                                'wkf-comment-editor', false, array('class' => 'accesshide')) .
-                                        $editor->toHtml() . '
-                                    </div>
-                                    <div class="wfk-submit">
-                                        <input type="button" class="submitbutton" value="' . get_string('submit') . '" />
-                                    </div>
-                                </form>
-                                <div class="loading-lightbox hidden">' .
+                $output .= '<div class="block-workflow-panel hidden">
+                                <div class="loading-lightbox d-flex justify-content-center align-item-center">' .
                                     $this->pix_icon('i/loading', get_string('loading', 'admin'), 'moodle',
-                                            array('class' => 'loading-icon')) . '
+                                            ['class' => 'loading-icon']) . '
                                 </div>
                             </div>';
             }
@@ -1165,7 +1151,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         foreach ($states as $state) {
             $table->data[] = $this->workflow_overview_step($state, $context);
         }
-        $this->page->requires->yui_module('moodle-block_workflow-userinfo', 'M.block_workflow.userinfo.init');
+        $this->page->requires->js_call_amd('block_workflow/userinfo', 'init');
 
         // Put everything together and return.
         $output .= html_writer::table($table);
