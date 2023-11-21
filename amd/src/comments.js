@@ -19,6 +19,9 @@ import Notification from 'core/notification';
 import {TodoList} from 'block_workflow/todolist';
 import Fragment from 'core/fragment';
 import Templates from 'core/templates';
+import {call as fetchMany} from 'core/ajax';
+import Pending from 'core/pending';
+import {addIconToContainerRemoveOnCompletion} from 'core/loadingicon';
 
 /**
  * JavaScript to handle comment.
@@ -29,7 +32,6 @@ import Templates from 'core/templates';
  */
 class Comment {
 
-    AJAXURL = '/blocks/workflow/ajax.php';
     CSS = {
         BLOCKWORKFLOW:  'block_workflow',
         BLOCKCOMMENTS:  'block_workflow_comments',
@@ -63,7 +65,6 @@ class Comment {
     async initializer() {
         // Setup and attach the modal to DOM.
         this.modal = await this.buildCommentModal();
-        this.loadingNode = document.querySelector(`.${this.CSS.PANEL} .${this.CSS.LIGHTBOX}`);
         this.modal.attachToDOM();
         this.modal.hide();
         this.attachEvents();
@@ -112,11 +113,14 @@ class Comment {
         }
 
         const fragment = Fragment.loadFragment('block_workflow', 'commentform', this.contextid, {inputLabel});
-        fragment.done(function(html, js) {
+        const pendingModalReady = new Pending('block_workflow/actions:show');
+        fragment.then(function(html, js) {
             this.modal.getBody()[0].innerHTML = html;
             Templates.runTemplateJS(js);
             const body = this.modal.getBody()[0];
-            this.displayLoading();
+            addIconToContainerRemoveOnCompletion(
+                this.modal.getBody()[0].querySelector('.' + this.CSS.PANEL), pendingModalReady
+            );
             this.modal.getRoot()[0].querySelector('.modal-dialog').style.cssText = 'width: fit-content; max-width: 1280px;';
             this.modal.getRoot()[0].querySelector('.modal-dialog').style.width = 'fit-content';
             this.modal.show();
@@ -129,32 +133,40 @@ class Comment {
             } else {
                 submitButton.onclick = this.save.bind(this);
             }
-
-            const data = {
-                sesskey: M.cfg.sesskey,
-                action:  'getcomment',
-                stateid: this.stateid
-            };
-
+            const editorId = this.editorid;
             // Fetch the comment and update the form
-            this.ajaxCall(data, false, result => {
-                const editorId = this.editorid;
+            this.getStepStateComment(this.stateid).then(function(result) {
                 const editor = document.getElementById(editorId + 'editable');
                 // Atto specific.
                 if (editor) {
-                    editor.innerHTML = result.response.comment;
+                    editor.innerHTML = result.response;
                 }
                 // Tiny specific.
                 // To make sure Tiny MCE has already loaded.
                 setTimeout(function() {
                     if (window.tinyMCE && window.tinyMCE.activeEditor) {
-                        window.tinyMCE.activeEditor.setContent(result.response.comment);
+                        window.tinyMCE.activeEditor.setContent(result.response);
                         window.tinyMCE.activeEditor.save();
                     }
                 });
-                document.getElementById(editorId).value = result.response.comment;
-            });
+                document.getElementById(editorId).value = result.response;
+                pendingModalReady.resolve();
+            }).catch(Notification.exception);
         }.bind(this));
+    }
+
+    /**
+     * Get the current comment of the step_state.
+     *
+     * @param {Number} stateid
+     */
+    getStepStateComment(stateid) {
+        return fetchMany([{
+            methodname: 'block_workflow_get_step_state_comment',
+            args: {
+                stateid: stateid,
+            },
+        }])[0];
     }
 
     /**
@@ -163,42 +175,55 @@ class Comment {
     finishStep() {
         const comment = document.getElementById(this.editorid).value;
         const worklowBlock = document.querySelector('.' + this.CSS.BLOCKWORKFLOW + ' .' + this.CSS.CONTENT);
-        // Build the data for submission
-        const data = {
-            sesskey: M.cfg.sesskey,
-            action:  'finishstep',
-            stateid: this.stateid,
-            text: comment,
-            format: document.getElementsByName(this.editorname + '[format]')[0].value
-        };
+        const modal = this.modal;
+        const commentCls = this;
+        this.updateFinishStep(this.stateid, comment, document.getElementsByName(this.editorname + '[format]')[0].value)
+            .then(function(result) {
+                if (result.response) {
+                    // Update content
+                    worklowBlock.innerHTML = result.response;
+                    if (result.stateid) {
+                        // Re-attach events to block buttons
+                        commentCls.attachEvents();
+                        // Reinit to-do events
+                        const todo = new TodoList({stateid: result.stateid});
+                        commentCls.stateid = result.stateid;
+                        // We are on the next step
+                        todo.initializer();
+                    }
+                    if (result.listworkflows) {
+                        // Last step, available workflows are listed
+                        const selectId = worklowBlock.querySelector('.singleselect form select').getAttribute('id');
+                        // Reinit single_select event
+                        // This is horrible, but the core JS we need is now inline in the template,
+                        // so we have to copy it.
+                        document.getElementById(selectId).onchange = function() {
+                            if (this.selectedOptions[0].dataset.ignore === undefined) {
+                                this.closest('form').submit();
+                            }
+                        };
+                    }
+                }
+                modal.hide();
+            }).catch(Notification.exception);
+    }
 
-        this.ajaxCall(data, true, result => {
-            if (result.response.blockcontent) {
-                // Update content
-                worklowBlock.innerHTML = result.response.blockcontent;
-                if (result.response.stateid) {
-                    // We are on the next step
-                    this.stateid = result.response.stateid;
-                    // Re-attach events to block buttons
-                    this.attachEvents();
-                    // Reinit to-do events
-                    const todo = new TodoList({stateid: result.response.stateid});
-                    todo.initializer();
-                }
-                if (result.response.listworkflows) {
-                    // Last step, available workflows are listed
-                    const selectId = worklowBlock.querySelector('.singleselect form select').getAttribute('id');
-                    // Reinit single_select event
-                    // This is horrible, but the core JS we need is now inline in the template,
-                    // so we have to copy it.
-                    document.getElementById(selectId).onchange = function() {
-                        if (this.selectedOptions[0].dataset.ignore === undefined) {
-                            this.closest('form').submit();
-                        }
-                    };
-                }
-            }
-        });
+    /**
+     * Finish the current step_state.
+     *
+     * @param {Number} stateid stateid id of the current step_state.
+     * @param {String} comment new comment of the finish step.
+     * @param {Number} format format of the editor.
+     */
+    updateFinishStep(stateid, comment, format) {
+        return fetchMany([{
+            methodname: 'block_workflow_finish_step',
+            args: {
+                stateid: this.stateid,
+                text: comment,
+                format: format
+            },
+        }])[0];
     }
 
     /**
@@ -208,82 +233,34 @@ class Comment {
         const comment = document.getElementById(this.editorid).value;
         const commentsBlock = document.querySelector('.' + this.CSS.BLOCKWORKFLOW + ' .' + this.CSS.BLOCKCOMMENTS);
         const noCommentString = await Str.get_string('nocomments', 'block_workflow');
-        // Build the data for submission
-        const data = {
-            sesskey: M.cfg.sesskey,
-            action:  'savecomment',
-            stateid: this.stateid,
-            text: comment,
-            format: document.getElementsByName(this.editorname + '[format]')[0].value
-        };
-
-        this.ajaxCall(data, true, function(result) {
-            if (result.response.blockcomments) {
-                commentsBlock.innerHTML = result.response.blockcomments;
-            } else {
-                commentsBlock.innerText = noCommentString;
-            }
-        });
+        const modal = this.modal;
+        this.updateStepStateComment(this.stateid, comment, document.getElementsByName(this.editorname + '[format]')[0].value)
+            .then(function(result) {
+                if (result.response) {
+                    commentsBlock.innerHTML = result.response;
+                } else {
+                    commentsBlock.innerText = noCommentString;
+                }
+                modal.hide();
+            }).catch(Notification.exception);
     }
 
     /**
-     * Display loading animation.
-     */
-    displayLoading() {
-        let body = this.modal.getBody()[0].querySelector('.' + this.CSS.PANEL);
-        if (!body) {
-            body = this.modal.getBody()[0];
-        }
-        body.appendChild(this.loadingNode);
-    }
-
-    /**
-     * Hide loading animation.
-     */
-    removeLoading() {
-        const loadingEl = this.modal.getBody()[0].querySelector(`.${this.CSS.LIGHTBOX}`);
-        if (!loadingEl) {
-            return;
-        }
-        loadingEl.remove();
-    }
-
-    /**
-     * Ajax call function.
+     * Update the comment of the step_state.
      *
-     * @param {Object} data The data value of the request.
-     * @param {Boolean} hideModal Hide modal after request.
-     * @param {Function} successCallback The callback function that will be triggered when the request is successful.
+     * @param {Number} stateid id of the current step_state.
+     * @param {String} comment new comment of
+     * @param {Number} format format of the editor.
      */
-    ajaxCall(data, hideModal, successCallback) {
-        const xhttp = new XMLHttpRequest();
-        xhttp.onloadstart = this.displayLoading.bind(this);
-        xhttp.onreadystatechange = () => {
-            if (xhttp.readyState !== XMLHttpRequest.DONE) {
-                return;
-            } else {
-                this.removeLoading();
-            }
-            if (xhttp.status !== 200) {
-                Notification.exception(new Error(xhttp.statusText));
-                return;
-            }
-            const result = JSON.parse(xhttp.responseText);
-            if (result.error) {
-                Notification.exception(result);
-                return;
-            }
-
-            // Trigger call back.
-            successCallback(result);
-
-            if (hideModal) {
-                this.modal.hide();
-            }
-        };
-        xhttp.open("POST", M.cfg.wwwroot + this.AJAXURL);
-        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xhttp.send(build_querystring(data)); // eslint-disable-line no-undef
+    updateStepStateComment(stateid, comment, format) {
+        return fetchMany([{
+            methodname: 'block_workflow_update_step_state_comment',
+            args: {
+                stateid: this.stateid,
+                newcomment: comment,
+                newcommentformat: format
+            },
+        }])[0];
     }
 }
 

@@ -437,21 +437,30 @@ class block_workflow_step_state {
 
     /**
      * Toggle the completed status of a task for a step state
-     * @param   int     $todoid  The ID of the task
+     *
+     * @param int $todoid  The ID of the task
+     * @param bool whether user check/uncheck the link.
      * @return  boolean The new state of the task
      */
-    public function todo_toggle($todoid) {
+    public function todo_toggle(int $todoid, bool $check): bool {
         global $DB, $USER;
         $transaction = $DB->start_delegated_transaction();
 
         // Try and pick up the current task.
         $todo = $DB->get_record('block_workflow_todo_done', array('stepstateid' => $this->id, 'steptodoid' => $todoid));
-
+        // Has completed to do and user want to completed it. Do nothing.
+        if ($todo && $check) {
+            return true;
+        }
+        // Don't have to do and user want to uncheck it.
+        if (!$check && !$todo) {
+            return false;
+        }
         // Trigger an event for the toggled completed status of this to-do.
         $event = \block_workflow\event\todo_triggered::create_from_step_state($this, $todoid, !$todo);
         $event->trigger();
 
-        if ($todo) {
+        if (!$check) {
             // Remove the current record. There is no past history at present.
             $DB->delete_records('block_workflow_todo_done', array('id' => $todo->id));
             $transaction->allow_commit();

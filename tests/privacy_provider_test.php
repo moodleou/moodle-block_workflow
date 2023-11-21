@@ -117,7 +117,7 @@ class privacy_provider_test extends \core_privacy\tests\provider_testcase {
         $this->todo->create_todo($data);
 
         // Toggle the to-do item.
-        $state->todo_toggle($this->todo->id);
+        $state->todo_toggle($this->todo->id, true);
     }
 
     /**
@@ -243,7 +243,7 @@ class privacy_provider_test extends \core_privacy\tests\provider_testcase {
         $this->todo->create_todo($data);
 
         // Toggle the to-do item.
-        $state->todo_toggle($this->todo->id);
+        $state->todo_toggle($this->todo->id, true);
 
         $params = ['statescontextid' => $this->coursecontext->id];
         $statechangesql = "SELECT statechanges.id, statechanges.userid

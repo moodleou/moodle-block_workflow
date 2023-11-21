@@ -14,6 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 import Notification from 'core/notification';
+import {call as fetchMany} from 'core/ajax';
 
 /**
  * JavaScript for the workflow to-do list.
@@ -24,7 +25,6 @@ import Notification from 'core/notification';
  */
 export class TodoList {
     TODOLISTNAME = 'blocks_workflow_todolist';
-    AJAXURL = '/blocks/workflow/ajax.php';
     STATEID = 'stateid';
     CSS = {
         BLOCKTODOTASK: 'block-workflow-todotask',
@@ -57,40 +57,40 @@ export class TodoList {
         event.preventDefault();
         // Expression to fetch ID
         const reg = new RegExp(this.CSS.BLOCKTODOID + "-(\\d{1,})");
-        // Build the data for submission
-        const data = {
-            sesskey: M.cfg.sesskey,
-            action: 'toggletaskdone',
-            stateid: this.stateid,
-            todoid: node.getAttribute('id').match(reg)[1]
-        };
-
-        const xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (xhttp.readyState !== XMLHttpRequest.DONE) {
+        // We don't have a real checkbox, it is just image with different class. So we will check the status base on class.
+        // When we click to the link with completed class, meaning we want to uncheck so the status should be false.
+        // When we click to the link without the completed class, meaning we want to check so the status should be true.
+        const check = !node.parentNode.classList.contains('completed');
+        this.updateStepStateTaskState(this.stateid, node.getAttribute('id').match(reg)[1], check)
+        .then(function(result) {
+            if (result.error) {
+                Notification.exception(result.error);
                 return;
             }
-            let result;
-            if (xhttp.status === 200) {
-                result = JSON.parse(this.responseText);
-                if (result.error) {
-                    Notification.exception(result);
-                    return;
-                }
-            } else {
-                Notification.exception(new Error(xhttp.statusText));
-                return;
-            }
-
-            if (result.response.iscompleted) {
+            if (result.response) {
                 node.parentNode.classList.add('completed');
             } else {
                 node.parentNode.classList.remove('completed');
             }
-        };
-        xhttp.open("POST", M.cfg.wwwroot + this.AJAXURL);
-        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xhttp.send(build_querystring(data)); // eslint-disable-line no-undef
+        }).catch(Notification.exception);
+    }
+
+    /**
+     * Update step_state to to
+     *
+     * @param {Number} stateid id of the current step_state
+     * @param {Number} todoid id of the current to do.
+     * @param {Boolean} check whether the current to is has been checked/uncheck.
+     */
+    updateStepStateTaskState(stateid, todoid, check) {
+        return fetchMany([{
+            methodname: 'block_workflow_update_step_state_task_state',
+            args: {
+                stateid: stateid,
+                todoid: todoid,
+                check: check
+            },
+        }])[0];
     }
 }
 

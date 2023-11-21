@@ -41,7 +41,7 @@ $context    = $state->context();
 require_capability('block/workflow:dostep', $context);
 
 // Toggle the todo item.
-$state->todo_toggle($todoid);
+$state->todo_toggle($todoid, true);
 
 if ($returnto) {
     redirect(new moodle_url($returnto));

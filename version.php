@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2022040800;
+$plugin->version   = 2023120500;
 $plugin->requires  = 2021051700;
 $plugin->component = 'block_workflow';
 $plugin->maturity  = MATURITY_STABLE;
