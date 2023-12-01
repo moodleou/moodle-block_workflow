@@ -53,6 +53,15 @@ class block_workflow_step_state {
     public $commentformat;
 
     /**
+     * @var ?string occasionally, so that it can be used in messges, we need
+     * to store the comment from the previous step as well. (A bit hacky, but ...).
+     */
+    public $previouscomment = null;
+
+    /** @var ?int format of $previouscomment, if present. */
+    public $previouscommentformat = null;
+
+    /**
      * Constructor to obtain a step_state
      *
      * See documentation for {@link load_state} for further information.
@@ -287,7 +296,7 @@ class block_workflow_step_state {
      * @return  mixed   The next state or false if there is none
      */
     public function finish_step($newcomment, $newcommentformat) {
-        global $DB, $USER;
+        global $DB;
         $transaction = $DB->start_delegated_transaction();
 
         // Update the comment.
@@ -316,7 +325,7 @@ class block_workflow_step_state {
                 $nextstate = new block_workflow_step_state($newstate->id);
             }
 
-            $nextstate->previouscomment = $this->comment; // Hack alert!
+            $nextstate->previouscomment = $this->comment;
             $nextstate->previouscommentformat = $this->commentformat;
             $nextstate->change_status(BLOCK_WORKFLOW_STATE_ACTIVE);
         }

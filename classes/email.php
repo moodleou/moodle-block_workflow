@@ -34,10 +34,21 @@
  * @property-read string    $subject            The subject of the e-mail email
  */
 class block_workflow_email {
+
+    /** @var int id from the database. */
     public $id;
-    public $message;
+
+    /** @var string identifier used to refer to this message. */
     public $shortname;
+
+    /** @var string email subject. */
     public $subject;
+
+    /** @var string text of the email. */
+    public $message;
+
+    /** @var int format of the message. One of the FORMAT_... constants. */
+    public $messageformat;
 
     /**
      * Constructor to obtain an e-mail template
@@ -63,10 +74,11 @@ class block_workflow_email {
      * @access  private
      */
     private function _load($email) {
-        $this->id           = $email->id;
-        $this->message      = $email->message;
-        $this->shortname    = $email->shortname;
-        $this->subject      = $email->subject;
+        $this->id            = $email->id;
+        $this->shortname     = $email->shortname;
+        $this->subject       = $email->subject;
+        $this->message       = $email->message;
+        $this->messageformat = $email->messageformat;
         return $this;
     }
 

@@ -386,17 +386,15 @@ class block_workflow_workflow {
     }
 
     /**
-     * Return an array of available workflows
+     * Return an array of available workflows.
      *
-     * @param   String for  The context in which the workflow is for
-     * @return  array of stdClass objects as returned by the database
-     *          abstraction layer
+     * @param string $for type of context the workflows should apply to.
+     * @return stdClass[] of stdClass objects representing workflows.
      */
-    public static function available_workflows($for) {
+    public static function available_workflows(string $for): array {
         global $DB;
-        $workflows = $DB->get_records('block_workflow_workflows',
-                array('appliesto' => $for, 'obsolete' => 0), 'name');
-        return $workflows;
+        return $DB->get_records('block_workflow_workflows',
+                ['appliesto' => $for, 'obsolete' => 0], 'name');
     }
 
     /**

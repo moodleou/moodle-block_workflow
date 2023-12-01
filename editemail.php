@@ -86,13 +86,15 @@ if ($emailform->is_cancelled()) {
 }
 
 // Set the form defaults.
- $email->emailid = $email->id;
- $message = $email->message;
- $email->message = array();
- $email->message['text'] = $message;
- $email->message['format'] = FORMAT_HTML;
-
- $emailform->set_data($email);
+$toform = new stdClass();
+$toform->emailid = $email->id;
+$toform->shortname = $email->shortname;
+$toform->subject = $email->subject;
+$toform->message = [
+    'text' => $email->message,
+    'format' => $email->messageformat,
+];
+$emailform->set_data($toform);
 
 // Grab the renderer.
 $renderer = $PAGE->get_renderer('block_workflow');
