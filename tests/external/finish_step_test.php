@@ -56,5 +56,12 @@ class finish_step_test extends external_api_base_lib {
         // Verify step 2 is active.
         $this->assertEquals($this->step2->id, $state2->stepid);
         $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $state2->state);
+        // Finish step state 2.
+        $returnvalue = finish_step::execute($state2->id, 'Finish comment', FORMAT_HTML);
+        $state2 = new block_workflow_step_state($state2->id);
+        // Verify step 2 is complete.
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_COMPLETED, $state2->state);
+        // We should return the listofworkflows.
+        $this->assertEquals(1, $returnvalue['listworkflows']);
     }
 }

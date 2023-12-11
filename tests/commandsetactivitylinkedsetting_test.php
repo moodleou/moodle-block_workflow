@@ -44,6 +44,12 @@ require_once(dirname(__FILE__) . '/lib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class commandsetactivitylinkedsetting_test extends \block_workflow_testlib {
+
+    /** @var object current workflow*/
+    private $workflow;
+    /** @var object current step*/
+    private $step;
+
     public function test_setcoursevisibility() {
         $command = $this->make_command();
         $this->assertInstanceOf('block_workflow_command', $command);

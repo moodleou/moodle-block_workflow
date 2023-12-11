@@ -91,7 +91,7 @@ class finish_step extends external_api_base {
         return new external_single_structure([
             'response' => new external_value(PARAM_RAW),
             'stateid' => new external_value(PARAM_INT, '', VALUE_OPTIONAL),
-            'listworkflow' => new external_value(PARAM_BOOL, '', VALUE_OPTIONAL),
+            'listworkflows' => new external_value(PARAM_BOOL, '', VALUE_OPTIONAL),
         ]);
     }
 }
