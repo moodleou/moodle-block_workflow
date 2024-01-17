@@ -22,6 +22,7 @@ import Templates from 'core/templates';
 import {call as fetchMany} from 'core/ajax';
 import Pending from 'core/pending';
 import {addIconToContainerRemoveOnCompletion} from 'core/loadingicon';
+import * as FormEvents from 'core_form/events';
 
 /**
  * JavaScript to handle comment.
@@ -205,7 +206,8 @@ class Comment {
                     }
                 }
                 modal.hide();
-            }).catch(Notification.exception);
+                this.resetAutoSaveData();
+            }.bind(this)).catch(Notification.exception);
     }
 
     /**
@@ -242,7 +244,8 @@ class Comment {
                     commentsBlock.innerText = noCommentString;
                 }
                 modal.hide();
-            }).catch(Notification.exception);
+                this.resetAutoSaveData();
+            }.bind(this)).catch(Notification.exception);
     }
 
     /**
@@ -261,6 +264,15 @@ class Comment {
                 newcommentformat: format
             },
         }])[0];
+    }
+
+    /**
+     * Reset auto-save data.
+     */
+    resetAutoSaveData() {
+        if (window.tinyMCE !== undefined && window.tinyMCE.activeEditor) {
+            FormEvents.notifyFormSubmittedByJavascript(window.tinyMCE.activeEditor.formElement);
+        }
     }
 }
 
