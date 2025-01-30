@@ -93,7 +93,7 @@ function block_workflow_appliesto_list() {
     $return = array('course' => get_string('course'));
 
     // ... and any installed modules.
-    $mods = get_plugin_list('mod');
+    $mods = core_component::get_plugin_list('mod');
     foreach ($mods as $name => $path) {
         $return[$name] = get_string('pluginname', 'mod_' . $name);
     }
