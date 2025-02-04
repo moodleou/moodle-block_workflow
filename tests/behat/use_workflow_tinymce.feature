@@ -35,7 +35,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
     And I upload "blocks/workflow/tests/fixtures/testworkflow.workflow.xml" file to "File" filemanager
     And I press "Import workflow"
     And I navigate to "Plugins > Text editors > Manage editors" in site administration
-    And I click on "Disable" "link" in the "Atto HTML editor" "table_row"
+    And I click on "Disable" "checkbox" in the "Atto HTML editor" "table_row"
     And I log out
 
     When I log in as "manager1"
