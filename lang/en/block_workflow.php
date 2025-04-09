@@ -164,6 +164,7 @@ $string['eventstepactivated']           = 'Step activated';
 $string['eventstepcompleted']           = 'Step completed';
 $string['eventtodotriggered']           = 'Todo triggered';
 $string['eventstepextranotification']   = 'Step extra notification processed';
+$string['eventworkflownotification']    = 'Workflow notification';
 $string['export']                       = 'Export';
 $string['exportworkflow']               = 'Export workflow';
 

@@ -282,7 +282,7 @@ class block_workflow_step_state {
 
         // This is a workaround for a limitation of the message_send system.
         // This must be called outside of a transaction.
-        block_workflow_command_email::message_send();
+        block_workflow_command_email::message_send($this);
 
         // Return the updated step_state object.
         return $this->load_state($this->id);
@@ -334,7 +334,7 @@ class block_workflow_step_state {
 
         // This is a workaround for a limitation of the message_send system.
         // This must be called outside of a transaction.
-        block_workflow_command_email::message_send();
+        block_workflow_command_email::message_send($nextstep ? $nextstate : $this);
 
         // Return the new state.
         if ($nextstep) {
@@ -373,7 +373,7 @@ class block_workflow_step_state {
 
             // This is a workaround for a limitation of the message_send system.
             // This must be called outside of a transaction.
-            block_workflow_command_email::message_send();
+            block_workflow_command_email::message_send($state);
 
             return;
         }
@@ -409,7 +409,7 @@ class block_workflow_step_state {
 
         // This is a workaround for a limitation of the message_send system.
         // This must be called outside of a transaction.
-        block_workflow_command_email::message_send();
+        block_workflow_command_email::message_send($nextstate);
 
         // Return a reference to the new state.
         return $nextstate;

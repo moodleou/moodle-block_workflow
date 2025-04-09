@@ -780,7 +780,7 @@ class block_workflow_step {
 
         // This is a workaround for a limitation of the message_send system.
         // This must be called outside of a transaction.
-        block_workflow_command_email::message_send();
+        block_workflow_command_email::message_send($state);
     }
 
     /**

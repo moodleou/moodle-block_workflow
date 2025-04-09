@@ -400,12 +400,29 @@ class emails_test extends \block_workflow_testlib {
         $workflow = $this->create_workflow(false);
         $this->create_step($workflow);
         $state = $this->assign_workflow($workflow);
+        $sink = $this->redirectEvents();
 
-        // This command should assign an send email template to student.
+        // This command should assign and send email template to student.
         $command = 'shortname to student';
         $emailcommand = \block_workflow_command::create('block_workflow_command_email');
         // Check that we throw an exception with correct error message.
-        $this->expectExceptionMessage("Failed send email 'Example subject' to egstudent@localhost.com");
         $emailcommand->execute($command, $state);
+        $events = $sink->get_events();
+        $event = reset($events);
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\block_workflow\event\email_sent_status', $event);
+        $this->assertStringContainsString("Failed send email 'Example subject' to egstudent@localhost.com",
+            $event->other['error']);
+        $this->assertStringContainsString("The email to user with id", $event->get_description());
+
+        // Test send email successfully.
+        $sink = $this->redirectEvents();
+        set_config('block_workflow_notification_disable', 0, 'message');
+        $emailcommand->execute($command, $state);
+        $events = $sink->get_events();
+        // The first event is core\event\notification_sent.
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\block_workflow\event\email_sent_status', $events[1]);
+        $this->assertStringContainsString("The email was successfully sent to user with id", $events[1]->get_description());
     }
 }

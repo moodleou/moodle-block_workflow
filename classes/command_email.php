@@ -173,7 +173,7 @@ class block_workflow_command_email extends block_workflow_command {
          */
         foreach ($email->users as $user) {
             $eventdata->userto          = $user;
-            self::message_send($eventdata);
+            self::message_send($state, $eventdata);
         }
     }
 
@@ -320,9 +320,10 @@ class block_workflow_command_email extends block_workflow_command {
      * It is safe to call this function multiple times
      *
      * @access  public
+     * @param   block_workflow_step_state $state The step-state with the data
      * @param   object  $eventdata  The message to send
      */
-    public static function message_send($eventdata = null) {
+    public static function message_send(block_workflow_step_state $state, $eventdata = null) {
         global $DB;
 
         static $mailqueue = array();
@@ -335,10 +336,18 @@ class block_workflow_command_email extends block_workflow_command {
             // Only try to send if we're not in a transaction.
             while ($eventdata = array_shift($mailqueue)) {
                 // Send each message in the array.
-                if (!message_send($eventdata)) {
-                    throw new block_workflow_exception(
-                        get_string('emailfailed', 'block_workflow',
-                            ['email' => $eventdata->userto->email, 'subject' => $eventdata->subject]));
+                try {
+                    if (!message_send($eventdata)) {
+                        throw new block_workflow_exception(
+                            get_string('emailfailed', 'block_workflow',
+                                ['email' => $eventdata->userto->email, 'subject' => $eventdata->subject]));
+                    } else {
+                        $event = \block_workflow\event\email_sent_status::create_from_step_state($state);
+                        $event->trigger();
+                    }
+                } catch (Exception $e) {
+                    $event = \block_workflow\event\email_sent_status::create_from_step_state($state, $e->getMessage());
+                    $event->trigger();
                 }
             }
         }
