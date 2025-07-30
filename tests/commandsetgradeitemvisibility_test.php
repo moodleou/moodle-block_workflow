@@ -327,7 +327,8 @@ final class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
      * @covers \block_workflow_command_setgradeitemvisibility::parse
      */
     public function test_parse_with_state_no_support_for_grade(): void {
-        $workflow = $this->create_activity_workflow('chat', false);
+        $this->generate_module('forum');
+        $workflow = $this->create_activity_workflow('forum', false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
 
