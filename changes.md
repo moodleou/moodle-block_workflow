@@ -1,5 +1,25 @@
 # Change log for the Workflow block
 
+## Changes in 2.4
+* This version works with Moodle 5.0.
+* Automation test failures are fixed.
+* Cherry-picked commits since february 2024 till now:
+  * Fix PHP8 deprecation errors (optional params before required ones)
+  * Behat: blocks/workflow (tt)
+  * blocks/workflow: Fix PHP  8.1 issues
+  * M4.2: fix uses of depreated cron_setup_user
+  * Workflow error when moving workflow on - and error reporting code is buggy
+  * YUI->AMD: Rewrite old JavaScript in block_workflow
+  * Behat: PHP8.2: fix block_/report_workflow failures
+  * Workflow block: convert use of ajax.php into moodle web services
+  * Workflow block: convert use of ajax.php into moodle web services
+  * Workflow/TinyEditor: incorrectly keeps the cached data when comment and finish step
+  * Moodle 4.5 merge - replace deprecated get_plugin_list
+  * Moodle 4.5 merge - fix miscellaneous Behat and PHPunit failures
+  * Theme: Technical debt - remove IE-specific rules
+  * Workflow: Enable logs to show whether a workflow email is sent
+* Upgrade the CI to support Moodle 5.0 (PHP 8.3), and update the branch to support branch MOODLE_405_STABLE, and MOODLE_500_STABLE.
+
 ## Changes in 2.3
 
 * This version works with Moodle 4.0.
