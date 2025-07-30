@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once(dirname(__FILE__) . '/editcomment_form.php');
@@ -47,12 +48,12 @@ if ($cm) {
 block_workflow_can_make_changes($state);
 
 // Set the page URL.
-$PAGE->set_url('/blocks/workflow/editcomment.php', array('stateid' => $stateid));
+$PAGE->set_url('/blocks/workflow/editcomment.php', ['stateid' => $stateid]);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_course($course);
 
 // Set the heading and page title.
-$tparams = array('stepname' => $state->step()->name, 'contextname' => $context->get_context_name());
+$tparams = ['stepname' => $state->step()->name, 'contextname' => $context->get_context_name()];
 $title = get_string('editingcommentfor', 'block_workflow', $tparams);
 $PAGE->set_heading($title);
 $PAGE->set_title($title);
@@ -63,7 +64,7 @@ $PAGE->navbar->add(get_string('pluginname', 'block_workflow'));
 $PAGE->navbar->add($state->step()->name);
 
 // Moodle form to update the state comment.
-$mform = new state_editcomment(null, array('state' => $state));
+$mform = new state_editcomment(null, ['state' => $state]);
 
 // Grab a returnurl which relates to the context.
 $returnurl = $context->get_url();
@@ -85,7 +86,7 @@ $data->stateid      = $state->id;
 $data->workflowname = $state->step()->workflow()->name;
 $data->stepname     = $state->step()->name;
 $data->instructions = $state->step()->instructions;
-$data = file_prepare_standard_editor($data, 'comment', array());
+$data = file_prepare_standard_editor($data, 'comment', []);
 
 $mform->set_data($data);
 

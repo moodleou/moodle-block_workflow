@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -41,7 +42,7 @@ require_capability('block/workflow:editdefinitions', context_system::instance())
 $workflow   = new block_workflow_workflow($workflowid);
 
 // Set the returnurl as we'll use this in a few places.
-$returnurl  = new moodle_url('/blocks/workflow/editsteps.php', array('workflowid' => $workflowid));
+$returnurl  = new moodle_url('/blocks/workflow/editsteps.php', ['workflowid' => $workflowid]);
 
 // Set various page settings.
 $title = get_string('editworkflow', 'block_workflow', $workflow->name);

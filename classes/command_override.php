@@ -33,9 +33,18 @@
  *
  */
 class block_workflow_command_override extends block_workflow_command {
+
+    /**
+     * Parses the provided arguments and processes the workflow step and state.
+     *
+     * @param array $args The arguments to be parsed.
+     * @param mixed $step The workflow step to be processed.
+     * @param mixed|null $state The current state of the workflow (optional).
+     * @return stdClass
+     */
     public function parse($args, $step, $state = null) {
         $data = new stdClass();
-        $data->errors = array();
+        $data->errors = [];
 
         if ($state) {
             $data->context = $state->context();
@@ -118,6 +127,14 @@ class block_workflow_command_override extends block_workflow_command {
 
         return $data;
     }
+
+    /**
+     * Executes the command with the given arguments and state.
+     *
+     * @param array $args The arguments to be used for execution.
+     * @param mixed $state The current state to be processed.
+     * @return void
+     */
     public function execute($args, $state) {
         $data = $this->parse($args, $state->step(), $state);
         assign_capability($data->capability, $data->permission, $data->role->id, $data->contextid, true);

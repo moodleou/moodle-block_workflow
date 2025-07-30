@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -48,11 +49,11 @@ require_capability('block/workflow:manage', $context);
 // Set various page options.
 $PAGE->set_pagelayout('standard');
 $PAGE->set_course($course);
-$PAGE->set_url('/blocks/workflow/removeworkflow.php', array('workflowid' => $workflowid, 'contextid' => $contextid));
+$PAGE->set_url('/blocks/workflow/removeworkflow.php', ['workflowid' => $workflowid, 'contextid' => $contextid]);
 
 // Grab the workflow.
 $workflow = new block_workflow_workflow($workflowid);
-$tparams = array('workflowname' => $workflow->name, 'contexttitle' => $context->get_context_name());
+$tparams = ['workflowname' => $workflow->name, 'contexttitle' => $context->get_context_name()];
 
 // Check that this workflow is assigned to this context.
 $stepstates = $workflow->step_states($contextid);
@@ -77,9 +78,9 @@ $PAGE->navbar->add(get_string('remove', 'block_workflow'));
 // The confirmation strings.
 $confirmstr = get_string('removeworkflowcheck', 'block_workflow', $tparams);
 $confirmurl = new moodle_url('/blocks/workflow/removeworkflow.php',
-        array('workflowid' => $workflowid, 'contextid' => $contextid, 'confirm' => 1));
+        ['workflowid' => $workflowid, 'contextid' => $contextid, 'confirm' => 1]);
 $returnurl  = new moodle_url('/blocks/workflow/overview.php',
-        array('workflowid' => $workflowid, 'contextid' => $contextid));
+        ['workflowid' => $workflowid, 'contextid' => $contextid]);
 
 if ($confirm) {
     // Confirm the session key to stop CSRF.

@@ -43,6 +43,11 @@ namespace block_workflow\event;
  */
 class todo_triggered extends \core\event\base {
 
+    /**
+     * Init method.
+     *
+     * @return void
+     */
     protected function init() {
         $this->data['objecttable'] = 'block_workflow_step_todos';
         $this->data['crud'] = 'u';
@@ -70,8 +75,8 @@ class todo_triggered extends \core\event\base {
                 'completed' => $completed,
                 'stepname' => $stepstate->step()->name,
                 'todoname' => $todo->task,
-                'workflowname' => $stepstate->step()->workflow()->name
-            ]
+                'workflowname' => $stepstate->step()->workflow()->name,
+            ],
         ]);
     }
 

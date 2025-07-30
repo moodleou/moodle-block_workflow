@@ -27,12 +27,12 @@ require_once(dirname(__FILE__) . '/external_api_base_lib.php');
  * @copyright 2023 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class update_step_state_task_state_test extends external_api_base_lib {
+final class update_step_state_task_state_test extends external_api_base_lib {
 
     /**
      * Test update update_step_state_task_state successfully.
      *
-     * @covers update_step_state_task_state::execute
+     * @covers \update_step_state_task_state::execute
      */
     public function test_update_step_state_task_state(): void {
         // Create a new to-do.

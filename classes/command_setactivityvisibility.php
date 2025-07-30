@@ -32,9 +32,17 @@
  *
  */
 class block_workflow_command_setactivityvisibility extends block_workflow_command {
+    /**
+     * Parses the provided arguments and processes them based on the given step and state.
+     *
+     * @param array $args The arguments to be parsed.
+     * @param object $step The step object associated with the workflow.
+     * @param object|null $state Optional. The current state object, if available.
+     * @return stdClass The result of the parsing process.
+     */
     public function parse($args, $step, $state = null) {
         $data = new stdClass();
-        $data->errors = array();
+        $data->errors = [];
 
         // Check that this step workflow relatees to an activity.
         if (!parent::is_activity($step->workflow())) {
@@ -61,6 +69,14 @@ class block_workflow_command_setactivityvisibility extends block_workflow_comman
 
         return $data;
     }
+
+    /**
+     * Executes the command to set activity visibility.
+     *
+     * @param array $args Arguments required for the command execution.
+     * @param mixed $state The current state or context in which the command is executed.
+     * @return void
+     */
     public function execute($args, $state) {
         global $CFG;
         require_once($CFG->dirroot . '/course/lib.php');

@@ -58,7 +58,7 @@ class block_workflow_renderer extends plugin_renderer_base {
             $output .= html_writer::tag('h3', get_string('tobecompletedby', 'block_workflow'));
 
             $who = '';
-            $whoelse = array();
+            $whoelse = [];
 
             // Got through the list.
             foreach ($roles as $role) {
@@ -99,9 +99,9 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // Comments.
         $output .= html_writer::tag('h3', get_string('comments', 'block_workflow'));
-        $commentsblock = html_writer::start_tag('div', array('class' => 'block_workflow_comments'));
+        $commentsblock = html_writer::start_tag('div', ['class' => 'block_workflow_comments']);
         $commenttext = shorten_text(format_text($state->comment, $state->commentformat,
-                array('context' => $state->context())), BLOCK_WORKFLOW_MAX_COMMENT_LENGTH);
+                ['context' => $state->context()]), BLOCK_WORKFLOW_MAX_COMMENT_LENGTH);
         if ($commenttext) {
             $commentsblock .= $commenttext;
         } else {
@@ -113,7 +113,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         // To-do list overview.
         if ($todos = $state->todos()) {
             $output .= html_writer::tag('h3', get_string('todolisttitle', 'block_workflow'));
-            $list = html_writer::start_tag('ul', array('class' => 'block_workflow_todolist'));
+            $list = html_writer::start_tag('ul', ['class' => 'block_workflow_todolist']);
             foreach ($state->todos() as $todo) {
                 $list .= $this->block_display_todo_item($todo, $state->id, $canmakechanges);
             }
@@ -124,7 +124,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         if ($canmakechanges) {
             // Edit comments.
             $url    = new moodle_url('/blocks/workflow/editcomment.php',
-                    array('stateid' => $state->id));
+                    ['stateid' => $state->id]);
             $editbutton = new single_button($url, get_string('editcomments', 'block_workflow'), 'get');
             $editbutton->class = 'singlebutton block_workflow_editcommentbutton';
 
@@ -142,7 +142,7 @@ class block_workflow_renderer extends plugin_renderer_base {
 
             // Finish step.
             $url = new moodle_url('/blocks/workflow/finishstep.php',
-                    array('stateid' => $state->id));
+                    ['stateid' => $state->id]);
             $finishbutton = new single_button($url, get_string('finishstep', 'block_workflow'), 'get');
             $finishbutton->class = 'singlebutton block_workflow_finishstepbutton';
 
@@ -161,8 +161,8 @@ class block_workflow_renderer extends plugin_renderer_base {
      * @return string HTML of the button.
      */
     public function workflow_overview_button($contextid, $workflowid) {
-        $url = new moodle_url('/blocks/workflow/overview.php', array(
-                'contextid' => $contextid, 'workflowid' => $workflowid));
+        $url = new moodle_url('/blocks/workflow/overview.php', [
+                'contextid' => $contextid, 'workflowid' => $workflowid]);
         $overviewbutton = new single_button($url,
                 get_string('workflowoverview', 'block_workflow'), 'get');
         return html_writer::tag('div', $this->output->render($overviewbutton));
@@ -178,7 +178,7 @@ class block_workflow_renderer extends plugin_renderer_base {
      */
     public function block_display_todo_item($todo, $stateid, $editable) {
         global $CFG;
-        $todoattribs = array();
+        $todoattribs = [];
 
         // The contents of the list item.
         $text = format_string($todo->task);
@@ -192,9 +192,9 @@ class block_workflow_renderer extends plugin_renderer_base {
             // Generate the URL and Link.
             $returnurl = str_replace($CFG->wwwroot, '', $this->page->url->out(false));
             $url = new moodle_url('/blocks/workflow/toggletaskdone.php',
-                    array('sesskey' => sesskey(), 'stateid' => $stateid, 'todoid' => $todo->id, 'returnurl' => $returnurl));
+                    ['sesskey' => sesskey(), 'stateid' => $stateid, 'todoid' => $todo->id, 'returnurl' => $returnurl]);
             $li  = html_writer::tag('li', html_writer::link($url, $text,
-                    array('class' => 'block-workflow-todotask', 'id' => 'block-workflow-todoid-' . $todo->id)),
+                    ['class' => 'block-workflow-todotask', 'id' => 'block-workflow-todoid-' . $todo->id]),
                     $todoattribs);
         } else {
             $li  = html_writer::tag('li', $text, $todoattribs);
@@ -213,7 +213,7 @@ class block_workflow_renderer extends plugin_renderer_base {
      * @return string the HTML to output.
      */
     public function block_display_no_more_steps($parentcontextid,
-            $canadd, array $addableworkflows, array $previous = null) {
+            $canadd, array $addableworkflows, ?array $previous = null) {
         $output = '';
 
         if ($previous) {
@@ -233,9 +233,9 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         if ($addableworkflows) {
             $url = new moodle_url('/blocks/workflow/addworkflow.php',
-                    array('sesskey' => sesskey(), 'contextid' => $parentcontextid));
+                    ['sesskey' => sesskey(), 'contextid' => $parentcontextid]);
 
-            $addoptions = array();
+            $addoptions = [];
             foreach ($addableworkflows as $wf) {
                 $addoptions[$wf->id] = $wf->name;
             }
@@ -300,9 +300,9 @@ class block_workflow_renderer extends plugin_renderer_base {
         // Display the current workflows.
         $table = new html_table();
         $table->attributes['class'] = '';
-        $table->head        = array();
-        $table->colclasses  = array();
-        $table->data        = array();
+        $table->head        = [];
+        $table->colclasses  = [];
+        $table->data        = [];
         $table->head[]      = get_string('shortname', 'block_workflow');
         $table->head[]      = get_string('name', 'block_workflow');
         $table->head[]      = get_string('appliesto', 'block_workflow');
@@ -317,25 +317,29 @@ class block_workflow_renderer extends plugin_renderer_base {
         // Create a new workflow.
         $emptycell = new html_table_cell();
         $emptycell->colspan = 3;
-        $actions = array();
-        $add = html_writer::empty_tag('img', array('src'   => $this->output->image_url('t/add'),
-                                                   'class' => 'iconsmall',
-                                                   'title' => get_string('createworkflow', 'block_workflow'),
-                                                   'alt'   => get_string('createworkflow', 'block_workflow')
-                                                ));
+        $actions = [];
+        $add = html_writer::empty_tag('img',
+            [
+                'src'   => $this->output->image_url('t/add'),
+                'class' => 'iconsmall',
+                'title' => get_string('createworkflow', 'block_workflow'),
+                'alt'   => get_string('createworkflow', 'block_workflow'),
+            ]);
         $url = new moodle_url('/blocks/workflow/editsettings.php');
         $actions[] = html_writer::link($url, $add);
-        $add = html_writer::empty_tag('img', array('src'   => $this->output->image_url('t/restore'),
-                                                   'class' => 'iconsmall',
-                                                   'title' => get_string('importworkflow', 'block_workflow'),
-                                                   'alt'   => get_string('importworkflow', 'block_workflow')
-                                                ));
+        $add = html_writer::empty_tag('img',
+            [
+                'src' => $this->output->image_url('t/restore'),
+                'class' => 'iconsmall',
+                'title' => get_string('importworkflow', 'block_workflow'),
+                'alt'   => get_string('importworkflow', 'block_workflow'),
+            ]);
         $url = new moodle_url('/blocks/workflow/import.php');
         $actions[] = html_writer::link($url, $add);
         $addimportcell = new html_table_cell(implode(' ', $actions));
         $addimportcell->attributes['class'] = 'mdl-align';
 
-        $row = new html_table_row(array($emptycell, $addimportcell));
+        $row = new html_table_row([$emptycell, $addimportcell]);
         $table->data[] = $row;
         $output .= html_writer::table($table);
         return $output;
@@ -368,71 +372,71 @@ class block_workflow_renderer extends plugin_renderer_base {
         $row->cells[] = $cell;
 
         // View/Edit steps.
-        $url = new moodle_url('/blocks/workflow/editsteps.php', array('workflowid' => $workflow->id));
-        $actions[] = html_writer::link($url, html_writer::empty_tag('img', array(
+        $url = new moodle_url('/blocks/workflow/editsteps.php', ['workflowid' => $workflow->id]);
+        $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
                 'src'   => $this->output->image_url('t/edit'),
                 'class' => 'iconsmall',
                 'title' => get_string('vieweditworkflow', 'block_workflow'),
-                'alt'   => get_string('vieweditworkflow', 'block_workflow')
-            )));
+                'alt'   => get_string('vieweditworkflow', 'block_workflow'),
+            ]));
 
         // Export workflow.
-        $url = new moodle_url('/blocks/workflow/export.php', array('sesskey' => sesskey(), 'workflowid' => $workflow->id));
-        $actions[] = html_writer::link($url, html_writer::empty_tag('img', array(
+        $url = new moodle_url('/blocks/workflow/export.php', ['sesskey' => sesskey(), 'workflowid' => $workflow->id]);
+        $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
                 'src'   => $this->output->image_url('t/backup'),
                 'class' => 'iconsmall',
                 'title' => get_string('exportworkflow', 'block_workflow'),
-                'alt'   => get_string('exportworkflow', 'block_workflow')
-            )));
+                'alt'   => get_string('exportworkflow', 'block_workflow'),
+            ]));
 
         // Clone workflow.
-        $url = new moodle_url('/blocks/workflow/clone.php', array('workflowid' => $workflow->id));
-        $actions[] = html_writer::link($url, html_writer::empty_tag('img', array(
+        $url = new moodle_url('/blocks/workflow/clone.php', ['workflowid' => $workflow->id]);
+        $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
                 'src'   => $this->output->image_url('t/copy'),
                 'class' => 'iconsmall',
                 'title' => get_string('cloneworkflow', 'block_workflow'),
-                'alt'   => get_string('cloneworkflow', 'block_workflow')
-            )));
+                'alt'   => get_string('cloneworkflow', 'block_workflow'),
+            ]));
 
         // Disable/Enable workflow.
         $cell = new html_table_cell();
         if ($workflow->obsolete == BLOCK_WORKFLOW_ENABLED) {
             $url = new moodle_url('/blocks/workflow/toggleworkflowobsolete.php',
-                    array('sesskey' => sesskey(), 'workflowid' => $workflow->id));
-            $actions[] = html_writer::link($url, html_writer::empty_tag('img', array(
+                    ['sesskey' => sesskey(), 'workflowid' => $workflow->id]);
+            $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
                     'src'   => $this->output->image_url('t/hide'),
                     'class' => 'iconsmall',
                     'title' => get_string('disableworkflow', 'block_workflow'),
-                    'alt'   => get_string('disableworkflow', 'block_workflow')
-                )));
+                    'alt'   => get_string('disableworkflow', 'block_workflow'),
+                ]));
         } else {
             $url = new moodle_url('/blocks/workflow/toggleworkflowobsolete.php',
-                    array('sesskey' => sesskey(), 'workflowid' => $workflow->id));
-            $actions[] = html_writer::link($url, html_writer::empty_tag('img', array(
+                    ['sesskey' => sesskey(), 'workflowid' => $workflow->id]);
+            $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
                     'src'   => $this->output->image_url('t/show'),
                     'class' => 'iconsmall',
                     'title' => get_string('enableworkflow', 'block_workflow'),
-                    'alt'   => get_string('enableworkflow', 'block_workflow')
-                )));
+                    'alt'   => get_string('enableworkflow', 'block_workflow'),
+                ]));
         }
 
         // Remove workflow.
         if ($workflow->is_deletable) {
-            $url = new moodle_url('/blocks/workflow/delete.php', array('workflowid' => $workflow->id));
-            $actions[] = html_writer::link($url, html_writer::empty_tag('img', array(
+            $url = new moodle_url('/blocks/workflow/delete.php', ['workflowid' => $workflow->id]);
+            $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
                     'src'   => $this->output->image_url('t/delete'),
                     'class' => 'iconsmall',
                     'title' => get_string('removeworkflow', 'block_workflow'),
-                    'alt'   => get_string('removeworkflow', 'block_workflow')
-                )));
+                    'alt'   => get_string('removeworkflow', 'block_workflow'),
+                ]));
         } else {
             $a = block_workflow_workflow::in_use_by($workflow->id);
-            $actions[] = html_writer::empty_tag('img', array(
+            $actions[] = html_writer::empty_tag('img', [
                     'src'   => $this->output->image_url('t/delete'),
                     'class' => 'iconsmall',
                     'title' => get_string('cannotdeleteworkflowinuseby', 'block_workflow', $a),
-                    'alt'   => get_string('removeworkflow', 'block_workflow')
-                ));
+                    'alt'   => get_string('removeworkflow', 'block_workflow'),
+                ]);
         }
 
         $cell = new html_table_cell(implode(' ', $actions));
@@ -466,15 +470,17 @@ class block_workflow_renderer extends plugin_renderer_base {
         // Create a new email.
         $emptycell  = new html_table_cell();
         $emptycell->colspan = 2;
-        $add = html_writer::empty_tag('img', array('src'   => $this->output->image_url('t/add'),
-                                                   'class' => 'iconsmall',
-                                                   'title' => get_string('addemail', 'block_workflow'),
-                                                   'alt'   => get_string('addemail', 'block_workflow')
-                                                ));
+        $add = html_writer::empty_tag('img',
+            [
+                'src'   => $this->output->image_url('t/add'),
+                'class' => 'iconsmall',
+                'title' => get_string('addemail', 'block_workflow'),
+                'alt'   => get_string('addemail', 'block_workflow'),
+            ]);
         $url = new moodle_url('/blocks/workflow/editemail.php');
         $addnewcell = new html_table_cell(html_writer::link($url, $add));
         $addnewcell->attributes['class'] = 'mdl-align';
-        $row = new html_table_row(array($emptycell, $addnewcell));
+        $row = new html_table_row([$emptycell, $addnewcell]);
         $table->data[] = $row;
 
         $output .= html_writer::table($table);
@@ -502,30 +508,30 @@ class block_workflow_renderer extends plugin_renderer_base {
         $row->cells[] = $cell;
 
         // View/Edit steps.
-        $url = new moodle_url('/blocks/workflow/editemail.php', array('emailid' => $email->id));
-        $actions[] = html_writer::link($url, html_writer::empty_tag('img', array(
+        $url = new moodle_url('/blocks/workflow/editemail.php', ['emailid' => $email->id]);
+        $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
                 'src'   => $this->output->image_url('t/edit'),
                 'class' => 'iconsmall',
                 'title' => get_string('vieweditemail', 'block_workflow'),
                 'alt'   => get_string('vieweditemail', 'block_workflow'),
-            )));
+            ]));
 
         // Remove email.
         if ($email->activecount || $email->completecount) {
-            $actions[] = html_writer::empty_tag('img', array(
+            $actions[] = html_writer::empty_tag('img', [
                     'src'   => $this->output->image_url('t/delete'),
                     'class' => 'iconsmall',
                     'title' => get_string('cannotremoveemailinuse', 'block_workflow'),
                     'alt'   => get_string('deleteemail', 'block_workflow'),
-                ));
+                ]);
         } else {
-            $url = new moodle_url('/blocks/workflow/deleteemail.php', array('emailid' => $email->id));
-            $actions[] = html_writer::link($url, html_writer::empty_tag('img', array(
+            $url = new moodle_url('/blocks/workflow/deleteemail.php', ['emailid' => $email->id]);
+            $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
                     'src'   => $this->output->image_url('t/delete'),
                     'class' => 'iconsmall',
                     'title' => get_string('deleteemail', 'block_workflow'),
                     'alt'   => get_string('deleteemail', 'block_workflow'),
-                )));
+                ]));
         }
 
         // Add the steps.
@@ -567,19 +573,21 @@ class block_workflow_renderer extends plugin_renderer_base {
         $info->appliesto    = $workflow->appliesto;
 
         // The image to add a new step.
-        $add = html_writer::empty_tag('img', array('src'   => $this->output->image_url('t/add'),
-                                                   'class' => 'iconsmall',
-                                                   'title' => get_string('addstep', 'block_workflow'),
-                                                   'alt'   => get_string('addstep', 'block_workflow')
-                                                ));
+        $add = html_writer::empty_tag('img',
+            [
+                'src' => $this->output->image_url('t/add'),
+                'class' => 'iconsmall',
+                'title' => get_string('addstep', 'block_workflow'),
+                'alt'   => get_string('addstep', 'block_workflow'),
+            ]);
 
         // Add a step to the beginning.
         $addempty = new html_table_cell();
         $addempty->colspan = 5;
         $addcell = new html_table_cell(html_writer::link(new moodle_url('/blocks/workflow/editstep.php',
-                array('workflowid' => $workflow->id, 'beforeafter' => -1)), $add));
+                ['workflowid' => $workflow->id, 'beforeafter' => -1]), $add));
         $addcell->attributes['class'] = 'mdl-align';
-        $addrow = new html_table_row(array($addempty, $addcell));
+        $addrow = new html_table_row([$addempty, $addcell]);
         $table->data[] = $addrow;
 
         // Process the other steps.
@@ -595,11 +603,11 @@ class block_workflow_renderer extends plugin_renderer_base {
         $infocell->colspan = 5;
         $infocell->attributes['class'] = 'mdl-align';
 
-        $url = new moodle_url('/blocks/workflow/editstep.php', array('workflowid' => $workflow->id));
+        $url = new moodle_url('/blocks/workflow/editstep.php', ['workflowid' => $workflow->id]);
         $addnewcell = new html_table_cell(html_writer::link($url, $add));
         $addnewcell->attributes['class'] = 'mdl-align';
 
-        $row = new html_table_row(array($infocell, $addnewcell));
+        $row = new html_table_row([$infocell, $addnewcell]);
         $table->data[] = $row;
 
         // Display the table.
@@ -608,6 +616,13 @@ class block_workflow_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Renders a single workflow step.
+     *
+     * @param object $step The workflow step object containing step details.
+     * @param object $info Additional information related to the workflow step.
+     * @return html_table_row The rendered HTML output for the workflow step.
+     */
     protected function workflow_step($step, $info) {
         $row = new html_table_row();
 
@@ -633,57 +648,60 @@ class block_workflow_renderer extends plugin_renderer_base {
         $row->cells[] = $cell;
 
         // Modification.
-        $actions = array();
-        $url = new moodle_url('/blocks/workflow/editstep.php', array('stepid' => $step->id));
-        $actions[] = html_writer::link($url, html_writer::empty_tag('img', array('src' => $this->output->image_url('t/edit'),
-                                                                           'class' => 'iconsmall',
-                                                                           'title' => get_string('editstep', 'block_workflow'),
-                                                                           'alt'   => get_string('editstep', 'block_workflow')
-                                                                        )));
+        $actions = [];
+        $url = new moodle_url('/blocks/workflow/editstep.php', ['stepid' => $step->id]);
+        $actions[] = html_writer::link($url, html_writer::empty_tag('img',
+            [
+                'src' => $this->output->image_url('t/edit'),
+                'class' => 'iconsmall',
+                'title' => get_string('editstep', 'block_workflow'),
+                'alt'   => get_string('editstep', 'block_workflow'),
+            ]
+        ));
 
         // Add step after this one.
         $url = new moodle_url('/blocks/workflow/editstep.php',
-                array('workflowid' => $info->workflowid, 'beforeafter' => $step->stepno));
-        $actions[] = html_writer::link($url, html_writer::empty_tag('img', array(
+                ['workflowid' => $info->workflowid, 'beforeafter' => $step->stepno]);
+        $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
                 'src' => $this->output->image_url('t/add'),
                 'class' => 'iconsmall',
                 'title' => get_string('addstepafter', 'block_workflow'),
-                'alt'   => get_string('addstepafter', 'block_workflow')
-            )));
+                'alt'   => get_string('addstepafter', 'block_workflow'),
+            ]));
 
         // Can't be removed if this is the only step or in use.
         if ($info->stepcount != 1 && !block_workflow_step::is_step_in_use($step->id)) {
-            $url = new moodle_url('/blocks/workflow/deletestep.php', array('stepid' => $step->id));
-            $actions[] = html_writer::link($url, html_writer::empty_tag('img', array(
+            $url = new moodle_url('/blocks/workflow/deletestep.php', ['stepid' => $step->id]);
+            $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
                     'src' => $this->output->image_url('t/delete'),
                     'class' => 'iconsmall',
                     'title' => get_string('removestep', 'block_workflow'),
-                    'alt'   => get_string('removestep', 'block_workflow')
-                )));
+                    'alt'   => get_string('removestep', 'block_workflow'),
+                ]));
         }
 
         // Move up if this is not the first step.
         if ($step->stepno != 1) {
             $url = new moodle_url('/blocks/workflow/movestep.php',
-                    array('sesskey' => sesskey(), 'id' => $step->id, 'direction' => 'up'));
-            $actions[] = html_writer::link($url, html_writer::empty_tag('img', array(
+                    ['sesskey' => sesskey(), 'id' => $step->id, 'direction' => 'up']);
+            $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
                     'src'   => $this->output->image_url('t/up'),
                     'class' => 'iconsmall',
                     'title' => get_string('moveup', 'block_workflow'),
-                    'alt'   => get_string('moveup', 'block_workflow')
-                )));
+                    'alt'   => get_string('moveup', 'block_workflow'),
+                ]));
         }
 
         // Move down if this is not the final step.
         if (!isset($step->finalstep)) {
             $url = new moodle_url('/blocks/workflow/movestep.php',
-                    array('sesskey' => sesskey(), 'id' => $step->id, 'direction' => 'down'));
-            $actions[] = html_writer::link($url, html_writer::empty_tag('img', array(
+                    ['sesskey' => sesskey(), 'id' => $step->id, 'direction' => 'down']);
+            $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
                     'src'   => $this->output->image_url('t/down'),
                     'class' => 'iconsmall',
                     'title' => get_string('movedown', 'block_workflow'),
-                    'alt'   => get_string('movedown', 'block_workflow')
-                )));
+                    'alt'   => get_string('movedown', 'block_workflow'),
+                ]));
         }
 
         $cell = new html_table_cell(implode(' ', $actions));
@@ -741,13 +759,19 @@ class block_workflow_renderer extends plugin_renderer_base {
      */
     protected function workflow_step_doers($stepdata) {
         $step = block_workflow_step::make($stepdata);
-        $doernames = array();
+        $doernames = [];
         foreach ($step->roles() as $doer) {
             $doernames[] = $doer->localname;
         }
         return implode(', ', $doernames);
     }
 
+    /**
+     * Displays detailed information about the given workflow.
+     *
+     * @param object $workflow The workflow object containing workflow details to be displayed.
+     * @return string The rendered HTML output for the workflow information.
+     */
     protected function workflow_information($workflow) {
         $output = '';
 
@@ -756,29 +780,29 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         $table = $this->setup_table();
         // Workflow name and shortname.
-        $row = new html_table_row(array(get_string('name', 'block_workflow')));
+        $row = new html_table_row([get_string('name', 'block_workflow')]);
         $cell = new html_table_cell();
-        $data = array('name' => format_string($workflow->name), 'shortname' => s($workflow->shortname));
+        $data = ['name' => format_string($workflow->name), 'shortname' => s($workflow->shortname)];
         $cell->text = get_string('nameshortname', 'block_workflow', $data);
         $row->cells[] = $cell;
         $table->data[] = $row;
 
         // Description.
-        $row = new html_table_row(array(get_string('description', 'block_workflow')));
+        $row = new html_table_row([get_string('description', 'block_workflow')]);
         $cell = new html_table_cell();
         $cell->text = format_text($workflow->description, $workflow->descriptionformat);
         $row->cells[] = $cell;
         $table->data[] = $row;
 
         // What contexts does this block apply to.
-        $row = new html_table_row(array(get_string('appliesto', 'block_workflow')));
+        $row = new html_table_row([get_string('appliesto', 'block_workflow')]);
         $cell = new html_table_cell();
         $cell->text = $workflow->appliesto;
         $row->cells[] = $cell;
         $table->data[] = $row;
 
         // Status information.
-        $row = new html_table_row(array(get_string('status', 'block_workflow')));
+        $row = new html_table_row([get_string('status', 'block_workflow')]);
         $cell = new html_table_cell();
         if ($workflow->obsolete == BLOCK_WORKFLOW_OBSOLETE) {
             $cell->text = get_string('obsoleteworkflow', 'block_workflow');
@@ -789,7 +813,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         $table->data[] = $row;
 
         // Other info.
-        $row = new html_table_row(array(get_string('inuseby', 'block_workflow')));
+        $row = new html_table_row([get_string('inuseby', 'block_workflow')]);
         $cell = new html_table_cell('This workflow is active in x contexts');
         $row->cells[] = $cell;
         $table->data[] = $row;
@@ -815,36 +839,36 @@ class block_workflow_renderer extends plugin_renderer_base {
         $table->attributes['class'] = '';
 
         // Shortname.
-        $row = new html_table_row(array(
+        $row = new html_table_row([
             get_string('shortname', 'block_workflow'),
             s($workflow->shortname),
-        ));
+        ]);
         $table->data[] = $row;
 
         // Name.
-        $row = new html_table_row(array(
+        $row = new html_table_row([
             get_string('name', 'block_workflow'),
             format_string($workflow->name),
-        ));
+        ]);
         $table->data[] = $row;
 
         // Description.
-        $row = new html_table_row(array(
+        $row = new html_table_row([
             get_string('description', 'block_workflow'),
             format_text($workflow->description, $workflow->descriptionformat),
-        ));
+        ]);
         $table->data[] = $row;
 
         // Applies to.
-        $row = new html_table_row(array(
+        $row = new html_table_row([
             get_string('thisworkflowappliesto', 'block_workflow'),
             block_workflow_appliesto($workflow->appliesto),
-        ));
+        ]);
         $table->data[] = $row;
 
         // Current status.
         $togglelink = new moodle_url('/blocks/workflow/toggleworkflowobsolete.php',
-                array('workflowid' => $workflow->id, 'returnto' => 'editsteps', 'sesskey' => sesskey()));
+                ['workflowid' => $workflow->id, 'returnto' => 'editsteps', 'sesskey' => sesskey()]);
         if ($workflow->obsolete) {
             $status = get_string('workflowobsolete', 'block_workflow', $togglelink->out());
         } else {
@@ -857,10 +881,10 @@ class block_workflow_renderer extends plugin_renderer_base {
             $status .= get_string('notcurrentlyinuse', 'block_workflow');
         }
 
-        $row = new html_table_row(array(
+        $row = new html_table_row([
             get_string('workflowstatus', 'block_workflow'),
-            $status
-        ));
+            $status,
+        ]);
         $table->data[] = $row;
 
         // Workflow actions.
@@ -869,23 +893,23 @@ class block_workflow_renderer extends plugin_renderer_base {
         $cell->colspan = 2;
         $cell->attributes['class'] = 'mdl-align';
 
-        $actions = array();
+        $actions = [];
 
         // Edit the workflow.
-        $url = new moodle_url('/blocks/workflow/editsettings.php', array('workflowid' => $workflow->id));
+        $url = new moodle_url('/blocks/workflow/editsettings.php', ['workflowid' => $workflow->id]);
         $actions[] = html_writer::link($url, get_string('edit', 'block_workflow'));
 
         // Clone the workflow.
-        $url = new moodle_url('/blocks/workflow/clone.php', array('workflowid' => $workflow->id));
+        $url = new moodle_url('/blocks/workflow/clone.php', ['workflowid' => $workflow->id]);
         $actions[] = html_writer::link($url, get_string('clone', 'block_workflow'));
 
         // Export the workflow.
-        $url = new moodle_url('/blocks/workflow/export.php', array('sesskey' => sesskey(), 'workflowid' => $workflow->id));
+        $url = new moodle_url('/blocks/workflow/export.php', ['sesskey' => sesskey(), 'workflowid' => $workflow->id]);
         $actions[] = html_writer::link($url, get_string('export', 'block_workflow'));
 
         if (block_workflow_workflow::is_workflow_deletable($workflow->id)) {
             // Delete the workflow.
-            $url = new moodle_url('/blocks/workflow/delete.php', array('workflowid' => $workflow->id));
+            $url = new moodle_url('/blocks/workflow/delete.php', ['workflowid' => $workflow->id]);
             $actions[] = html_writer::link($url, get_string('delete', 'block_workflow'));
         }
 
@@ -900,6 +924,13 @@ class block_workflow_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Renders the to-do list for a given workflow step.
+     *
+     * @param array $todos An array of to-do items associated with the workflow step.
+     * @param object $step The workflow step object for which the to-do list is being rendered.
+     * @return string The HTML output for the to-do list.
+     */
     public function step_todolist($todos, $step) {
         $output = '';
 
@@ -918,15 +949,16 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // Add option to add a new task.
         $emptycell  = new html_table_cell();
-        $add = html_writer::empty_tag('img', array('src'   => $this->output->image_url('t/add'),
-                                                   'class' => 'iconsmall',
-                                                   'title' => get_string('addtask', 'block_workflow'),
-                                                   'alt'   => get_string('addtask', 'block_workflow')
-                                                ));
-        $url = new moodle_url('/blocks/workflow/edittask.php', array('stepid' => $step->id));
+        $add = html_writer::empty_tag('img', [
+            'src'   => $this->output->image_url('t/add'),
+            'class' => 'iconsmall',
+            'title' => get_string('addtask', 'block_workflow'),
+            'alt'   => get_string('addtask', 'block_workflow'),
+        ]);
+        $url = new moodle_url('/blocks/workflow/edittask.php', ['stepid' => $step->id]);
         $addnewcell = new html_table_cell(html_writer::link($url, $add));
 
-        $row = new html_table_row(array($emptycell, $addnewcell));
+        $row = new html_table_row([$emptycell, $addnewcell]);
         $table->data[] = $row;
 
         // Display the table.
@@ -934,52 +966,71 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         return $output;
     }
+
+    /**
+     * Renders a to-do list item for a workflow step.
+     *
+     * @param stdClass $task The task object containing information about the workflow step.
+     * @return string The HTML output for the to-do list item.
+     */
     protected function step_todolist_item(stdClass $task) {
         $row    = new html_table_row();
         $name   = new html_table_cell(format_string($task->task));
-        $actions = array();
+        $actions = [];
 
-        $url    = new moodle_url('/blocks/workflow/edittask.php', array('id' => $task->id));
-        $actions[] = html_writer::link($url, html_writer::empty_tag('img', array('src'   => $this->output->image_url('t/edit'),
-                                                                           'class' => 'iconsmall',
-                                                                           'title' => get_string('edittask', 'block_workflow'),
-                                                                           'alt'   => get_string('edittask', 'block_workflow')
-                                                                        )));
+        $url    = new moodle_url('/blocks/workflow/edittask.php', ['id' => $task->id]);
+        $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
+            'src'   => $this->output->image_url('t/edit'),
+            'class' => 'iconsmall',
+            'title' => get_string('edittask', 'block_workflow'),
+            'alt'   => get_string('edittask', 'block_workflow'),
+        ]));
 
         // Obsolete task.
-        $url = new moodle_url('/blocks/workflow/toggletaskobsolete.php', array('sesskey' => sesskey(), 'taskid' => $task->id));
+        $url = new moodle_url('/blocks/workflow/toggletaskobsolete.php', ['sesskey' => sesskey(), 'taskid' => $task->id]);
         if ($task->obsolete == BLOCK_WORKFLOW_ENABLED) {
-            $actions[] = html_writer::link($url, html_writer::empty_tag('img', array('src'   => $this->output->image_url('t/hide'),
-                                                                            'class' => 'iconsmall',
-                                                                            'title' => get_string('hidetask', 'block_workflow'),
-                                                                            'alt'   => get_string('hidetask', 'block_workflow')
-                                                                            )));
+            $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
+                'src'   => $this->output->image_url('t/hide'),
+                'class' => 'iconsmall',
+                'title' => get_string('hidetask', 'block_workflow'),
+                'alt'   => get_string('hidetask', 'block_workflow'),
+            ]));
         } else {
-            $actions[] = html_writer::link($url, html_writer::empty_tag('img', array('src'   => $this->output->image_url('t/show'),
-                                                                            'class' => 'iconsmall',
-                                                                            'title' => get_string('showtask', 'block_workflow'),
-                                                                            'alt'   => get_string('showtask', 'block_workflow')
-                                                                            )));
+            $actions[] = html_writer::link($url, html_writer::empty_tag('img', [
+                'src'   => $this->output->image_url('t/show'),
+                'class' => 'iconsmall',
+                'title' => get_string('showtask', 'block_workflow'),
+                'alt'   => get_string('showtask', 'block_workflow'),
+            ]));
         }
 
         // Delete task.
         if ($task->isremovable) {
-            $url    = new moodle_url('/blocks/workflow/deletetask.php', array('id' => $task->id));
+            $url    = new moodle_url('/blocks/workflow/deletetask.php', ['id' => $task->id]);
             $actions[] = html_writer::link($url,
-                    html_writer::empty_tag('img', array('src' => $this->output->image_url('t/delete'),
-                            'class' => 'iconsmall',
-                            'title' => get_string('removetask', 'block_workflow'),
-                            'alt'   => get_string('removetask', 'block_workflow')
-                    )));
+                html_writer::empty_tag('img', [
+                    'src' => $this->output->image_url('t/delete'),
+                    'class' => 'iconsmall',
+                    'title' => get_string('removetask', 'block_workflow'),
+                    'alt'   => get_string('removetask', 'block_workflow'),
+            ]));
         }
 
         $actions = new html_table_cell(implode(' ', $actions));
 
         // Put it all together into a row and return the data.
-        $row    = new html_table_row(array($name, $actions));
+        $row    = new html_table_row([$name, $actions]);
         return $row;
     }
 
+    /**
+     * Generates the step doers.
+     *
+     * @param array $roles Array of role objects or IDs relevant to the workflow step.
+     * @param array $doers Array of user objects or IDs who are assigned as doers for the step.
+     * @param int $stepid The unique identifier of the workflow step.
+     * @return string HTML output displaying the doers for the specified step.
+     */
     public function step_doers($roles, $doers, $stepid) {
         $output = '';
 
@@ -1009,30 +1060,38 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         return $output;
     }
+
+    /**
+     * Returns the user or entity responsible for performing a specific workflow step.
+     *
+     * @param object $role The role or identifier of the doer.
+     * @param int $stepid The ID of the workflow step.
+     * @return string The doer of the specified workflow step.
+     */
     protected function step_doer($role, $stepid) {
         $row    = new html_table_row();
         $name   = new html_table_cell($role->localname);
 
         $url = new moodle_url('/blocks/workflow/togglerole.php',
-                array('sesskey' => sesskey(), 'roleid' => $role->id, 'stepid' => $stepid));
+                ['sesskey' => sesskey(), 'roleid' => $role->id, 'stepid' => $stepid]);
         if ($role->doer) {
-            $actions = html_writer::link($url, html_writer::empty_tag('img', array(
+            $actions = html_writer::link($url, html_writer::empty_tag('img', [
                     'src'   => $this->output->image_url('t/delete'),
                     'class' => 'iconsmall',
                     'title' => get_string('removerolefromstep', 'block_workflow'),
-                    'alt'   => get_string('removerolefromstep', 'block_workflow')
-                )));
+                    'alt'   => get_string('removerolefromstep', 'block_workflow'),
+                ]));
         } else {
-            $actions = html_writer::link($url, html_writer::empty_tag('img', array(
+            $actions = html_writer::link($url, html_writer::empty_tag('img', [
                     'src'   => $this->output->image_url('t/add'),
                     'class' => 'iconsmall',
                     'title' => get_string('addroletostep', 'block_workflow'),
-                    'alt'   => get_string('addroletostep', 'block_workflow')
-                )));
+                    'alt'   => get_string('addroletostep', 'block_workflow'),
+                ]));
         }
 
         // Put it all together into a row and return the data.
-        $row    = new html_table_row(array($name, $actions));
+        $row    = new html_table_row([$name, $actions]);
         return $row;
     }
 
@@ -1115,9 +1174,9 @@ class block_workflow_renderer extends plugin_renderer_base {
      */
     protected function setup_table() {
         $table = new html_table();
-        $table->head        = array();
-        $table->colclasses  = array();
-        $table->data        = array();
+        $table->head        = [];
+        $table->colclasses  = [];
+        $table->data        = [];
         return $table;
     }
 
@@ -1130,6 +1189,14 @@ class block_workflow_renderer extends plugin_renderer_base {
         return 'generalbox boxwidthwide boxaligncenter';
     }
 
+    /**
+     * Renders the overview of a workflow.
+     *
+     * @param object $workflow The workflow object containing workflow details.
+     * @param array $states An array of workflow states.
+     * @param object $context The context in which the workflow is being rendered.
+     * @return string The rendered HTML output for the workflow overview.
+     */
     public function workflow_overview($workflow, array $states, $context) {
         $output = '';
 
@@ -1156,19 +1223,26 @@ class block_workflow_renderer extends plugin_renderer_base {
         // Put everything together and return.
         $output .= html_writer::table($table);
         // Put text and button after the table.
-        $output .= html_writer::tag('div', $this->atendgobackto($workflow), array('id' => 'text-after-table'));
+        $output .= html_writer::tag('div', $this->atendgobackto($workflow), ['id' => 'text-after-table']);
         if (has_capability('block/workflow:manage', $context)) {
             $url = new moodle_url('/blocks/workflow/removeworkflow.php',
-                array('contextid' => $context->id, 'workflowid' => $workflow->id));
+                ['contextid' => $context->id, 'workflowid' => $workflow->id]);
             $output .= $this->output->render(new single_button($url, get_string('removeworkflow', 'block_workflow')));
         }
         $output .= $this->box_end();
         return $output;
     }
 
+    /**
+     * Renders the overview for a specific workflow step.
+     *
+     * @param stdClass $stepstate The current state of the workflow step.
+     * @param object $context The context in which the workflow is being rendered.
+     * @return string The rendered HTML output for the workflow step overview.
+     */
     private function workflow_overview_step($stepstate, $context) {
         $row = new html_table_row();
-        $classes = array('step');
+        $classes = ['step'];
 
         // Add some CSS classes to help colour-code the states.
         if ($stepstate->state == BLOCK_WORKFLOW_STATE_ACTIVE) {
@@ -1188,7 +1262,7 @@ class block_workflow_renderer extends plugin_renderer_base {
             $complete = html_writer::tag('span',
                     get_string('percentcomplete', 'block_workflow',
                             format_float($stepstate->complete, 0)),
-                    array('class' => 'completeinfo'));
+                    ['class' => 'completeinfo']);
         } else {
             $complete = '';
         }
@@ -1219,7 +1293,7 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         // Comments.
         $cell = new html_table_cell();
-        $cell->text = format_text($stepstate->comment, $stepstate->commentformat, array('context' => $context));
+        $cell->text = format_text($stepstate->comment, $stepstate->commentformat, ['context' => $context]);
         if (!$cell->text) {
             $cell->text  = get_string('nocomment', 'block_workflow');
         }
@@ -1239,7 +1313,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         $cell = new html_table_cell();
         if ($stepstate->timemodified) {
             $cell->text = $stepstate->modifieduser . html_writer::tag('span',
-                    userdate($stepstate->timemodified), array('class' => 'dateinfo'));
+                    userdate($stepstate->timemodified), ['class' => 'dateinfo']);
         }
         $cell->attributes['class'] = 'mdl-align';
         $row->cells[] = $cell;
@@ -1268,10 +1342,16 @@ class block_workflow_renderer extends plugin_renderer_base {
         return $row;
     }
 
+    /**
+     * Generates the step history overview for a given workflow state.
+     *
+     * @param int $stateid The ID of the workflow state to retrieve the step history for.
+     * @return string The rendered HTML output of the step history overview.
+     */
     private function workflow_overview_step_history($stateid) {
-        $history = array();
+        $history = [];
         foreach (block_workflow_step_state::state_changes($stateid) as $change) {
-            $a = array();
+            $a = [];
             $a['newstate']  = get_string('state_history_' . $change->newstate, 'block_workflow');
             $a['time']      = userdate($change->timestamp);
             $a['user']      = $change->username;
@@ -1288,7 +1368,7 @@ class block_workflow_renderer extends plugin_renderer_base {
      */
     protected function atendgobackto($workflow) {
         // At end go back to ...
-        $a = array();
+        $a = [];
         // ... count the steps.
         $a['stepcount'] = count($workflow->steps());
 
@@ -1307,7 +1387,7 @@ class block_workflow_renderer extends plugin_renderer_base {
      * @return  String  The rendered button to take the user to the finishstep form
      */
     protected function finish_step($stateid) {
-        $url = new moodle_url('/blocks/workflow/finishstep.php', array('stateid' => $stateid));
+        $url = new moodle_url('/blocks/workflow/finishstep.php', ['stateid' => $stateid]);
         return $this->output->render(new single_button($url, get_string('finishstep', 'block_workflow'), 'get'));
     }
 
@@ -1318,7 +1398,7 @@ class block_workflow_renderer extends plugin_renderer_base {
      * @return  String  The rendered button to take the user to the jumptostep form
      */
     protected function jump_to_step($stepid, $contextid) {
-        $url = new moodle_url('/blocks/workflow/jumptostep.php', array('stepid' => $stepid, 'contextid' => $contextid));
+        $url = new moodle_url('/blocks/workflow/jumptostep.php', ['stepid' => $stepid, 'contextid' => $contextid]);
         return $this->output->render(new single_button($url, get_string('jumptostep', 'block_workflow'), 'get'));
     }
 
@@ -1366,16 +1446,16 @@ class block_workflow_renderer extends plugin_renderer_base {
         // Get extra user information from the user policies settings.
         $extrafields = \core_user\fields::get_identity_fields($this->page->context, true);
         // Set up the table header.
-        $tableheader = array();
+        $tableheader = [];
         $tableheader[] = get_string('name');
         foreach ($extrafields as $field) {
             $tableheader[] = \core_user\fields::get_display_name($field);
         }
         $tableheader[] = get_string('roles');
 
-        $data = array();
+        $data = [];
         foreach ($users as $key => $user) {
-            $row = array();
+            $row = [];
             $row[0] = html_writer::tag('b', fullname($user));
             $extraindex = 1;
             if ($extrafields) {
@@ -1405,7 +1485,7 @@ class block_workflow_renderer extends plugin_renderer_base {
             $popupheader .= " (Step $stepno)";
         }
         // Return header and body of the popup.
-        return array($popupheader, html_writer::table($table));
+        return [$popupheader, html_writer::table($table)];
     }
 
     /**
@@ -1419,7 +1499,7 @@ class block_workflow_renderer extends plugin_renderer_base {
         $users = $steptate->get_all_users_and_their_roles($roles, $context);
         $numberofusers = $users === null ? 0 : count($users);
         list ($header, $body) = $this->get_popup_table($users, $stepno);
-        $options = array('class' => 'userinfoclass', 'header' => $header, 'body' => $body, 'stepno' => $stepno);
+        $options = ['class' => 'userinfoclass', 'header' => $header, 'body' => $body, 'stepno' => $stepno];
 
         if (!$roles) {
             return null;

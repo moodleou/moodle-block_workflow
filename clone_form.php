@@ -28,20 +28,27 @@ require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/formslib.php');
 
 
+/**
+ * Form class for cloning a workflow in Moodle.
+ *
+ * This class extends the moodleform base class.
+ */
 class clone_workflow extends moodleform {
+
+    #[\Override]
     protected function definition() {
         $mform = $this->_form;
 
         $mform->addElement('header', 'general', get_string('cloneworkflow', 'block_workflow'));
 
         // Shortname.
-        $mform->addElement('text', 'shortname', get_string('shortname', 'block_workflow'), array('size' => 80, 'maxlength' => 255));
+        $mform->addElement('text', 'shortname', get_string('shortname', 'block_workflow'), ['size' => 80, 'maxlength' => 255]);
         $mform->setType('shortname', PARAM_TEXT);
         $mform->addRule('shortname', null, 'required', null, 'client');
         $mform->addRule('shortname', null, 'maxlength', 255);
 
         // Name.
-        $mform->addElement('text', 'name', get_string('name', 'block_workflow'), array('size' => 80, 'maxlength' => 255));
+        $mform->addElement('text', 'name', get_string('name', 'block_workflow'), ['size' => 80, 'maxlength' => 255]);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', null, 'maxlength', 255);
@@ -61,6 +68,7 @@ class clone_workflow extends moodleform {
         $this->add_action_buttons(true, get_string('clone', 'block_workflow'));
     }
 
+    #[\Override]
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

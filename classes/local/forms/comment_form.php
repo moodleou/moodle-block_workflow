@@ -14,14 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Block workflow comment form.
- *
- * @package block_workflow
- * @copyright 2023 The Open University
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace block_workflow\local\forms;
 
 // Make sure this isn't being directly accessed.
@@ -29,7 +21,16 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
 
+/**
+ * Block workflow comment form.
+ *
+ * @package block_workflow
+ * @copyright 2023 The Open University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class comment_form extends \moodleform {
+
+    #[\Override]
     protected function definition() {
         $mform = $this->_form;
         $editoroptions = [

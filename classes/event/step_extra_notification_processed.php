@@ -43,6 +43,11 @@ namespace block_workflow\event;
  */
 class step_extra_notification_processed extends \core\event\base {
 
+    /**
+     * Init method.
+     *
+     * @return void
+     */
     protected function init() {
         $this->data['objecttable'] = 'block_workflow_steps';
         $this->data['crud'] = 'u';
@@ -65,8 +70,8 @@ class step_extra_notification_processed extends \core\event\base {
                 'workflowid' => $stepstate->step()->workflowid,
                 'timestamp' => $stepstate->timemodified,
                 'stepname' => $stepstate->step()->name,
-                'workflowname' => $stepstate->step()->workflow()->name
-            ]
+                'workflowname' => $stepstate->step()->workflow()->name,
+            ],
         ]);
     }
 

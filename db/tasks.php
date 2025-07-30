@@ -26,25 +26,25 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$tasks = array(
+$tasks = [
     // Run once a day after 05:01 AM.
-    array(
+    [
         'classname' => 'block_workflow\task\send_extra_notification',
         'blocking' => 0,
         'minute' => '1',
         'hour' => '5',
         'day' => '*',
         'month' => '*',
-        'dayofweek' => '*'
-    ),
+        'dayofweek' => '*',
+    ],
     // Run once a day after 01:01 AM.
-    array(
+    [
         'classname' => 'block_workflow\task\finish_step_automatically',
         'blocking' => 0,
         'minute' => '1',
         'hour' => '1',
         'day' => '*',
         'month' => '*',
-        'dayofweek' => '*'
-    )
-);
+        'dayofweek' => '*',
+    ],
+];

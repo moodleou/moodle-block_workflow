@@ -28,7 +28,15 @@ global $CFG;
 require_once($CFG->dirroot . '/lib/form/editor.php');
 
 
+/**
+ * Class block_workflow
+ */
 class block_workflow extends block_base {
+    /**
+     * Initializes the block settings and properties.
+     *
+     * @return void
+     */
     public function init() {
         global $CFG;
         $this->title = get_string('workflow', 'block_workflow');
@@ -81,12 +89,12 @@ class block_workflow extends block_base {
             $this->page->requires->strings_for_js(['editcomments', 'nocomments', 'finishstep'], 'block_workflow');
             $this->page->requires->strings_for_js(['savechanges'], 'moodle');
 
-            $arguments = array(
+            $arguments = [
                 'stateid'    => $state->id,
                 'editorid'   => 'id_wkf-comment-editor',
                 'editorname' => 'comment_editor',
                 'contextid' => $this->instance->parentcontextid,
-            );
+            ];
             $this->page->requires->js_call_amd('block_workflow/comments', 'initComments', [$arguments]);
             $this->page->requires->js_call_amd('block_workflow/todolist', 'initTodolist', [['stateid' => $state->id]]);
 
@@ -130,7 +138,7 @@ class block_workflow extends block_base {
      * @return  array       An array of the applicable formats for the block
      */
     public function applicable_formats() {
-        return array('course' => true, 'mod' => true);
+        return ['course' => true, 'mod' => true];
     }
 
     /**

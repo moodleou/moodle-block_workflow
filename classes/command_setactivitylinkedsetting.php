@@ -47,12 +47,20 @@ class block_workflow_command_setactivitylinkedsetting extends block_workflow_com
     /** @var string used to indicate that the script action is to set values. */
     const CLEAR = 'clear';
 
+    /**
+     * Parses the given arguments and processes the workflow step.
+     *
+     * @param array $args Arguments to be parsed.
+     * @param int $step The workflow step identifier.
+     * @param mixed|null $state Optional state information.
+     * @return stdClass The result of the parsing operation.
+     */
     public function parse($args, $step, $state = null) {
         global $DB;
         $dbman = $DB->get_manager();
 
         $data = new stdClass();
-        $data->errors = array();
+        $data->errors = [];
 
         $workflow = $step->workflow();
 
@@ -106,7 +114,7 @@ class block_workflow_command_setactivitylinkedsetting extends block_workflow_com
         }
 
         if ($data->action == self::SET) {
-            $data->toset = array();
+            $data->toset = [];
             while ($line) {
                 $column = array_shift($line);
                 if (!$dbman->field_exists($data->table, $column)) {
@@ -126,17 +134,24 @@ class block_workflow_command_setactivitylinkedsetting extends block_workflow_com
         return $data;
     }
 
+    /**
+     * Executes the command to set the activity linked setting.
+     *
+     * @param mixed $args  The arguments required for execution.
+     * @param mixed $state The current state or context for the command.
+     * @return void
+     */
     public function execute($args, $state) {
         global $DB;
 
         $data = $this->parse($args, $state->step(), $state);
 
         if ($data->action == self::CLEAR) {
-            $DB->delete_records($data->table, array($data->fkcolumn => $data->cm->instance));
+            $DB->delete_records($data->table, [$data->fkcolumn => $data->cm->instance]);
             return;
         }
 
-        $existingrow = $DB->get_record($data->table, array($data->fkcolumn => $data->cm->instance));
+        $existingrow = $DB->get_record($data->table, [$data->fkcolumn => $data->cm->instance]);
         if ($existingrow) {
             $row = new stdClass();
             $row->id = $existingrow->id;

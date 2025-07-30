@@ -27,12 +27,12 @@ require_once(dirname(__FILE__) . '/external_api_base_lib.php');
  * @copyright 2023 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_step_state_comment_test extends external_api_base_lib {
+final class get_step_state_comment_test extends external_api_base_lib {
 
     /**
      * Test get step state comment successfully.
      *
-     * @covers get_step_state_comment::execute
+     * @covers \get_step_state_comment::execute
      */
     public function test_get_step_state_comment(): void {
         // Call the external service function.
@@ -50,10 +50,10 @@ class get_step_state_comment_test extends external_api_base_lib {
     /**
      * Test get step state comment without capability.
      *
-     * @covers get_step_state_comment::execute
+     * @covers \get_step_state_comment::execute
      * @runInSeparateProcess
      */
-    public function test_get_step_state_comment_failed() {
+    public function test_get_step_state_comment_failed(): void {
         $this->resetAfterTest();
         $this->setUser($this->egstudent);
 

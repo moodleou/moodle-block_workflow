@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 
@@ -38,4 +39,4 @@ require_capability('block/workflow:editdefinitions', context_system::instance())
 $task = block_workflow_todo::toggle_task($taskid);
 
 // Redirect.
-redirect(new moodle_url('/blocks/workflow/editstep.php', array('stepid' => $task->stepid)));
+redirect(new moodle_url('/blocks/workflow/editstep.php', ['stepid' => $task->stepid]));

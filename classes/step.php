@@ -45,27 +45,105 @@
  * @property-read string    $onextranotifyscript The script for processing which email notification should be sent.
  */
 class block_workflow_step {
+    /**
+     * Number of days before the quiz starts.
+     */
     const DAYS_BEFORE_QUIZ = -10;
+
+    /**
+     * Number of days after the quiz ends.
+     */
     const DAYS_AFTER_QUIZ = 10;
+
+    /**
+     * Number of days before the course starts.
+     */
     const DAYS_BEFORE_COURSE = -120;
+
+    /**
+     * Number of days after the course ends.
+     */
     const DAYS_AFTER_COURSE = 30;
 
-    private $step       = null;
-    private $workflow   = null;
-    private $todos      = null;
+    /**
+     * @var mixed|null $step The current step of the workflow. Defaults to null.
+     */
+    private $step;
 
+    /**
+     * @var mixed|null $workflow The workflow associated with the step. Defaults to null.
+     */
+    private $workflow;
+
+    /**
+     * @var mixed|null $todos The list of tasks or actions to be completed in this step. Defaults to null.
+     */
+    private $todos;
+
+    /**
+     * @var int $id The unique identifier for the step.
+     */
     public $id;
+
+    /**
+     * @var int $workflowid The ID of the workflow to which this step belongs.
+     */
     public $workflowid;
+
+    /**
+     * @var int $stepno The step number in the workflow sequence.
+     */
     public $stepno;
+
+    /**
+     * @var string $name The name of the step.
+     */
     public $name;
+
+    /**
+     * @var string $instructions The instructions for completing the step.
+     */
     public $instructions;
+
+    /**
+     * @var int $instructionsformat The format of the instructions (e.g., plain text, HTML).
+     */
     public $instructionsformat;
+
+    /**
+     * @var string|null $onactivescript The script to execute when the step becomes active. Defaults to null.
+     */
     public $onactivescript;
+
+    /**
+     * @var string|null $oncompletescript The script to execute when the step is completed. Defaults to null.
+     */
     public $oncompletescript;
+
+    /**
+     * @var bool $autofinish Whether the step should automatically finish. Defaults to false.
+     */
     public $autofinish;
+
+    /**
+     * @var int|null $autofinishoffset The time offset (in seconds) for automatically finishing the step. Defaults to null.
+     */
     public $autofinishoffset;
+
+    /**
+     * @var string|null $extranotify Additional notification settings for the step. Defaults to null.
+     */
     public $extranotify;
+
+    /**
+     * @var int|null $extranotifyoffset The time offset (in seconds) for sending extra notifications. Defaults to null.
+     */
     public $extranotifyoffset;
+
+
+    /**
+     * @var mixed $onextranotifyscript Holds the extra notification script associated with the workflow step.
+     */
     public $onextranotifyscript;
 
     /**
@@ -89,9 +167,8 @@ class block_workflow_step {
      * @param   stdClass $step Database record to overload into the
      * object   instance
      * @return  The instantiated block_workflow_step object
-     * @access  private
      */
-    private function _load($step) {
+    private function load($step) {
         $this->id                   = $step->id;
         $this->workflowid           = $step->workflowid;
         $this->stepno               = $step->stepno;
@@ -115,7 +192,7 @@ class block_workflow_step {
      */
     public static function make($stepdata) {
         $step = new block_workflow_step();
-        $step->_load($stepdata);
+        $step->load($stepdata);
         return $step;
     }
 
@@ -125,7 +202,7 @@ class block_workflow_step {
      * @return  array   The list of available settings
      */
     public function expected_settings() {
-        return array(
+        return [
             'id',
             'workflowid',
             'stepno',
@@ -138,8 +215,8 @@ class block_workflow_step {
             'autofinishoffset',
             'extranotify',
             'extranotifyoffset',
-            'onextranotifyscript'
-        );
+            'onextranotifyscript',
+        ];
     }
 
     /**
@@ -151,11 +228,11 @@ class block_workflow_step {
      */
     public function load_step($stepid) {
         global $DB;
-        $step = $DB->get_record('block_workflow_steps', array('id' => $stepid));
+        $step = $DB->get_record('block_workflow_steps', ['id' => $stepid]);
         if (!$step) {
             throw new block_workflow_invalid_step_exception(get_string('noactiveworkflow', 'block_workflow'));
         }
-        return $this->_load($step);
+        return $this->load($step);
     }
 
     /**
@@ -169,11 +246,11 @@ class block_workflow_step {
     public function load_workflow_stepno($workflowid, $stepno) {
         global $DB;
         $step = $DB->get_record('block_workflow_steps',
-                array('workflowid' => $workflowid, 'stepno' => $stepno));
+                ['workflowid' => $workflowid, 'stepno' => $stepno]);
         if (!$step) {
             throw new block_workflow_invalid_step_exception(get_string('invalidworkflowstepno', 'block_workflow'));
         }
-        return $this->_load($step);
+        return $this->load($step);
     }
 
     /**
@@ -266,7 +343,7 @@ class block_workflow_step {
         } else {
             // Retrieve the stepno from the final step for this workflow.
             $sql = 'SELECT stepno FROM {block_workflow_steps} WHERE workflowid = ? ORDER BY stepno DESC LIMIT 1';
-            $step->stepno = $DB->get_field_sql($sql, array($step->workflowid));
+            $step->stepno = $DB->get_field_sql($sql, [$step->workflowid]);
 
             if ($step->stepno) {
                 // If there's already a step on this workflow, add to that step number.
@@ -335,7 +412,6 @@ class block_workflow_step {
      *          no workflowid is specified, the step is placed within the same
      *          workflow as the source
      * @return  The newly created block_workflow_step object
-     * @static
      */
     public static function clone_step($srcid, $workflowid = null) {
         global $DB;
@@ -400,7 +476,7 @@ class block_workflow_step {
         $transaction = $DB->start_delegated_transaction();
 
         // Retrieve a list of the step_states.
-        $states = $DB->get_records('block_workflow_step_states', array('stepid' => $this->id), null, 'id');
+        $states = $DB->get_records('block_workflow_step_states', ['stepid' => $this->id], null, 'id');
         $statelist = array_map(function ($a) {
             return $a->id;
         }, $states);
@@ -412,7 +488,7 @@ class block_workflow_step {
         $DB->delete_records_list('block_workflow_todo_done', 'stepstateid', $statelist);
 
         // Remove the states.
-        $DB->delete_records('block_workflow_step_states', array('stepid' => $this->id));
+        $DB->delete_records('block_workflow_step_states', ['stepid' => $this->id]);
 
         // Update the atengobacktostep setting for the workflow if required.
         $workflow           = $this->workflow();
@@ -422,7 +498,7 @@ class block_workflow_step {
         }
 
         // Remove the step.
-        $DB->delete_records('block_workflow_steps', array('id' => $this->id));
+        $DB->delete_records('block_workflow_steps', ['id' => $this->id]);
 
         // Now that the step has been removed, renumber the remaining step numbers.
         $workflow->renumber_steps();
@@ -547,7 +623,7 @@ class block_workflow_step {
     public static function is_step_in_use($stepid) {
         global $DB;
         return $DB->count_records('block_workflow_step_states',
-                array('stepid' => $stepid, 'state' => BLOCK_WORKFLOW_STATE_ACTIVE));
+                ['stepid' => $stepid, 'state' => BLOCK_WORKFLOW_STATE_ACTIVE]);
     }
 
     /**
@@ -614,7 +690,7 @@ class block_workflow_step {
                 LEFT JOIN {block_workflow_steps} steps ON steps.id = state.stepid
                 WHERE state.contextid = ? AND state.state = ?';
 
-        $step = $DB->get_record_sql($sql, array($contextid, BLOCK_WORKFLOW_STATE_ACTIVE));
+        $step = $DB->get_record_sql($sql, [$contextid, BLOCK_WORKFLOW_STATE_ACTIVE]);
         if (!$step) {
             throw new block_workflow_not_assigned_exception(get_string('noactiveworkflow', 'block_workflow'));
         }
@@ -635,8 +711,8 @@ class block_workflow_step {
     public static function parse_script($script) {
         // Our return place-holder.
         $return = new stdClass();
-        $return->errors     = array();
-        $return->commands   = array();
+        $return->errors     = [];
+        $return->commands   = [];
 
         // Break the script into lines.
         $lines = preg_split('~[\r\n]+~', $script, -1, PREG_SPLIT_NO_EMPTY);
@@ -799,7 +875,7 @@ class block_workflow_step {
 
         // Determine the stepid of the next step.
         $stepid = $DB->get_field('block_workflow_steps', 'id',
-                array('workflowid' => $this->workflowid, 'stepno' => ($this->stepno + 1)));
+                ['workflowid' => $this->workflowid, 'stepno' => ($this->stepno + 1)]);
 
         if ($stepid) {
             // If there is another step, return that step object.
@@ -914,7 +990,7 @@ class block_workflow_step {
                 WHERE d.stepid = ?
                 ORDER BY r.shortname ASC';
 
-        return role_fix_names($DB->get_records_sql($sql, array($stepid)));
+        return role_fix_names($DB->get_records_sql($sql, [$stepid]));
     }
 
     /**
@@ -927,8 +1003,8 @@ class block_workflow_step {
      */
     public function toggle_role($roleid) {
         global $DB;
-        if ($DB->get_record('block_workflow_step_doers', array('stepid' => $this->id, 'roleid' => $roleid))) {
-            return $DB->delete_records('block_workflow_step_doers', array('roleid' => $roleid, 'stepid' => $this->id));
+        if ($DB->get_record('block_workflow_step_doers', ['stepid' => $this->id, 'roleid' => $roleid])) {
+            return $DB->delete_records('block_workflow_step_doers', ['roleid' => $roleid, 'stepid' => $this->id]);
         } else {
             $role = new stdClass();
             $role->stepid = $this->id;
@@ -937,20 +1013,32 @@ class block_workflow_step {
         }
     }
 
+    /**
+     * Formats the instructions for the given context.
+     *
+     * @param context $context The context in which to format the instructions.
+     * @return string The formatted instructions.
+     */
     public function format_instructions($context) {
-        $replaces = array();
+        $replaces = [];
         if ($context->contextlevel == CONTEXT_MODULE) {
             $replaces['%%cmid%%'] = $context->instanceid;
         }
         $instructions = str_replace(array_keys($replaces), array_values($replaces), $this->instructions);
         return format_text($instructions, $this->instructionsformat,
-                array('noclean' => true, 'context' => $context));
+                ['noclean' => true, 'context' => $context]);
     }
 
+    /**
+     * Returns the available autofinish options for the specified application context.
+     *
+     * @param mixed $appliesto The context or entity to which the autofinish options apply.
+     * @return array List of autofinish options.
+     */
     public static function get_autofinish_options($appliesto) {
         global $CFG, $DB;
 
-        $options = array();
+        $options = [];
         $options[''] = get_string('donotautomaticallyfinish', 'block_workflow');
         if ($appliesto === 'course') {
             // The string is stored in the database in the following format.
@@ -985,7 +1073,7 @@ class block_workflow_step {
             $days = self::get_list_of_days(0, 0);
         }
 
-        return array($options, $days);
+        return [$options, $days];
     }
 
     /**
@@ -1001,7 +1089,7 @@ class block_workflow_step {
      * @return object $days, array of strings
      */
     private static function get_list_of_days($daysbefore, $dayafter) {
-        $days = array();
+        $days = [];
         $secondsinday = 24 * 60 * 60;
         for ($count = $daysbefore; $count <= $dayafter; $count++) {
             if ($count < 0) {

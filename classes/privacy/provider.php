@@ -24,11 +24,11 @@
 
 namespace block_workflow\privacy;
 
-use \core_privacy\local\request\approved_contextlist;
-use \core_privacy\local\request\contextlist;
-use \core_privacy\local\request\writer;
-use \core_privacy\local\request\helper;
-use \core_privacy\local\metadata\collection;
+use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\contextlist;
+use core_privacy\local\request\writer;
+use core_privacy\local\request\helper;
+use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\userlist;
 
@@ -52,7 +52,7 @@ class provider implements
      * @param collection $collection The initialised collection to add items to.
      * @return collection A listing of user data stored through this system.
      */
-    public static function get_metadata(collection $collection) : collection {
+    public static function get_metadata(collection $collection): collection {
         // The 'block_workflow_state_changes' table stores the state change by user.
         $collection->add_database_table('block_workflow_state_changes', [
             'userid' => 'privacy:metadata:block_workflow_state_changes:userid',
@@ -160,7 +160,7 @@ class provider implements
                   ORDER BY step.id ASC";
             $params = [
                 'stepstatecontextid' => $context->id,
-                'statechangesuserid' => $user->id
+                'statechangesuserid' => $user->id,
             ];
             $rs = $DB->get_recordset_sql($sql, $params);
 
@@ -172,7 +172,7 @@ class provider implements
                     'description' => $rec->description,
                     'stepname' => $rec->stepname,
                     'userid' => self::you_or_somebody_else($rec->userid, $user),
-                    'newstate' => $rec->newstate
+                    'newstate' => $rec->newstate,
                 ];
 
                 if (empty($contextdata->statechangedata)) {
@@ -196,7 +196,7 @@ class provider implements
 
             $params = [
                 'statescontextid' => $context->id,
-                'doneuserid' => $user->id
+                'doneuserid' => $user->id,
             ];
             $rs = $DB->get_recordset_sql($sql, $params);
 
@@ -206,7 +206,7 @@ class provider implements
                 $donedata = [
                     'stepname' => $rec->stepname,
                     'taskdone' => $rec->taskdone,
-                    'userid' => self::you_or_somebody_else($rec->userid, $user)
+                    'userid' => self::you_or_somebody_else($rec->userid, $user),
                 ];
 
                 if (empty($contextdata->tododonedata)) {
@@ -265,7 +265,7 @@ class provider implements
 
         $params = [
             'statescontextid' => $context->id,
-            'adminuserid' => get_admin()->id
+            'adminuserid' => get_admin()->id,
         ];
 
         // Keep all the data but anonymise with the admin user id.
@@ -320,7 +320,7 @@ class provider implements
         $params = [
                 'statescontextid' => $context->id,
                 'userid' => $userid,
-                'adminuserid' => get_admin()->id
+                'adminuserid' => get_admin()->id,
         ];
 
         // Delete block_workflow_todo_done owned by user.

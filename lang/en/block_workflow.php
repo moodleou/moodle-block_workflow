@@ -23,13 +23,9 @@
  */
 
 // Core strings.
-$string['workflow:addinstance'] = 'Add a new workflow block';
-$string['pluginname']                   = 'Workflows';
-$string['workflow']                     = 'Workflow';
-
 $string['activetasktitle']              = 'Currently active task';
-$string['addaworkflow']                 = 'Add a workflow';
 $string['addanotherworkflow']           = 'Add another workflow';
+$string['addaworkflow']                 = 'Add a workflow';
 $string['addemail']                     = 'Add email template';
 $string['addroletostep']                = 'Add role to step';
 $string['addstep']                      = 'Add an additional step to this workflow';
@@ -66,11 +62,11 @@ $string['confirmjumptostep']            = 'Are you sure that you want to jump to
 $string['confirmstepdeletetitle']       = 'Delete step \'{$a}\'?';
 $string['confirmworkflowdeletetitle']   = 'Delete workflow \'{$a}\'?';
 $string['contexthasactiveworkflow']     = 'This context already has an active workflow.';
+$string['coursestartdate']              = 'the course start date';
 $string['coursestudentclose']           = 'the course is closed to students';
 $string['coursestudentopen']            = 'the course is opened to students';
 $string['coursetutorclose']             = 'the course is closed to tutors';
 $string['coursetutoropen']              = 'the course is opened to tutors';
-$string['coursestartdate']              = 'the course start date';
 $string['create']                       = 'Create';
 $string['createemail']                  = 'Create new email template';
 $string['createstep']                   = 'Create step';
@@ -82,12 +78,12 @@ $string['createworkflow']               = 'Create new workflow';
 $string['crontaskautostepfinisher']     = 'Workflow step finisher';
 $string['crontaskextranotify']          = 'Workflow step extra notify';
 $string['currentlyinuseby']             = 'This workflow is currently in use by';
+$string['dayafter']                     = '{$a} day after';
+$string['dayas']                        = 'same day as';
+$string['daybefore']                    = '{$a} day before';
 
 $string['days']                         = 'Days';
-$string['dayas']                        = 'same day as';
-$string['dayafter']                     = '{$a} day after';
 $string['daysafter']                    = '{$a} days after';
-$string['daybefore']                    = '{$a} day before';
 $string['daysbefore']                   = '{$a} days before';
 $string['defaultonactivescript']        = '# You may place a set of actions to complete when marking this step active here';
 $string['defaultoncompletescript']      = '# You may place a set of actions to complete when marking this step finished here';
@@ -129,6 +125,7 @@ $string['edittemplateinstructions']     = 'Some instructions on how to create an
 $string['editworkflow']                 = 'Editing workflow \'{$a}\'';
 $string['editworkflowinstructions']     = 'Edit workflow instructions';
 $string['emaildescription']             = 'E-mail templates may be used by the various scripts in a workflow step';
+$string['emailfailed']                  = 'Failed send email \'{$a->subject}\' to {$a->email}';
 $string['emailfrom']                    = '{$a} workflow system';
 $string['emaillist']                    = 'Email email templates';
 $string['emailmessage']                 = 'Message';
@@ -154,7 +151,6 @@ The following tokens can be used only in the message body:
 $string['emailsettings']                = 'E-mail template settings';
 $string['emailsubject']                 = 'Subject';
 $string['emailtemplateexists']          = 'Email template \'{$a}\' which was attempted to import already exists. Existing template is preserved.';
-$string['emailfailed']                  = 'Failed send email \'{$a->subject}\' to {$a->email}';
 $string['emptyfield']                   = 'The required field is empty: {$a}';
 $string['enabled']                      = 'Enabled';
 $string['enabledworkflow']              = 'Enabled';
@@ -162,8 +158,8 @@ $string['enableworkflow']               = 'Enable workflow';
 $string['eventstepaborted']             = 'Step aborted';
 $string['eventstepactivated']           = 'Step activated';
 $string['eventstepcompleted']           = 'Step completed';
-$string['eventtodotriggered']           = 'Todo triggered';
 $string['eventstepextranotification']   = 'Step extra notification processed';
+$string['eventtodotriggered']           = 'Todo triggered';
 $string['eventworkflownotification']    = 'Workflow notification';
 $string['export']                       = 'Export';
 $string['exportworkflow']               = 'Export workflow';
@@ -171,6 +167,7 @@ $string['exportworkflow']               = 'Export workflow';
 $string['finish']                       = 'Finish';
 $string['finishstep']                   = 'Finish step';
 $string['finishstepautomatically']      = 'This step was automatically finished by workflow system at {$a}.';
+
 $string['finishstepfor']                = 'Finish step \'{$a->stepname}\' on {$a->contextname}';
 $string['finishstepinstructions']       = 'You are about to mark this step as complete, and move to the next step in the workflow. A summary of the step is shown below -- you may wish to update the comment below.';
 $string['format_html']                  = 'html';
@@ -182,8 +179,11 @@ $string['general']                      = 'General';
 $string['hidetask']                     = 'Disable task';
 
 $string['importfile']                   = 'File';
+
 $string['importsuccess']                = 'Importing was successful. You will be redirected to workflow editing page shortly.';
+
 $string['importworkflow']               = 'Import workflow';
+
 $string['instructions']                 = 'Instructions';
 $string['inuseby']                      = 'It is currently in use in {$a} locations.';
 $string['invalidactivitysettingcolumn'] = 'The column specified ({$a}) does not exist.';
@@ -225,6 +225,7 @@ $string['invalidworkflowstepno']        = 'The specified step number could not b
 $string['jumpstep']                     = 'Jump to step';
 $string['jumptostep']                   = 'Jump to step';
 $string['jumptostepcheck']              = 'Are you sure you wish to jump from step \'{$a->fromstep}\' to step \'{$a->tostep}\' for the workflow on {$a->workflowon}?';
+
 $string['jumptostepcommentaddition']    = '<p>[Note: the workflow just jumped from step \'{$a->fromstep}\'. This comment may seem out-of-context.]</p>{$a->comment}';
 $string['jumptostepon']                 = 'Jump to step \'{$a->stepname}\' on {$a->contextname}';
 $string['jumptosteptitle']              = 'Jump to step \'{$a->tostep}\' for \'{$a->workflowon}\' confirmation';
@@ -233,7 +234,9 @@ $string['lastmodified']                 = 'Last modified';
 
 $string['managedescription']            = 'On this page you can create end edit workflows and the email templates that they use.';
 $string['manageemails']                 = 'Manage email templates';
+
 $string['manageworkflows']              = 'Manage workflows';
+
 $string['messageprovider:notification'] = 'Workflow notifications and alerts';
 $string['missingfield']                 = 'The required field is missing: {$a}';
 $string['movedown']                     = 'Move down';
@@ -242,6 +245,7 @@ $string['moveup']                       = 'Move up';
 $string['name']                         = 'Name';
 $string['nameinuse']                    = 'The name specified is already in use. Names must be unique';
 $string['nameshortname']                = '{$a->name} ({$a->shortname})';
+
 $string['noactiveworkflow']             = 'There is currently no active workflow.';
 $string['nocomment']                    = 'No comment yet...';
 $string['nocomments']                   = 'No comments have been made about this step yet';
@@ -269,23 +273,21 @@ $string['overview']                     = 'Overview';
 $string['overviewtitle']                = 'Overview of {$a->workflowname} workflow on {$a->contexttitle}';
 
 $string['percentcomplete']              = '{$a}% complete';
-
-// GDPR.
-$string['privacy:metadata:block_workflow_state_changes'] = 'Changes to states.';
-$string['privacy:metadata:block_workflow_state_changes:userid'] = 'The user who caused the state change.';
-$string['privacy:metadata:block_workflow_state_changes:newstate'] = 'The state that this step changed to.';
-
-$string['privacy:metadata:block_workflow_todo_done'] = 'Changes to each step in the workflow.';
-$string['privacy:metadata:block_workflow_todo_done:userid'] = 'The user who caused the state change.';
-$string['privacy:metadata:block_workflow_todo_done:steptodoid'] = 'The todo step that user changed to.';
+$string['pluginname']                   = 'Workflows';
 $string['privacy:metadata'] = 'The Calendar block only displays existing calendar data.';
 
-$string['privacy_you'] = 'You';
-$string['privacy_somebodyelse'] = 'Somebody else';
-// End GDPR.
+$string['privacy:metadata:block_workflow_state_changes'] = 'Changes to states.';
+$string['privacy:metadata:block_workflow_state_changes:newstate'] = 'The state that this step changed to.';
+$string['privacy:metadata:block_workflow_state_changes:userid'] = 'The user who caused the state change.';
+$string['privacy:metadata:block_workflow_todo_done'] = 'Changes to each step in the workflow.';
 
-$string['quizopendate']                 = 'the quiz open date';
+$string['privacy:metadata:block_workflow_todo_done:steptodoid'] = 'The todo step that user changed to.';
+$string['privacy:metadata:block_workflow_todo_done:userid'] = 'The user who caused the state change.';
+$string['privacy_somebodyelse'] = 'Somebody else';
+$string['privacy_you'] = 'You';
+
 $string['quizclosedate']                = 'the quiz close date';
+$string['quizopendate']                 = 'the quiz open date';
 
 $string['remove']                       = 'Remove';
 $string['removerolefromstep']           = 'Remove role from step';
@@ -348,14 +350,16 @@ $string['updatecomment']                = 'Update comment';
 
 $string['vieweditemail']                = 'View/Edit email';
 $string['vieweditworkflow']             = 'View/Edit workflow';
+$string['workflow']                     = 'Workflow';
+$string['workflow:addinstance'] = 'Add a new workflow block';
 
 $string['workflow:dostep']              = 'Permission to perform a step';
 $string['workflow:editdefinitions']     = 'Permission to edit workflow details';
 $string['workflow:manage']              = 'Permission to manage workflows';
 $string['workflow:view']                = 'Permission to view workflow information';
 $string['workflowactive']               = 'This workflow is currently enabled (<a href="{$a}" title="Disable this workflow">disable it</a>). ';
-$string['workflowalreadyset']           = 'A workflow has already been set for this step. Steps cannot be reassigned to a different workflow';
 $string['workflowalreadyassigned']      = 'A workflow is already assigned to this context. Only one workflow may be assigned to any one context at a time.';
+$string['workflowalreadyset']           = 'A workflow has already been set for this step. Steps cannot be reassigned to a different workflow';
 $string['workflowimport']               = 'Workflow importing';
 $string['workflowinformation']          = 'Workflow information';
 $string['workflowlist']                 = 'Workflows';

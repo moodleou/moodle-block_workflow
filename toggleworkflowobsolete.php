@@ -42,7 +42,7 @@ $workflow->toggle();
 
 // Redirect as appropriate.
 if ($returnto == 'editsteps') {
-    redirect(new moodle_url('/blocks/workflow/editsteps.php', array('workflowid' => $workflowid)));
+    redirect(new moodle_url('/blocks/workflow/editsteps.php', ['workflowid' => $workflowid]));
 } else {
     redirect(new moodle_url('/blocks/workflow/manage.php'));
 }

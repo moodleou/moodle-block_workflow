@@ -28,12 +28,12 @@ require_once(dirname(__FILE__) . '/external_api_base_lib.php');
  * @copyright 2023 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class finish_step_test extends external_api_base_lib {
+final class finish_step_test extends external_api_base_lib {
 
     /**
      * Test finish step run successfully.
      *
-     * @covers finish_step::execute
+     * @covers \finish_step::execute
      */
     public function test_finish_step(): void {
         // Call the external service function.

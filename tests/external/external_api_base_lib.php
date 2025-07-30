@@ -32,13 +32,34 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  */
 class external_api_base_lib extends externallib_advanced_testcase {
 
+    /**
+     * @var int|null ID of the first workflow state, or null if not set.
+     */
     protected $state1id = null;
+    /**
+     * @var mixed|null Step 1 variable, initialized as null.
+     */
     protected $step1 = null;
+    /**
+     * @var mixed|null Stores the second step in the workflow, or null if not set.
+     */
     protected $step2 = null;
+    /**
+     * Example student user object for testing purposes.
+     *
+     * @var mixed|null
+     */
     protected $egstudent = null;
+    /**
+     * @var stdClass|null The course object associated with the test, or null if not set.
+     */
     protected $course = null;
+    /**
+     * @var int|null The ID of the student role, or null if not set.
+     */
     protected $studenroleid = null;
 
+    #[\Override]
     public function setUp(): void {
         $this->resetAfterTest();
         $this->setAdminUser();

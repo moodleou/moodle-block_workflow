@@ -43,7 +43,7 @@ class block_workflow_command_email extends block_workflow_command {
      */
     public function parse_args($args) {
         $data = new stdClass();
-        $data->errors = array();
+        $data->errors = [];
 
         // Break down the line. It should be in the format:
         // email to rolea roleb rolen
@@ -106,7 +106,7 @@ class block_workflow_command_email extends block_workflow_command {
         }
 
         // Check whether the specified roles exist and fill the list of target users.
-        $data->users = array();
+        $data->users = [];
         foreach ($data->roles as $role) {
             $thisrole = parent::require_role_exists($role, $data->errors);
             if ($data->errors) {
@@ -186,7 +186,7 @@ class block_workflow_command_email extends block_workflow_command {
      */
     public function email($shortname, &$errors) {
         global $DB;
-        $email = $DB->get_record('block_workflow_emails', array('shortname' => $shortname));
+        $email = $DB->get_record('block_workflow_emails', ['shortname' => $shortname]);
         if (!$email) {
             $errors[] = get_string('invalidemailemail', 'block_workflow', $shortname);
             return false;
@@ -279,7 +279,7 @@ class block_workflow_command_email extends block_workflow_command {
         $string = str_replace('%%instructions%%', $instructions, $string);
 
         // Replace %%tasks%%.
-        $tasks = array();
+        $tasks = [];
         foreach ($step->todos() as $todo) {
             $tasks[] = format_string($todo->task);
         }
@@ -302,7 +302,7 @@ class block_workflow_command_email extends block_workflow_command {
             $format = FORMAT_HTML;
         }
         $string = str_replace('%%comment%%', format_text($comment, $format,
-                array('context' => $email->context)), $string);
+                ['context' => $email->context]), $string);
 
         // Re-assign the message.
         $email->email->message = $string;
@@ -319,14 +319,13 @@ class block_workflow_command_email extends block_workflow_command {
      *
      * It is safe to call this function multiple times
      *
-     * @access  public
      * @param   block_workflow_step_state $state The step-state with the data
      * @param   object  $eventdata  The message to send
      */
     public static function message_send(block_workflow_step_state $state, $eventdata = null) {
         global $DB;
 
-        static $mailqueue = array();
+        static $mailqueue = [];
 
         if ($eventdata) {
             $mailqueue[] = clone $eventdata;

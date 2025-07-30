@@ -33,19 +33,25 @@ global $CFG;
 require_once(dirname(__FILE__) . '/../locallib.php');
 require_once(dirname(__FILE__) . '/lib.php');
 
-class command_test extends \block_workflow_testlib {
+/**
+ * Unit test class for the block_workflow command functionality.
+ */
+final class command_test extends \block_workflow_testlib {
 
     /**
      * Test the role_exists function
      * - Positive test for a known good role
      * - Negative test for a known bad role (check for exception)
+     *
+     * @covers \block_workflow_command::role_exists
+     * @covers \block_workflow_command::require_role_exists
      */
-    public function test_role_exists() {
+    public function test_role_exists(): void {
         // First test that a known good role works.
         $result = block_workflow_command::role_exists('manager');
         $this->assertInstanceOf('stdClass', $result);
 
-        $errors = array();
+        $errors = [];
         $result = block_workflow_command::require_role_exists('manager', $errors);
         $this->assertInstanceOf('stdClass', $result);
         $this->assertEquals(count($errors), 0);
@@ -54,7 +60,7 @@ class command_test extends \block_workflow_testlib {
         $result = block_workflow_command::role_exists('invalidrole');
         $this->assertFalse($result);
 
-        $errors = array();
+        $errors = [];
         $result = block_workflow_command::require_role_exists('invalidrole', $errors);
         $this->assertEquals(count($errors), 1);
     }
@@ -63,8 +69,10 @@ class command_test extends \block_workflow_testlib {
      * Test the type of workflow
      * - Positive test for an activity (activity == true)
      * - Negative test for an activity (activity == false)
+     *
+     * @covers \block_workflow_command::is_activity
      */
-    public function test_is_activity() {
+    public function test_is_activity(): void {
 
         $this->resetAfterTest(true);
 

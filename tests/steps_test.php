@@ -37,8 +37,19 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class steps_test extends \block_workflow_testlib {
-    public function test_step_validation() {
+/**
+ * Unit tests for the workflow steps functionality in the block_workflow plugin.
+ *
+ * This class extends the block_workflow_testlib to provide test cases
+ * for verifying the behavior and integrity of workflow steps.
+ */
+final class steps_test extends \block_workflow_testlib {
+    /**
+     * Tests the create_step methods.
+     *
+     * @covers \block_workflow_step::create_step
+     */
+    public function test_step_validation(): void {
         // Create a new workflow.
         $workflow = $this->create_workflow();
 
@@ -91,7 +102,18 @@ class steps_test extends \block_workflow_testlib {
         unset($data->oncompletescript);
     }
 
-    public function test_step_validation_2() {
+    /**
+     * Tests the create_step, update_step methods.
+     *
+     * @covers \block_workflow_step::create_step
+     * @covers \block_workflow_step::update_step
+     * @covers \block_workflow_step::delete
+     * @covers \block_workflow_step::load_workflow_stepno
+     * @covers \block_workflow_workflow::update
+     * @covers \block_workflow_workflow::load_workflow
+     * @covers \block_workflow_workflow::steps
+     */
+    public function test_step_validation_2(): void {
         // Create a new workflow.
         $workflow = $this->create_workflow();
 
@@ -190,7 +212,13 @@ class steps_test extends \block_workflow_testlib {
         unset($data->oncompletescript);
     }
 
-    public function test_step_validation_3() {
+    /**
+     * Tests the create_step methods.
+     *
+     * @covers \block_workflow_step::create_step
+     * @covers \block_workflow_step::update_step
+     */
+    public function test_step_validation_3(): void {
         // Create a new workflow.
         $workflow = $this->create_workflow();
 
@@ -272,6 +300,8 @@ class steps_test extends \block_workflow_testlib {
     }
 
     /**
+     * Tests the toggle_role methods.
+     *
      * Test toggling of block_workflow_step roles
      * - Ensure that we can add a role
      * - Ensure that we get the right result from step->roles()
@@ -281,8 +311,11 @@ class steps_test extends \block_workflow_testlib {
      * - Ensure that we get the right result from step->roles()
      * - Ensure that we can remove the second role
      * - Ensure that we get the right result from step->roles()
+     *
+     * @covers \block_workflow_step::toggle_role
+     * @covers \block_workflow_step::roles
      */
-    public function test_step_roles() {
+    public function test_step_roles(): void {
         global $DB;
         // Create a new workflow.
         $data = new stdClass();
@@ -304,7 +337,7 @@ class steps_test extends \block_workflow_testlib {
         $step->load_workflow_stepno($workflow->id, 1);
 
         // Find the ID for the manager role.
-        $managerid = $DB->get_field('role', 'id', array('shortname' => 'manager'));
+        $managerid = $DB->get_field('role', 'id', ['shortname' => 'manager']);
 
         // Enable the role.
         $return = $step->toggle_role($managerid);
@@ -323,7 +356,7 @@ class steps_test extends \block_workflow_testlib {
         $this->assertEquals($thisrole->id, $managerid);
 
         // Add a second role.
-        $teacherid = $DB->get_field('role', 'id', array('shortname' => 'teacher'));
+        $teacherid = $DB->get_field('role', 'id', ['shortname' => 'teacher']);
 
         // Enable the second role.
         $return = $step->toggle_role($teacherid);
@@ -364,7 +397,12 @@ class steps_test extends \block_workflow_testlib {
         $this->assertEquals(count($return), 0);
     }
 
-    public function test_script_parse() {
+    /**
+     * Tests the parse_script methods.
+     *
+     * @covers \block_workflow_step::parse_script
+     */
+    public function test_script_parse(): void {
         // Create a new workflow and step.
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
@@ -382,7 +420,14 @@ class steps_test extends \block_workflow_testlib {
         $this->assertEquals(count($command->errors), 0);
     }
 
-    public function test_script_validation() {
+    /**
+     * Tests the is_script_valid, require_script_valid, get_validation_errors methods.
+     *
+     * @covers \block_workflow_step::is_script_valid
+     * @covers \block_workflow_step::require_script_valid
+     * @covers \block_workflow_step::get_validation_errors
+     */
+    public function test_script_validation(): void {
         // Create a new workflow and step.
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
@@ -415,7 +460,14 @@ class steps_test extends \block_workflow_testlib {
         $this->assertEquals(count($errors), 0);
     }
 
-    public function test_step_commands() {
+    /**
+     * Tests the validate_script, update_step, create methods.
+     *
+     * @covers \block_workflow_step::validate_script
+     * @covers \block_workflow_step::update_step
+     * @covers \block_workflow_email::create
+     */
+    public function test_step_commands(): void {
         // Create a new workflow.
         $data = new stdClass();
         $data->shortname            = 'courseworkflow';
@@ -496,7 +548,12 @@ class steps_test extends \block_workflow_testlib {
         $this->expect_exception_without_halting('block_workflow_invalid_command_exception', $step, 'update_step', $update);
     }
 
-    public function test_next_step_end() {
+    /**
+     * Tests the get_next_step method.
+     *
+     * @covers \block_workflow_step::get_next_step
+     */
+    public function test_next_step_end(): void {
         // Create a new workflow.
         $workflow   = $this->create_workflow(false);
 
@@ -521,7 +578,12 @@ class steps_test extends \block_workflow_testlib {
         $this->assertFalse($getnext);
     }
 
-    public function test_next_step_loop() {
+    /**
+     * Tests the get_next_step method.
+     *
+     * @covers \block_workflow_step::get_next_step
+     */
+    public function test_next_step_loop(): void {
         // Create a new workflow.
         $workflow   = $this->create_workflow(false);
 
@@ -553,7 +615,12 @@ class steps_test extends \block_workflow_testlib {
         $this->compare_step($firststep, $getnext);
     }
 
-    public function test_set_workflow() {
+    /**
+     * Tests the set_workflow method.
+     *
+     * @covers \block_workflow_step::set_workflow
+     */
+    public function test_set_workflow(): void {
         $step = new block_workflow_step();
         $step->set_workflow(1);
         $this->assertEquals($step->workflowid, 1);
@@ -563,7 +630,12 @@ class steps_test extends \block_workflow_testlib {
                 'set_workflow', 1);
     }
 
-    public function test_get_all_users_and_their_roles() {
+    /**
+     * Tests the get_all_users_and_their_roles method.
+     *
+     * @covers \block_workflow_step_state::get_all_users_and_their_roles
+     */
+    public function test_get_all_users_and_their_roles(): void {
         global $DB;
          $this->resetAfterTest(true);
 
@@ -571,7 +643,7 @@ class steps_test extends \block_workflow_testlib {
         $roleids = $DB->get_records_menu('role', null, '', 'shortname, id');
         $roles = $DB->get_records('role');
 
-        $rolenames = array();
+        $rolenames = [];
         $rolenames['manager'] = 'Manager';
         $rolenames['coursecreator'] = 'Course creater';
         $rolenames['editingteacher'] = 'Teacher';
@@ -593,12 +665,12 @@ class steps_test extends \block_workflow_testlib {
 
         // Create users.
         $maxnumberofusers = 5;
-        $users = array();
+        $users = [];
         for ($index = 1; $index < ($maxnumberofusers + 1); $index++) {
-            $users[$index] = $generator->create_user(array('username' => 'user' . $index));
+            $users[$index] = $generator->create_user(['username' => 'user' . $index]);
         }
         // Create a course.
-        $course = $generator->create_course(array('shortname' => 'MK123-12J'));
+        $course = $generator->create_course(['shortname' => 'MK123-12J']);
         $coursecontext = \context_course::instance($course->id);
 
         // Users one to 5 get following roles.
@@ -609,16 +681,16 @@ class steps_test extends \block_workflow_testlib {
         // user5 is a student.
         $manualenrol = enrol_get_plugin('manual');
         $manualenrol->add_default_instance($course);
-        $instance1 = $DB->get_record('enrol', array('enrol' => 'manual', 'courseid' => $course->id));
+        $instance1 = $DB->get_record('enrol', ['enrol' => 'manual', 'courseid' => $course->id]);
 
         foreach ($users as $i => $user) {
             $manualenrol->enrol_user($instance1,  $user->id, $roleids[$roles[$i]->shortname]);
         }
-        $expectedroles = array();
+        $expectedroles = [];
 
-        $expectedusers = array();
+        $expectedusers = [];
         foreach ($users as $key => $user) {
-            $user->roles = array();
+            $user->roles = [];
             $user->roles[] = $rolenames[$roles[$key]->shortname];
             $expectedusers[$user->id] = $user;
         }

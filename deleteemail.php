@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -44,11 +45,11 @@ $email->require_deletable();
 
 // The confirmation strings.
 $confirmstr = get_string('deleteemailcheck', 'block_workflow', $email->shortname);
-$confirmurl = new moodle_url('/blocks/workflow/deleteemail.php', array('emailid' => $emailid, 'confirm' => 1));
+$confirmurl = new moodle_url('/blocks/workflow/deleteemail.php', ['emailid' => $emailid, 'confirm' => 1]);
 $returnurl  = new moodle_url('/blocks/workflow/manage.php');
 
 // Set the page and return urls.
-$PAGE->set_url('/blocks/workflow/deleteemail.php', array('emaild' => $emailid));
+$PAGE->set_url('/blocks/workflow/deleteemail.php', ['emaild' => $emailid]);
 
 // Set the heading and page title.
 $title = get_string('confirmemaildeletetitle', 'block_workflow', $email->shortname);

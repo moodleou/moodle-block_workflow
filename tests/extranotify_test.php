@@ -34,8 +34,20 @@ global $CFG;
 require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
 require_once($CFG->dirroot . '/blocks/workflow/tests/lib.php');
 
-class extranotify_test extends \block_workflow_testlib {
-    public function test_extra_notify() {
+/**
+ * Unit tests for the extranotify functionality in the block_workflow plugin.
+ *
+ * This class extends the block_workflow_testlib to provide specific test cases
+ * for the extranotify feature, ensuring correct behavior and integration within
+ * the workflow block.
+ */
+final class extranotify_test extends \block_workflow_testlib {
+    /**
+     * Tests the block_workflow_send_extra_notification methods.
+     *
+     * @covers ::block_workflow_send_extra_notification
+     */
+    public function test_extra_notify(): void {
         global $CFG, $DB;
         $now = time();
         $after5days = $this->get_days(5);
@@ -48,11 +60,11 @@ class extranotify_test extends \block_workflow_testlib {
         $generator = $this->getDataGenerator();
 
         // Create a course object.
-        $course1 = $generator->create_course(array('shortname' => 'M123-12J', 'startdate' => $timestamp1));
+        $course1 = $generator->create_course(['shortname' => 'M123-12J', 'startdate' => $timestamp1]);
         $coursecontext1 = \context_course::instance($course1->id);
 
         // Create another course object.
-        $course2 = $generator->create_course(array('shortname' => 'K123-12J', 'startdate' => $timestamp2));
+        $course2 = $generator->create_course(['shortname' => 'K123-12J', 'startdate' => $timestamp2]);
         $coursecontext2 = \context_course::instance($course2->id);
 
         // Generate a vl_v_crs_version_pres table.
@@ -66,7 +78,7 @@ class extranotify_test extends \block_workflow_testlib {
 
         $courseondataloadtable = $DB->get_record_sql(
                 'SELECT * FROM vl_v_crs_version_pres ' .
-                'WHERE vle_course_short_name = ?', array($courseshortname), MUST_EXIST);
+                'WHERE vle_course_short_name = ?', [$courseshortname], MUST_EXIST);
 
         // Create an email template.
         $data = new \stdClass();
@@ -78,12 +90,12 @@ class extranotify_test extends \block_workflow_testlib {
         $email->create($data);
 
         // Create a new workflow object which applies to course.
-        $stepoptions = array('extranotify' => 'course;startdate', 'extranotifyoffset' => $before5days,
-                'onextranotifyscript' => 'email testing to manager');
+        $stepoptions = ['extranotify' => 'course;startdate', 'extranotifyoffset' => $before5days,
+                'onextranotifyscript' => 'email testing to manager'];
         list($courseworkflow, $step1) = $this->create_a_workflow_with_one_step($stepoptions);
 
         // Required DB tables are not populated and therefore following methods return empty arrays.
-        $stepoptions = array('extranotify', 'extranotifyoffset', 'onextranotifyscript');
+        $stepoptions = ['extranotify', 'extranotifyoffset', 'onextranotifyscript'];
         $activesteps = block_workflow_get_active_steps_with_fields_not_null($stepoptions);
         $this->assertEmpty($activesteps);
 
@@ -115,18 +127,23 @@ class extranotify_test extends \block_workflow_testlib {
         $this->assertEquals($expectedactivesteps, $activesteps);
 
         // Check relevant fields in 'block_workflow_step_states' table before sending extra notification.
-        $state = $DB->get_record('block_workflow_step_states', array('id' => $state1->id));
+        $state = $DB->get_record('block_workflow_step_states', ['id' => $state1->id]);
         $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $state->state);
 
         // Get ready active steps and finish them automatically.
         block_workflow_send_extra_notification();
 
         // Check relevant fields in 'block_workflow_step_states' table after finishing automatically.
-        $stateafterfinish = $DB->get_record('block_workflow_step_states', array('id' => $state1->id));
+        $stateafterfinish = $DB->get_record('block_workflow_step_states', ['id' => $state1->id]);
         $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $stateafterfinish->state);
     }
 
-    public function test_block_workflow_get_offset_time_relative_to_course() {
+    /**
+     * Tests the block_workflow_get_offset_time methods relative to course.
+     *
+     * @covers ::block_workflow_get_offset_time
+     */
+    public function test_block_workflow_get_offset_time_relative_to_course(): void {
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
@@ -141,7 +158,12 @@ class extranotify_test extends \block_workflow_testlib {
         $this->assertEquals(strtotime('2019-02-01'), $timestamp);
     }
 
-    public function test_block_workflow_get_offset_time_relative_to_quiz() {
+    /**
+     * Tests the block_workflow_get_offset_time methods relative to quiz.
+     *
+     * @covers ::block_workflow_get_offset_time
+     */
+    public function test_block_workflow_get_offset_time_relative_to_quiz(): void {
         global $SITE;
         $this->resetAfterTest();
 
@@ -157,7 +179,12 @@ class extranotify_test extends \block_workflow_testlib {
         $this->assertEquals(strtotime('2019-02-01'), $timestamp);
     }
 
-    public function test_block_workflow_get_offset_time_relative_to_crs_version_pres() {
+    /**
+     * Tests the block_workflow_get_offset_time methods.
+     *
+     * @covers ::block_workflow_get_offset_time
+     */
+    public function test_block_workflow_get_offset_time_relative_to_crs_version_pres(): void {
         $this->resetAfterTest();
 
         if (!class_exists('\local_oudataload\util') || !class_exists('local_createwebsite_utils')) {

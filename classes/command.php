@@ -104,7 +104,7 @@ class block_workflow_command {
     public static function role_exists($rolename) {
         global $DB;
 
-        $role = $DB->get_record('role', array('shortname' => strtolower($rolename)));
+        $role = $DB->get_record('role', ['shortname' => strtolower($rolename)]);
         return $role;
     }
 
@@ -157,6 +157,14 @@ class block_workflow_command {
         return ($workflow->appliesto == 'course');
     }
 
+    /**
+     * Checks if the next word matches the required word.
+     *
+     * @param string $requiredword The word that is expected.
+     * @param string $actualword The word that is being checked.
+     * @param mixed $data Additional data used for the check.
+     * @return bool
+     */
     protected function check_next_word_is($requiredword, $actualword, $data) {
         if ($actualword != $requiredword) {
             $data->errors[] = get_string('invalidsyntaxmissingx', 'block_workflow', $requiredword);

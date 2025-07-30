@@ -34,13 +34,29 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class commandsetactivityvisibility_test extends \block_workflow_testlib {
-    public function test_setactivityvisibility() {
+/**
+ * Unit tests for the commandsetactivityvisibility functionality in the block_workflow plugin.
+ *
+ * This class extends the block_workflow_testlib to provide test cases for verifying
+ * the correct behavior of activity visibility commands within the workflow block.
+ */
+final class commandsetactivityvisibility_test extends \block_workflow_testlib {
+    /**
+     * Tests setactivityvisibility.
+     *
+     * @covers \block_workflow_command_setactivityvisibility
+     */
+    public function test_setactivityvisibility(): void {
         $command = new block_workflow_command_setactivityvisibility();
         $this->assertInstanceOf('block_workflow_command', $command);
     }
 
-    public function test_parse_no_state_hidden() {
+    /**
+     * Tests the parse methods no state hidden.
+     *
+     * @covers \block_workflow_command_setactivityvisibility::parse
+     */
+    public function test_parse_no_state_hidden(): void {
         $workflow = $this->create_activity_workflow('quiz', false);
         $step     = $this->create_step($workflow);
 
@@ -64,7 +80,12 @@ class commandsetactivityvisibility_test extends \block_workflow_testlib {
         $this->assertFalse(isset($result->id));
     }
 
-    public function test_parse_no_state_visible() {
+    /**
+     * Tests the parse methods no state visible.
+     *
+     * @covers \block_workflow_command_setactivityvisibility::parse
+     */
+    public function test_parse_no_state_visible(): void {
         $workflow = $this->create_activity_workflow('quiz', false);
         $step     = $this->create_step($workflow);
 
@@ -88,7 +109,12 @@ class commandsetactivityvisibility_test extends \block_workflow_testlib {
         $this->assertFalse(isset($result->id));
     }
 
-    public function test_parse_no_state_invalid_state() {
+    /**
+     * Tests the parse methods no state invalid state.
+     *
+     * @covers \block_workflow_command_setactivityvisibility::parse
+     */
+    public function test_parse_no_state_invalid_state(): void {
         $workflow = $this->create_activity_workflow('quiz', false);
         $step     = $this->create_step($workflow);
 
@@ -112,7 +138,12 @@ class commandsetactivityvisibility_test extends \block_workflow_testlib {
         $this->assertFalse(isset($result->id));
     }
 
-    public function test_parse_no_state_appliestocourse() {
+    /**
+     * Tests the parse methods no state appliestocourse.
+     *
+     * @covers \block_workflow_command_setactivityvisibility::parse
+     */
+    public function test_parse_no_state_appliestocourse(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
 
@@ -133,7 +164,12 @@ class commandsetactivityvisibility_test extends \block_workflow_testlib {
         $this->assertFalse(isset($result->id));
     }
 
-    public function test_parse_with_state_hidden() {
+    /**
+     * Tests the parse methods with state hidden.
+     *
+     * @covers \block_workflow_command_setactivityvisibility::parse
+     */
+    public function test_parse_with_state_hidden(): void {
         $workflow = $this->create_activity_workflow('quiz', false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -161,7 +197,12 @@ class commandsetactivityvisibility_test extends \block_workflow_testlib {
         $this->assertNotNull($result->cm);
     }
 
-    public function test_parse_with_state_visible() {
+    /**
+     * Tests the parse methods with state visible.
+     *
+     * @covers \block_workflow_command_setactivityvisibility::parse
+     */
+    public function test_parse_with_state_visible(): void {
         $workflow = $this->create_activity_workflow('quiz', false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -189,7 +230,12 @@ class commandsetactivityvisibility_test extends \block_workflow_testlib {
         $this->assertNotNull($result->cm);
     }
 
-    public function test_parse_with_state_invalid_state() {
+    /**
+     * Tests the parse methods with state invalid state.
+     *
+     * @covers \block_workflow_command_setactivityvisibility::parse
+     */
+    public function test_parse_with_state_invalid_state(): void {
         $workflow = $this->create_activity_workflow('quiz', false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -217,7 +263,12 @@ class commandsetactivityvisibility_test extends \block_workflow_testlib {
         $this->assertNotNull($result->cm);
     }
 
-    public function test_parse_with_state_appliestocourse() {
+    /**
+     * Tests the parse methods.
+     *
+     * @covers \block_workflow_command_setactivityvisibility::parse
+     */
+    public function test_parse_with_state_appliestocourse(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -236,7 +287,12 @@ class commandsetactivityvisibility_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->errors), 1);
     }
 
-    public function test_execute_hidden() {
+    /**
+     * Tests the execute methods.
+     *
+     * @covers \block_workflow_command_setactivityvisibility::execute
+     */
+    public function test_execute_hidden(): void {
         global $DB;
         $workflow = $this->create_activity_workflow('quiz', false);
         $step     = $this->create_step($workflow);
@@ -246,7 +302,7 @@ class commandsetactivityvisibility_test extends \block_workflow_testlib {
         $args = 'hidden';
 
         // Check that the parent course is visible.
-        $check = $DB->get_record('course', array('id' => $this->courseid));
+        $check = $DB->get_record('course', ['id' => $this->courseid]);
         $this->assertEquals($check->visible, 1);
 
         $module = $workflow->appliesto;
@@ -256,10 +312,10 @@ class commandsetactivityvisibility_test extends \block_workflow_testlib {
                 INNER JOIN {context} c ON c.instanceid = cm.id
                 INNER JOIN {modules} md ON md.id = cm.module
                 WHERE md.name = ? AND cm.course = ? LIMIT 1";
-        $instance = $DB->get_record_sql($sql, array($module, $this->courseid));
+        $instance = $DB->get_record_sql($sql, [$module, $this->courseid]);
 
         // Check that the activity visibility is currently visible.
-        $check = $DB->get_record('course_modules', array('id' => $instance->id));
+        $check = $DB->get_record('course_modules', ['id' => $instance->id]);
         $this->assertEquals($check->visible, 1);
 
         // Execute.
@@ -267,11 +323,11 @@ class commandsetactivityvisibility_test extends \block_workflow_testlib {
         $class->execute($args, $state);
 
         // Check that the activity visibility is now hidden.
-        $check = $DB->get_record('course_modules', array('id' => $instance->id));
+        $check = $DB->get_record('course_modules', ['id' => $instance->id]);
         $this->assertEquals($check->visible, 0);
 
         // This should not have affected the parent courses visibility.
-        $check = $DB->get_record('course', array('id' => $this->courseid));
+        $check = $DB->get_record('course', ['id' => $this->courseid]);
         $this->assertEquals($check->visible, 1);
     }
 }

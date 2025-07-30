@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 
@@ -42,4 +43,4 @@ $step = new block_workflow_step($stepid);
 $step->toggle_role($roleid);
 
 // Redirect.
-redirect(new moodle_url('/blocks/workflow/editstep.php', array('stepid' => $stepid)));
+redirect(new moodle_url('/blocks/workflow/editstep.php', ['stepid' => $stepid]));

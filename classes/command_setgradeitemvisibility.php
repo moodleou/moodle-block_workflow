@@ -39,9 +39,17 @@ class block_workflow_command_setgradeitemvisibility extends block_workflow_comma
     /** @var int Constant for visible grade items */
     const VISIBLE = 0;
 
-    public function parse($args, $step, $state = null) {
+    /**
+     * Parses the given arguments to set the visibility of a grade item.
+     *
+     * @param array $args Arguments required for the command.
+     * @param object $step The current workflow step.
+     * @param object|null $state Optional state information.
+     * @return stdClass The result of the parsing operation.
+     */
+    public function parse($args, $step, $state = null): stdClass {
         $data = new stdClass();
-        $data->errors = array();
+        $data->errors = [];
 
         // Check that this step workflow relates to an activity.
         if (!parent::is_activity($step->workflow())) {
@@ -76,6 +84,13 @@ class block_workflow_command_setgradeitemvisibility extends block_workflow_comma
         return $data;
     }
 
+    /**
+     * Executes the command to set the visibility of a grade item.
+     *
+     * @param mixed $args  Arguments required to execute the command.
+     * @param mixed $state Current state or context for the command execution.
+     * @return void
+     */
     public function execute($args, $state) {
         global $CFG;
         require_once($CFG->dirroot . '/lib/grade/grade_item.php');
@@ -84,8 +99,8 @@ class block_workflow_command_setgradeitemvisibility extends block_workflow_comma
             return;
         }
         // Set grade_items visibility.
-        $gradeitems = grade_item::fetch_all(array('courseid' => $data->cm->course, 'itemtype' => 'mod',
-                'itemmodule' => $data->cm->modname, 'iteminstance' => $data->cm->instance));
+        $gradeitems = grade_item::fetch_all(['courseid' => $data->cm->course, 'itemtype' => 'mod',
+                'itemmodule' => $data->cm->modname, 'iteminstance' => $data->cm->instance]);
         if ($gradeitems) {
             foreach ($gradeitems as $gradeitem) {
                 if ($gradeitem->hidden === $data->visibility) {

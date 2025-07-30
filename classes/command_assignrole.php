@@ -50,7 +50,7 @@ class block_workflow_command_assignrole extends block_workflow_command {
     public function parse($args, $step, $state = null) {
         // We'll return the components in an object.
         $data = new stdClass();
-        $data->errors = array();
+        $data->errors = [];
 
         if ($state) {
             $data->context = $state->context();
@@ -72,8 +72,8 @@ class block_workflow_command_assignrole extends block_workflow_command {
         }
 
         // Check whether the specified roles exist and fill the list of target users.
-        $data->roles = array();
-        $data->users = array();
+        $data->roles = [];
+        $data->users = [];
 
         // Check each role exists, and retrieve the data.
         foreach ($line as $role) {

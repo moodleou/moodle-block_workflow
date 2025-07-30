@@ -43,25 +43,40 @@ require_once(dirname(__FILE__) . '/lib.php');
  * @copyright 2012 the Open University.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class commandsetactivitylinkedsetting_test extends \block_workflow_testlib {
+final class commandsetactivitylinkedsetting_test extends \block_workflow_testlib {
 
     /** @var object current workflow*/
     private $workflow;
     /** @var object current step*/
     private $step;
 
-    public function test_setcoursevisibility() {
+    /**
+     * Tests the block_workflow_command_setactivitylinkedsetting.
+     *
+     * @covers \block_workflow_command_setactivitylinkedsetting
+     */
+    public function test_setcoursevisibility(): void {
         $command = $this->make_command();
         $this->assertInstanceOf('block_workflow_command', $command);
     }
 
+    /**
+     * Creates and returns a command instance for testing purposes.
+     *
+     * @return object The command instance created for the test.
+     */
     protected function make_command() {
         $this->workflow = $this->create_activity_workflow('quiz', false);
         $this->step     = $this->create_step($this->workflow);
         return block_workflow_command::create('block_workflow_command_setactivitylinkedsetting');
     }
 
-    public function test_parse_clear() {
+    /**
+     * Tests the block_workflow_command_setactivitylinkedsetting::parse method.
+     *
+     * @covers \block_workflow_command_setactivitylinkedsetting::parse
+     */
+    public function test_parse_clear(): void {
         $command = $this->make_command();
         $result = $command->parse('block_workflow_steps by workflowid clear', $this->step);
 
@@ -73,7 +88,12 @@ class commandsetactivitylinkedsetting_test extends \block_workflow_testlib {
         $this->assertEquals($result->action, block_workflow_command_setactivitylinkedsetting::CLEAR);
     }
 
-    public function test_parse_set() {
+    /**
+     * Tests the block_workflow_command_setactivitylinkedsetting::parse method.
+     *
+     * @covers \block_workflow_command_setactivitylinkedsetting::parse
+     */
+    public function test_parse_set(): void {
         $command = $this->make_command();
         $result = $command->parse('block_workflow_steps by workflowid set stepno 1 name Fred', $this->step);
 
@@ -83,10 +103,15 @@ class commandsetactivitylinkedsetting_test extends \block_workflow_testlib {
         $this->assertEquals($result->table, 'block_workflow_steps');
         $this->assertEquals($result->fkcolumn, 'workflowid');
         $this->assertEquals($result->action, block_workflow_command_setactivitylinkedsetting::SET);
-        $this->assertEquals($result->toset, array('stepno' => '1', 'name' => 'Fred'));
+        $this->assertEquals($result->toset, ['stepno' => '1', 'name' => 'Fred']);
     }
 
-    public function test_parse_missing_by() {
+    /**
+     * Tests the block_workflow_command_setactivitylinkedsetting::parse method.
+     *
+     * @covers \block_workflow_command_setactivitylinkedsetting::parse
+     */
+    public function test_parse_missing_by(): void {
         $command = $this->make_command();
         $result = $command->parse('block_workflow_steps workflowid clear', $this->step);
 
@@ -95,7 +120,12 @@ class commandsetactivitylinkedsetting_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->errors), 1);
     }
 
-    public function test_parse_missing_clear() {
+    /**
+     * Tests the block_workflow_command_setactivitylinkedsetting::parse method.
+     *
+     * @covers \block_workflow_command_setactivitylinkedsetting::parse
+     */
+    public function test_parse_missing_clear(): void {
         $command = $this->make_command();
         $result = $command->parse('block_workflow_steps by workflowid', $this->step);
 
@@ -104,7 +134,12 @@ class commandsetactivitylinkedsetting_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->errors), 1);
     }
 
-    public function test_parse_missing_neither_clear_nor_set() {
+    /**
+     * Tests the block_workflow_command_setactivitylinkedsetting::parse method.
+     *
+     * @covers \block_workflow_command_setactivitylinkedsetting::parse
+     */
+    public function test_parse_missing_neither_clear_nor_set(): void {
         $command = $this->make_command();
         $result = $command->parse('block_workflow_steps by workflowid frog', $this->step);
 
@@ -113,7 +148,12 @@ class commandsetactivitylinkedsetting_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->errors), 1);
     }
 
-    public function test_parse_junk_after_clear() {
+    /**
+     * Tests the block_workflow_command_setactivitylinkedsetting::parse method.
+     *
+     * @covers \block_workflow_command_setactivitylinkedsetting::parse
+     */
+    public function test_parse_junk_after_clear(): void {
         $command = $this->make_command();
         $result = $command->parse('block_workflow_steps by workflowid clear junk', $this->step);
 
@@ -122,7 +162,12 @@ class commandsetactivitylinkedsetting_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->errors), 1);
     }
 
-    public function test_parse_cols_values_mismatched() {
+    /**
+     * Tests the block_workflow_command_setactivitylinkedsetting::parse method.
+     *
+     * @covers \block_workflow_command_setactivitylinkedsetting::parse
+     */
+    public function test_parse_cols_values_mismatched(): void {
         $command = $this->make_command();
         $result = $command->parse('block_workflow_steps by workflowid set name', $this->step);
 
@@ -131,7 +176,12 @@ class commandsetactivitylinkedsetting_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->errors), 1);
     }
 
-    public function test_parse_unknown_table() {
+    /**
+     * Tests the block_workflow_command_setactivitylinkedsetting::parse method.
+     *
+     * @covers \block_workflow_command_setactivitylinkedsetting::parse
+     */
+    public function test_parse_unknown_table(): void {
         $command = $this->make_command();
         $result = $command->parse('__unknown_db_table_name___ by workflowid clear', $this->step);
 
@@ -140,7 +190,12 @@ class commandsetactivitylinkedsetting_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->errors), 1);
     }
 
-    public function test_parse_unknown_fk_column() {
+    /**
+     * Tests the block_workflow_command_setactivitylinkedsetting::parse method.
+     *
+     * @covers \block_workflow_command_setactivitylinkedsetting::parse
+     */
+    public function test_parse_unknown_fk_column(): void {
         $command = $this->make_command();
         $result = $command->parse('block_workflow_steps by __unknown_column__ clear', $this->step);
 
@@ -149,7 +204,12 @@ class commandsetactivitylinkedsetting_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->errors), 1);
     }
 
-    public function test_parse_unknown_set_column() {
+    /**
+     * Tests the block_workflow_command_setactivitylinkedsetting::parse method.
+     *
+     * @covers \block_workflow_command_setactivitylinkedsetting::parse
+     */
+    public function test_parse_unknown_set_column(): void {
         $command = $this->make_command();
         $result = $command->parse('block_workflow_steps by workflowid set name frog __unknown_column__ 1', $this->step);
 

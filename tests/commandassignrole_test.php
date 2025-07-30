@@ -34,14 +34,30 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class commandassignrole_test extends \block_workflow_testlib {
+/**
+ * Unit tests for the commandassignrole functionality in the block_workflow plugin.
+ *
+ * This test class extends the block_workflow_testlib base class to provide
+ * test cases for assigning roles via workflow commands.
+ */
+final class commandassignrole_test extends \block_workflow_testlib {
 
-    public function test_assignrole() {
+    /**
+     * Tests the assignrole method.
+     *
+     * @covers \block_workflow_command_assignrole
+     */
+    public function test_assignrole(): void {
         $command = new block_workflow_command_assignrole();
         $this->assertInstanceOf('block_workflow_command', $command);
     }
 
-    public function test_parse_no_state() {
+    /**
+     * Tests the parse method for no state.
+     *
+     * @covers \block_workflow_command_assignrole::parse
+     */
+    public function test_parse_no_state(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
 
@@ -79,7 +95,12 @@ class commandassignrole_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->users), 0);
     }
 
-    public function test_parse_no_state_invalid_newrole() {
+    /**
+     * Tests the parse method for no state invalid new role.
+     *
+     * @covers \block_workflow_command_assignrole::parse
+     */
+    public function test_parse_no_state_invalid_newrole(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
 
@@ -117,7 +138,12 @@ class commandassignrole_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->users), 0);
     }
 
-    public function test_parse_no_state_invalid_targetrole() {
+    /**
+     * Tests the parse method for no state invalid targetrole.
+     *
+     * @covers \block_workflow_command_assignrole::parse
+     */
+    public function test_parse_no_state_invalid_targetrole(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
 
@@ -155,7 +181,12 @@ class commandassignrole_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->users), 0);
     }
 
-    public function test_parse_with_state() {
+    /**
+     * Tests the parse method.
+     *
+     * @covers \block_workflow_command_assignrole::parse
+     */
+    public function test_parse_with_state(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -196,7 +227,12 @@ class commandassignrole_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->users), 2);
     }
 
-    public function test_parse_with_state_invalid_newrole() {
+    /**
+     * Tests the parse method.
+     *
+     * @covers \block_workflow_command_assignrole::parse
+     */
+    public function test_parse_with_state_invalid_newrole(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -237,7 +273,12 @@ class commandassignrole_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->users), 2);
     }
 
-    public function test_parse_with_state_invalid_targetrole() {
+    /**
+     * Tests the parse method.
+     *
+     * @covers \block_workflow_command_assignrole::parse
+     */
+    public function test_parse_with_state_invalid_targetrole(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -278,7 +319,12 @@ class commandassignrole_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->users), 1);
     }
 
-    public function test_execute() {
+    /**
+     * Tests the execute method.
+     *
+     * @covers \block_workflow_command_assignrole::execute
+     */
+    public function test_execute(): void {
         global $DB;
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
@@ -293,9 +339,9 @@ class commandassignrole_test extends \block_workflow_testlib {
 
         // Check the current assignments.
         foreach ($result->users as $user) {
-            $assignments = $DB->get_records('role_assignments', array('roleid' => $result->newrole->id,
+            $assignments = $DB->get_records('role_assignments', ['roleid' => $result->newrole->id,
                     'contextid' => $result->context->id, 'userid' => $user->id, 'component' => 'block_workflow',
-                    'itemid' => $state->id));
+                    'itemid' => $state->id]);
             $this->assertEquals(count($assignments), 0);
         }
 
@@ -305,9 +351,9 @@ class commandassignrole_test extends \block_workflow_testlib {
 
         // Check the new assignments.
         foreach ($result->users as $user) {
-            $assignments = $DB->get_records('role_assignments', array('roleid' => $result->newrole->id,
+            $assignments = $DB->get_records('role_assignments', ['roleid' => $result->newrole->id,
                     'contextid' => $result->context->id, 'userid' => $user->id, 'component' => 'block_workflow',
-                    'itemid' => $state->id));
+                    'itemid' => $state->id]);
             $this->assertEquals(count($assignments), 1);
         }
     }

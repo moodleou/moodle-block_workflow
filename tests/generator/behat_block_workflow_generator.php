@@ -22,8 +22,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/**
+ * Behat data generator for the block_workflow plugin.
+ */
 class behat_block_workflow_generator extends behat_generator_base {
 
+    /**
+     * Returns an array of creatable entities for the block_workflow generator.
+     *
+     * @return array List of creatable entity.
+     */
     protected function get_creatable_entities(): array {
         return [
             'workflows' => [

@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -40,11 +41,11 @@ require_capability('block/workflow:editdefinitions', context_system::instance())
 
 // Load the todo.
 $todo      = new block_workflow_todo($id);
-$returnurl = new moodle_url('/blocks/workflow/editstep.php', array('stepid' => $todo->stepid));
+$returnurl = new moodle_url('/blocks/workflow/editstep.php', ['stepid' => $todo->stepid]);
 $workflow  = $todo->step()->workflow();
 
 // Generate the confirmation message.
-$strparams = array('stepname' => $todo->step()->name, 'taskname' => $todo->task);
+$strparams = ['stepname' => $todo->step()->name, 'taskname' => $todo->task];
 
 // Set the heading and page title.
 $title = get_string('deletetasktitle', 'block_workflow', $strparams);
@@ -59,11 +60,11 @@ $confirmstr = get_string('deletetaskcheck', 'block_workflow', $strparams);
 
 // Generate the confirmation button.
 $confirmurl = new moodle_url('/blocks/workflow/deletetask.php',
-        array('id' => $todo->id, 'confirm' => 1));
+    ['id' => $todo->id, 'confirm' => 1]);
 $confirmbutton  = new single_button($confirmurl, get_string('confirm'), 'post');
 
 // Set page url.
-$PAGE->set_url('/blocks/workflow/deletetask.php', array('id' => $id));
+$PAGE->set_url('/blocks/workflow/deletetask.php', ['id' => $id]);
 
 // If confirmatation has already been received, then process.
 if ($confirm) {

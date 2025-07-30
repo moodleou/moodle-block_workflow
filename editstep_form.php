@@ -14,21 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Form for editing steps
- *
- * @package   block_workflow
- * @copyright 2011 Lancaster University Network Services Limited
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/formslib.php');
 
+/**
+ * Form definition for editing a workflow step in the Moodle block_workflow plugin.
+ *
+ * This class extends the moodleform base class to provide fields and validation
+ * for creating or editing workflow steps within the workflow block.
+ *
+ * @package   block_workflow
+ * @copyright  2025 The Open University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class step_edit extends moodleform {
 
+    #[\Override]
     protected function definition() {
         global $DB;
         $mform = $this->_form;
@@ -47,7 +50,7 @@ class step_edit extends moodleform {
         $mform->addRule('instructions_editor', null, 'required', null, 'client');
 
         // Scripts.
-        $scriptoptions = array('cols' => 80, 'rows' => 8);
+        $scriptoptions = ['cols' => 80, 'rows' => 8];
 
         // IDs.
         $mform->addElement('hidden', 'stepid');
@@ -92,7 +95,7 @@ class step_edit extends moodleform {
         $options[''] = get_string('donotautomaticallyfinish', 'block_workflow');
         $mform->addElement('textarea', 'oncompletescript', get_string('oncompletescript', 'block_workflow'), $scriptoptions);
         $mform->setType('oncompletescript', PARAM_RAW);
-        $autofinish = array();
+        $autofinish = [];
         $autofinish[] = $mform->createElement('select', 'autofinishoffset', null, $days);
         $autofinish[] = $mform->createElement('select', 'autofinish', null, $options);
         $mform->addGroup($autofinish, null, get_string('automaticallyfinish', 'block_workflow'), ' ', true);
@@ -101,7 +104,7 @@ class step_edit extends moodleform {
         $mform->disabledIf('autofinishoffset', 'autofinish', 'eq', '');
 
         // We disable the autofinish functionality for modules other than quiz or external quiz.
-        $autofinshallowed = array('course', 'quiz', 'externalquiz');
+        $autofinshallowed = ['course', 'quiz', 'externalquiz'];
         if (!in_array($this->_customdata['appliesto'], $autofinshallowed)) {
             // We use disbaleIf function without dependency and conditions, because
             // other modules apart from 'quiz and 'externalquiz' do not support the functionality.
@@ -112,6 +115,7 @@ class step_edit extends moodleform {
         $this->add_action_buttons();
     }
 
+    #[\Override]
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

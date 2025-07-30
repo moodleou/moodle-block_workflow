@@ -17,7 +17,7 @@
 namespace block_workflow\event;
 
 /**
- * This event is triggered when we want to sent an email in workflow..
+ * This event is triggered when we want to sent an email in workflow.
  *
  * @property-read array $other {
  *      Extra information about the event.
@@ -30,17 +30,22 @@ namespace block_workflow\event;
  *      - string stepname: The name of the step which has its status changed.
  *      - string workflowname: The name of the workflow this step is part of.
  *      - string error the error message when the email is not sent.
- * }
- */
-/**
- * Event implementation for workflow email notification.
  *
  * @package   block_workflow
  * @copyright 2025 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+/**
+ * Class representing a user in the system.
+ */
 class email_sent_status extends \core\event\base {
 
+    /**
+     * Init method.
+     *
+     * @return void
+     */
     protected function init() {
         $this->data['objecttable'] = 'block_workflow_steps';
         $this->data['crud'] = 'r';
