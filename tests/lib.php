@@ -143,7 +143,6 @@ abstract class block_workflow_testlib extends advanced_testcase {
         }
 
         $generator->get_plugin_generator('mod_quiz')->create_instance(['course' => $course->id]);
-        $generator->get_plugin_generator('mod_chat')->create_instance(['course' => $course->id]);
     }
 
     /**
