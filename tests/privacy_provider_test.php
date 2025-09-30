@@ -40,7 +40,7 @@ require_once(dirname(__FILE__) . '/../locallib.php');
  * @copyright 2018 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class privacy_provider_test extends \core_privacy\tests\provider_testcase {
+final class privacy_provider_test extends \core_privacy\tests\provider_testcase {
 
     /** @var \stdClass A student who is enrolled in course */
     protected $student1;
@@ -64,6 +64,7 @@ class privacy_provider_test extends \core_privacy\tests\provider_testcase {
      * Set up for each test
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest(true);
         $this->setAdminUser();
 
@@ -117,13 +118,15 @@ class privacy_provider_test extends \core_privacy\tests\provider_testcase {
         $this->todo->create_todo($data);
 
         // Toggle the to-do item.
-        $state->todo_toggle($this->todo->id);
+        $state->todo_toggle($this->todo->id, true);
     }
 
     /**
      * Test for provider::get_contexts_for_userid().
+     *
+     * @covers \block_workflow\privacy\provider::get_contexts_for_userid
      */
-    public function test_get_contexts_for_userid() {
+    public function test_get_contexts_for_userid(): void {
         // Get workflow context for student1.
         $contextids = provider::get_contexts_for_userid($this->student1->id)->get_contextids();
 
@@ -133,8 +136,10 @@ class privacy_provider_test extends \core_privacy\tests\provider_testcase {
 
     /**
      * Test for provider::get_users_in_context().
+     *
+     * @covers \block_workflow\privacy\provider::get_users_in_context
      */
-    public function test_get_users_in_context() {
+    public function test_get_users_in_context(): void {
         $userlist = new userlist($this->coursecontext, 'block_workflow');
         $this->assertCount(0, $userlist);
         provider::get_users_in_context($userlist);
@@ -144,8 +149,10 @@ class privacy_provider_test extends \core_privacy\tests\provider_testcase {
 
     /**
      * Test for provider::export_user_data().
+     *
+     * @covers \block_workflow\privacy\provider::export_user_data
      */
-    public function test_export_user_data() {
+    public function test_export_user_data(): void {
         // Get workflow context for student1.
         $contextids = provider::get_contexts_for_userid($this->student1->id)->get_contextids();
         $context = \context::instance_by_id($contextids[0]);
@@ -164,28 +171,30 @@ class privacy_provider_test extends \core_privacy\tests\provider_testcase {
             'description' => $this->workflow->description,
             'stepname' => $this->step->name,
             'userid' => get_string('privacy_you', 'block_workflow'),
-            'newstate' => 'active'
+            'newstate' => 'active',
         ], $data->statechangedata[0]);
         $this->assertEquals((object)[
             'workflowname' => $this->workflow->name,
             'description' => $this->workflow->description,
             'stepname' => $this->step->name,
             'userid' => get_string('privacy_you', 'block_workflow'),
-            'newstate' => 'completed'
+            'newstate' => 'completed',
         ], $data->statechangedata[1]);
 
         // Check student1 has one task done.
         $this->assertEquals((object)[
             'stepname' => $this->step->name,
             'taskdone' => $this->todo->task,
-            'userid' => get_string('privacy_you', 'block_workflow')
+            'userid' => get_string('privacy_you', 'block_workflow'),
         ], $data->tododonedata[0]);
     }
 
     /**
      * Test for delete_data_for_user().
+     *
+     * @covers \block_workflow\privacy\provider::delete_data_for_user
      */
-    public function test_delete_data_for_user() {
+    public function test_delete_data_for_user(): void {
         global $DB;
         // Get workflow context for student1.
         $contextids = provider::get_contexts_for_userid($this->student1->id)->get_contextids();
@@ -203,9 +212,11 @@ class privacy_provider_test extends \core_privacy\tests\provider_testcase {
     }
 
     /**
-     * Test for provider::test_delete_data_for_users().
+     * Test for provider::delete_data_for_users().
+     *
+     * @covers \block_workflow\privacy\provider::delete_data_for_users
      */
-    public function test_delete_data_for_users() {
+    public function test_delete_data_for_users(): void {
         global $DB;
         // Get workflow context for student1.
         $approveduserids = [$this->student1->id];
@@ -224,8 +235,10 @@ class privacy_provider_test extends \core_privacy\tests\provider_testcase {
 
     /**
      * Test for delete_data_for_all_users_in_context().
+     *
+     * @covers \block_workflow\privacy\provider::delete_data_for_all_users_in_context
      */
-    public function test_delete_data_for_all_users_in_context() {
+    public function test_delete_data_for_all_users_in_context(): void {
         global $DB;
 
         // Add the workflow to our course (returns the block_workflow_step_state).
@@ -243,7 +256,7 @@ class privacy_provider_test extends \core_privacy\tests\provider_testcase {
         $this->todo->create_todo($data);
 
         // Toggle the to-do item.
-        $state->todo_toggle($this->todo->id);
+        $state->todo_toggle($this->todo->id, true);
 
         $params = ['statescontextid' => $this->coursecontext->id];
         $statechangesql = "SELECT statechanges.id, statechanges.userid

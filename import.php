@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once(dirname(__FILE__) . '/import_form.php');
@@ -105,7 +106,7 @@ if ($importform->is_cancelled()) {
     $workflow = $workflow->create_workflow($workflowx, false, true);
 
     // Check whether the steps are incorrectly ordered and sort them.
-    $steporder = array();
+    $steporder = [];
     foreach ($xml->steps->step as $importedstep) {
         $attributes = $importedstep->attributes();
         $stepno = (string)$attributes['no'];
@@ -200,7 +201,7 @@ if ($importform->is_cancelled()) {
     $transaction->allow_commit();
 
     // Redirect.
-    redirect(new moodle_url('/blocks/workflow/editsteps.php', array('workflowid' => $workflow->id)),
+    redirect(new moodle_url('/blocks/workflow/editsteps.php', ['workflowid' => $workflow->id]),
             $extramessage . get_string('importsuccess', 'block_workflow'), 10);
 }
 

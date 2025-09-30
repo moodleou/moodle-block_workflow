@@ -32,9 +32,17 @@ global $CFG;
 require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
 require_once($CFG->dirroot . '/blocks/workflow/tests/lib.php');
 
-class autostepfinisher_test extends \block_workflow_testlib {
+/**
+ * Unit tests for the autostepfinisher functionality in the block_workflow plugin.
+ */
+final class autostepfinisher_test extends \block_workflow_testlib {
 
-    public function test_automatic_step_finisher() {
+    /**
+     * Tests the block_workflow_autofinish_steps method.
+     *
+     * @covers ::block_workflow_autofinish_steps
+     */
+    public function test_automatic_step_finisher(): void {
         global $CFG, $DB;
         $now = time();
         $after5days = $this->get_days(5);
@@ -47,11 +55,11 @@ class autostepfinisher_test extends \block_workflow_testlib {
         $generator = $this->getDataGenerator();
 
         // Create a course object.
-        $course1 = $generator->create_course(array('shortname' => 'M123-12J', 'startdate' => $timestamp1));
+        $course1 = $generator->create_course(['shortname' => 'M123-12J', 'startdate' => $timestamp1]);
         $coursecontext1 = \context_course::instance($course1->id);
 
         // Create another course object.
-        $course2 = $generator->create_course(array('shortname' => 'K123-12J', 'startdate' => $timestamp2));
+        $course2 = $generator->create_course(['shortname' => 'K123-12J', 'startdate' => $timestamp2]);
         $coursecontext2 = \context_course::instance($course2->id);
 
         // Generate a vl_v_crs_version_pres table.
@@ -65,14 +73,14 @@ class autostepfinisher_test extends \block_workflow_testlib {
 
         $courseondataloadtable = $DB->get_record_sql(
                 'SELECT * FROM vl_v_crs_version_pres ' .
-                'WHERE vle_course_short_name = ?', array($courseshortname), MUST_EXIST);
+                'WHERE vle_course_short_name = ?', [$courseshortname], MUST_EXIST);
 
         // Create a new workflow object which applies to course.
-        $stepoptions = array('autofinish' => 'course;startdate', 'autofinishoffset' => $before5days);
+        $stepoptions = ['autofinish' => 'course;startdate', 'autofinishoffset' => $before5days];
         list($courseworkflow, $step1) = $this->create_a_workflow_with_one_step($stepoptions);
 
         // Required DB tables are not populated and therefore following methods return empty arrays.
-        $stepoptions = array('autofinish', 'autofinishoffset', null);
+        $stepoptions = ['autofinish', 'autofinishoffset', null];
         $activesteps = block_workflow_get_active_steps_with_fields_not_null($stepoptions);
         $this->assertEmpty($activesteps);
 
@@ -104,7 +112,7 @@ class autostepfinisher_test extends \block_workflow_testlib {
         $this->assertEquals($expectedactivesteps, $activesteps);
 
         // Check relevant fields in 'block_workflow_step_states' table before finishing automatically.
-        $statebeforefinish = $DB->get_record('block_workflow_step_states', array('id' => $state1->id));
+        $statebeforefinish = $DB->get_record('block_workflow_step_states', ['id' => $state1->id]);
         $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, $statebeforefinish->state);
         $this->assertEmpty($statebeforefinish->comment);
 
@@ -112,7 +120,7 @@ class autostepfinisher_test extends \block_workflow_testlib {
         block_workflow_autofinish_steps();
 
         // Check relevant fields in 'block_workflow_step_states' table after finishing automatically.
-        $stateafterfinish = $DB->get_record('block_workflow_step_states', array('id' => $state1->id));
+        $stateafterfinish = $DB->get_record('block_workflow_step_states', ['id' => $state1->id]);
         $this->assertEquals(BLOCK_WORKFLOW_STATE_COMPLETED, $stateafterfinish->state);
         $this->assertNotEmpty($stateafterfinish->comment);
     }

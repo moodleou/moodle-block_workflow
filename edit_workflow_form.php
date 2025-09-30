@@ -14,20 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Workflow edit form
- *
- * @package   block_workflow
- * @copyright 2011 Lancaster University Network Services Limited
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/formslib.php');
 
+/**
+ * Form definition for editing a workflow in the Moodle block_workflow plugin.
+ *
+ * This class extends moodleform to provide fields and validation for editing workflows.
+ *
+ * @package    block_workflow
+ * @copyright  2025 The Open University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class edit_workflow extends moodleform {
+
+    #[\Override]
     protected function definition() {
         $mform = $this->_form;
 
@@ -35,13 +38,13 @@ class edit_workflow extends moodleform {
 
         // Workflow base data.
         $mform->addElement('text',     'shortname',           get_string('shortname', 'block_workflow'),
-                array('size' => 80, 'maxlength' => 255));
+                ['size' => 80, 'maxlength' => 255]);
         $mform->setType('shortname', PARAM_TEXT);
         $mform->addRule('shortname', null, 'required', null, 'client');
         $mform->addRule('shortname', null, 'maxlength', 255);
 
         $mform->addElement('text',     'name',                get_string('name', 'block_workflow'),
-                array('size' => 80, 'maxlength' => 255));
+                ['size' => 80, 'maxlength' => 255]);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', null, 'maxlength', 255);
@@ -60,7 +63,7 @@ class edit_workflow extends moodleform {
         }
 
         // When reaching the end of the workflow, go back to.
-        $steplist = array();
+        $steplist = [];
         $steplist[null] = get_string('atendfinishworkflow', 'block_workflow');
         $finalstep = null;
         foreach ($this->_customdata['steps'] as $step) {
@@ -75,7 +78,7 @@ class edit_workflow extends moodleform {
         }
 
         // The current status of this workflow.
-        $enabledoptions = array();
+        $enabledoptions = [];
         $enabledoptions['0'] = get_string('enabled', 'block_workflow');
         $enabledoptions['1'] = get_string('disabled', 'block_workflow');
         $mform->addElement('select',   'obsolete', get_string('status', 'block_workflow'), $enabledoptions);
@@ -87,6 +90,7 @@ class edit_workflow extends moodleform {
         $this->add_action_buttons();
     }
 
+    #[\Override]
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

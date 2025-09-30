@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 
@@ -39,10 +40,10 @@ require_capability('block/workflow:manage', context_system::instance());
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
-$PAGE->set_url('/blocks/workflow/movestep.php', array('stepid' => $stepid, 'direction' => $direction));
+$PAGE->set_url('/blocks/workflow/movestep.php', ['stepid' => $stepid, 'direction' => $direction]);
 
 // Grab the retrieve.
-$returnurl = new moodle_url('/blocks/workflow/editsteps.php', array('workflowid' => $step->workflowid));
+$returnurl = new moodle_url('/blocks/workflow/editsteps.php', ['workflowid' => $step->workflowid]);
 
 // Work out what we'll be waspping with.
 $stepno = $step->stepno;

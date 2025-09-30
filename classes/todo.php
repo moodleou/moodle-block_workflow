@@ -34,11 +34,25 @@
  * @property-read int       $obsolete           The visibility of this workflow
  */
 class block_workflow_todo {
+    /**
+     * @var int $id This is the unique identifier for the todo item.
+     */
     public $id;
+    /**
+     * @var int $stepid The identifier of the associated step.
+     */
     public $stepid;
+    /**
+     * @var string $task The description or name of the task.
+     */
     public $task;
+    /**
+     * @var bool $obsolete Indicates whether the task is obsolete.
+     */
     public $obsolete;
-
+    /**
+     * @var object|null $step The associated step object, or null if not set.
+     */
     private $step = null;
 
     /**
@@ -62,9 +76,8 @@ class block_workflow_todo {
      * @param   stdClass $todo Database record to overload into the
      *          object instance
      * @return  The instantiated block_workflow_todo object
-     * @access  private
      */
-    private function _load($todo) {
+    private function load($todo) {
         $this->id       = $todo->id;
         $this->stepid   = $todo->stepid;
         $this->task     = $todo->task;
@@ -78,12 +91,12 @@ class block_workflow_todo {
      * @return  array   The list of available settings
      */
     public function expected_settings() {
-        return array(
+        return [
             'id',
             'stepid',
             'task',
-            'obsolete'
-        );
+            'obsolete',
+        ];
     }
 
     /**
@@ -95,11 +108,11 @@ class block_workflow_todo {
      */
     public function load_by_id($id) {
         global $DB;
-        $todo = $DB->get_record('block_workflow_step_todos', array('id' => $id));
+        $todo = $DB->get_record('block_workflow_step_todos', ['id' => $id]);
         if (!$todo) {
             throw new block_workflow_invalid_todo_exception(get_string('invalidtodo', 'block_workflow'));
         }
-        return $this->_load($todo);
+        return $this->load($todo);
     }
 
     /**
@@ -206,10 +219,10 @@ class block_workflow_todo {
         $transaction = $DB->start_delegated_transaction();
 
         // First remove any todo_done records.
-        $DB->delete_records('block_workflow_todo_done', array('steptodoid' => $this->id));
+        $DB->delete_records('block_workflow_todo_done', ['steptodoid' => $this->id]);
 
         // Then remove the actual todo.
-        $DB->delete_records('block_workflow_step_todos', array('id' => $this->id));
+        $DB->delete_records('block_workflow_step_todos', ['id' => $this->id]);
 
         $transaction->allow_commit();
     }
@@ -226,7 +239,6 @@ class block_workflow_todo {
      *          no stepid is specified, the todo is placed within the same
      *          step as the source
      * @return  The newly created block_workflow_todo object
-     * @static
      */
     public static function clone_todo($srcid, $stepid = null) {
         global $DB;

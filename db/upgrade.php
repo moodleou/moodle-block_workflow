@@ -22,6 +22,16 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/**
+ * Handles the upgrade process for the block_workflow plugin.
+ *
+ * This function is called automatically during the upgrade process
+ * when the version in version.php is higher than the currently installed version.
+ * It applies any necessary database schema changes or data migrations.
+ *
+ * @param int $oldversion The version number of the currently installed plugin.
+ * @return bool True on success, false on failure.
+ */
 function xmldb_block_workflow_upgrade($oldversion) {
     global $DB, $CFG;
 
@@ -67,7 +77,7 @@ function xmldb_block_workflow_upgrade($oldversion) {
             $dbman->add_field($table, $field);
             if ($CFG->texteditors !== 'textarea') {
                 $rs = $DB->get_recordset('block_workflow_emails',
-                        array('messageformat' => FORMAT_MOODLE), '', 'id,message,messageformat');
+                        ['messageformat' => FORMAT_MOODLE], '', 'id,message,messageformat');
                 foreach ($rs as $b) {
                     $b->message = text_to_html($b->message, false, false, true);
                     $b->messageformat = FORMAT_HTML;
@@ -83,14 +93,14 @@ function xmldb_block_workflow_upgrade($oldversion) {
     // Replace 'course:startdate' with 'course;startdate'.
     if ($oldversion < 2013072200) {
         $sql = "UPDATE {block_workflow_steps} SET autofinish = :new WHERE autofinish = :old";
-        $DB->execute($sql, array('new' => 'course;startdate', 'old' => 'course:startdate'));
+        $DB->execute($sql, ['new' => 'course;startdate', 'old' => 'course:startdate']);
         upgrade_block_savepoint(true, 2013072200, 'workflow');
     }
 
     // Fix broken autofinish values.
     if ($oldversion < 2014030500) {
         $DB->set_field_select('block_workflow_steps', 'autofinish', null,
-                'autofinish IN (?, ?)', array('', 'donotautomaticallyfinish'));
+                'autofinish IN (?, ?)', ['', 'donotautomaticallyfinish']);
         upgrade_block_savepoint(true, 2014030500, 'workflow');
     }
 
@@ -129,7 +139,7 @@ function xmldb_block_workflow_upgrade($oldversion) {
 
         // Define key roleid (foreign) to be added to block_workflow_step_doers.
         $table = new xmldb_table('block_workflow_step_doers');
-        $key = new xmldb_key('roleid', XMLDB_KEY_FOREIGN, array('roleid'), 'role', array('id'));
+        $key = new xmldb_key('roleid', XMLDB_KEY_FOREIGN, ['roleid'], 'role', ['id']);
 
         // Launch add key roleid.
         $dbman->add_key($table, $key);

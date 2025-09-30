@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once(dirname(__FILE__) . '/clone_form.php');
@@ -43,7 +44,7 @@ $workflow   = new block_workflow_workflow($workflowid);
 
 // Set page and return urls.
 $returnurl  = new moodle_url('/blocks/workflow/manage.php');
-$PAGE->set_url('/blocks/workflow/clone.php', array('workflowid' => $workflowid));
+$PAGE->set_url('/blocks/workflow/clone.php', ['workflowid' => $workflowid]);
 
 // Page settings.
 $title = get_string('cloneworkflowname', 'block_workflow', $workflow->name);
@@ -71,7 +72,7 @@ if ($cloneform->is_cancelled()) {
     $workflow = block_workflow_workflow::clone_workflow($workflowid, $data);
 
     // Redirect to the newly created workflow.
-    redirect(new moodle_url('/blocks/workflow/editsteps.php', array('workflowid' => $workflow->id)));
+    redirect(new moodle_url('/blocks/workflow/editsteps.php', ['workflowid' => $workflow->id]));
 }
 
 // Set the clone workflow form defaults.
@@ -82,7 +83,7 @@ $data->name                 = get_string('clonedname', 'block_workflow', $workfl
 $data->description          = $workflow->description;
 $data->descriptionformat    = $workflow->descriptionformat;
 $data->appliesto            = block_workflow_appliesto($workflow->appliesto);
-$data = file_prepare_standard_editor($data, 'description', array('noclean' => true));
+$data = file_prepare_standard_editor($data, 'description', ['noclean' => true]);
 
 $cloneform->set_data($data);
 

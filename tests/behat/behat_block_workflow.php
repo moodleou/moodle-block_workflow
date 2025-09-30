@@ -100,10 +100,11 @@ class behat_block_workflow extends behat_base {
      */
     public function test_course_visibility(string $coursefullname, string $isvisible): void {
         global $DB;
-        $course = $DB->get_record("course", array("fullname" => $coursefullname), 'visible', MUST_EXIST);
+        $course = $DB->get_record("course", ["fullname" => $coursefullname], 'visible', MUST_EXIST);
         $expectedvisibility = $isvisible == 'visible';
         if ($course->visible != $expectedvisibility) {
-            throw new ExpectationException('"' . $coursefullname . '" should be ' . $isvisible . ' but isn\'t.', $this->getSession());
+            throw new ExpectationException('"' . $coursefullname . '" should be ' . $isvisible . ' but isn\'t.',
+                $this->getSession());
         }
     }
 }

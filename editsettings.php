@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once(dirname(__FILE__) . '/edit_workflow_form.php');
@@ -42,13 +43,13 @@ require_capability('block/workflow:editdefinitions', context_system::instance())
 $workflow   = new block_workflow_workflow();
 
 // Attempt to the set page/return url initially.
-$returnurl  = new moodle_url('/blocks/workflow/editsteps.php', array('workflowid' => $workflowid));
+$returnurl  = new moodle_url('/blocks/workflow/editsteps.php', ['workflowid' => $workflowid]);
 
 if ($workflowid) {
     // If we've been given an existing workflow.
     $workflow->load_workflow($workflowid);
     $title = get_string('editworkflow', 'block_workflow', $workflow->name);
-    $PAGE->set_url('/blocks/workflow/editsettings.php', array('workflowid' => $workflowid));
+    $PAGE->set_url('/blocks/workflow/editsettings.php', ['workflowid' => $workflowid]);
 } else {
     // We're creating a new workflow.
     $title = get_string('createworkflow', 'block_workflow');
@@ -68,7 +69,7 @@ if ($workflowid) {
 }
 
 // Moodle form to create/edit workflow.
-$customdata = array('steps' => $workflow->steps(), 'is_deletable' => $workflow->is_deletable());
+$customdata = ['steps' => $workflow->steps(), 'is_deletable' => $workflow->is_deletable()];
 $editform = new edit_workflow(null, $customdata);
 
 if ($editform->is_cancelled()) {
@@ -108,7 +109,7 @@ if ($editform->is_cancelled()) {
     }
 
     // Redirect to the editsteps page.
-    redirect(new moodle_url('/blocks/workflow/editsteps.php', array('workflowid' => $workflow->id)));
+    redirect(new moodle_url('/blocks/workflow/editsteps.php', ['workflowid' => $workflow->id]));
 }
 
 $data = new stdClass();
@@ -123,7 +124,7 @@ if ($workflow->id) {
     $data->obsolete             = $workflow->obsolete;
     $data->appliesto            = $workflow->appliesto;
     $data->atendgobacktostep    = $workflow->atendgobacktostep;
-    $data = file_prepare_standard_editor($data, 'description', array('noclean' => true));
+    $data = file_prepare_standard_editor($data, 'description', ['noclean' => true]);
     $editform->set_data($data);
 }
 

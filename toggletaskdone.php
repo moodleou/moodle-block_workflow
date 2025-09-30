@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 
@@ -41,7 +42,7 @@ $context    = $state->context();
 require_capability('block/workflow:dostep', $context);
 
 // Toggle the todo item.
-$state->todo_toggle($todoid);
+$state->todo_toggle($todoid, true);
 
 if ($returnto) {
     redirect(new moodle_url($returnto));

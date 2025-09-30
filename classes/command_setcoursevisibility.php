@@ -32,9 +32,18 @@
  *
  */
 class block_workflow_command_setcoursevisibility extends block_workflow_command {
+
+    /**
+     * Parses the provided arguments to set the course visibility.
+     *
+     * @param string $args Arguments required for parsing the command.
+     * @param object $step The current step in the workflow process.
+     * @param ?object $state Optional state information for the workflow.
+     * @return stdClass The result of the parsing operation.
+     */
     public function parse($args, $step, $state = null) {
         $data = new stdClass();
-        $data->errors = array();
+        $data->errors = [];
 
         // Check that this step workflow relatees to an activity.
         if (!parent::is_course($step->workflow())) {
@@ -57,6 +66,13 @@ class block_workflow_command_setcoursevisibility extends block_workflow_command 
         return $data;
     }
 
+    /**
+     * Executes the command to set the course visibility.
+     *
+     * @param string $args  Arguments required for the command execution.
+     * @param object $state Current state or context for the command.
+     * @return void
+     */
     public function execute($args, $state) {
         global $DB;
         $data = $this->parse($args, $state->step(), $state);

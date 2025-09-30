@@ -43,12 +43,12 @@ class block_workflow_command_email extends block_workflow_command {
      */
     public function parse_args($args) {
         $data = new stdClass();
-        $data->errors = array();
+        $data->errors = [];
 
         // Break down the line. It should be in the format:
         // email to rolea roleb rolen
         // with any number of role shortnames.
-        $line = preg_split('/[\s+]/', $args);
+        $line = preg_split('/[\s+]/', $args ?? '');
 
         // Grab the email name.
         $data->emailname = array_shift($line);
@@ -106,7 +106,7 @@ class block_workflow_command_email extends block_workflow_command {
         }
 
         // Check whether the specified roles exist and fill the list of target users.
-        $data->users = array();
+        $data->users = [];
         foreach ($data->roles as $role) {
             $thisrole = parent::require_role_exists($role, $data->errors);
             if ($data->errors) {
@@ -173,7 +173,7 @@ class block_workflow_command_email extends block_workflow_command {
          */
         foreach ($email->users as $user) {
             $eventdata->userto          = $user;
-            self::message_send($eventdata);
+            self::message_send($state, $eventdata);
         }
     }
 
@@ -186,7 +186,7 @@ class block_workflow_command_email extends block_workflow_command {
      */
     public function email($shortname, &$errors) {
         global $DB;
-        $email = $DB->get_record('block_workflow_emails', array('shortname' => $shortname));
+        $email = $DB->get_record('block_workflow_emails', ['shortname' => $shortname]);
         if (!$email) {
             $errors[] = get_string('invalidemailemail', 'block_workflow', $shortname);
             return false;
@@ -279,7 +279,7 @@ class block_workflow_command_email extends block_workflow_command {
         $string = str_replace('%%instructions%%', $instructions, $string);
 
         // Replace %%tasks%%.
-        $tasks = array();
+        $tasks = [];
         foreach ($step->todos() as $todo) {
             $tasks[] = format_string($todo->task);
         }
@@ -302,7 +302,7 @@ class block_workflow_command_email extends block_workflow_command {
             $format = FORMAT_HTML;
         }
         $string = str_replace('%%comment%%', format_text($comment, $format,
-                array('context' => $email->context)), $string);
+                ['context' => $email->context]), $string);
 
         // Re-assign the message.
         $email->email->message = $string;
@@ -319,14 +319,13 @@ class block_workflow_command_email extends block_workflow_command {
      *
      * It is safe to call this function multiple times
      *
-     * @access  public
+     * @param   block_workflow_step_state $state The step-state with the data
      * @param   object  $eventdata  The message to send
-     * @return  void
      */
-    public static function message_send($eventdata = null) {
-        global $DB, $SITE;
+    public static function message_send(block_workflow_step_state $state, $eventdata = null) {
+        global $DB;
 
-        static $mailqueue = array();
+        static $mailqueue = [];
 
         if ($eventdata) {
             $mailqueue[] = clone $eventdata;
@@ -336,8 +335,18 @@ class block_workflow_command_email extends block_workflow_command {
             // Only try to send if we're not in a transaction.
             while ($eventdata = array_shift($mailqueue)) {
                 // Send each message in the array.
-                if (!message_send($eventdata)) {
-                    throw new workflow_command_failed_exception(get_string('emailfailed', 'block_workflow'));
+                try {
+                    if (!message_send($eventdata)) {
+                        throw new block_workflow_exception(
+                            get_string('emailfailed', 'block_workflow',
+                                ['email' => $eventdata->userto->email, 'subject' => $eventdata->subject]));
+                    } else {
+                        $event = \block_workflow\event\email_sent_status::create_from_step_state($state);
+                        $event->trigger();
+                    }
+                } catch (Exception $e) {
+                    $event = \block_workflow\event\email_sent_status::create_from_step_state($state, $e->getMessage());
+                    $event->trigger();
                 }
             }
         }

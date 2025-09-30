@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once(dirname(__FILE__) . '/editstep_form.php');
@@ -41,26 +42,26 @@ require_capability('block/workflow:editdefinitions', context_system::instance())
 if ($stepid) {
     // If we've been given an existing workflow.
     $step       = new block_workflow_step($stepid);
-    $returnurl  = new moodle_url('/blocks/workflow/editsteps.php', array('workflowid' => $step->workflowid));
+    $returnurl  = new moodle_url('/blocks/workflow/editsteps.php', ['workflowid' => $step->workflowid]);
     $todos      = $step->todos(false);
     $doers      = $step->roles();
     $roles      = block_workflow_contextlevel_roles($step->workflow()->context());
     $title      = get_string('editstepname', 'block_workflow', $step->name);
-    $PAGE->set_url('/blocks/workflow/editstep.php', array('stepid' => $stepid));
+    $PAGE->set_url('/blocks/workflow/editstep.php', ['stepid' => $stepid]);
 
     // Add the breadcrumbs.
     $PAGE->navbar->add($step->workflow()->name, $returnurl);
     $PAGE->navbar->add(get_string('editstep', 'block_workflow'));
 
-    $appliesto = $DB->get_field('block_workflow_workflows', 'appliesto', array('id' => $step->workflowid));
+    $appliesto = $DB->get_field('block_workflow_workflows', 'appliesto', ['id' => $step->workflowid]);
 } else {
     // We're creating a new step.
     $workflowid  = required_param('workflowid', PARAM_INT);
     $workflow    = new block_workflow_workflow($workflowid);
-    $returnurl   = new moodle_url('/blocks/workflow/editsteps.php', array('workflowid' => $workflowid));
+    $returnurl   = new moodle_url('/blocks/workflow/editsteps.php', ['workflowid' => $workflowid]);
     $title       = get_string('createstepname', 'block_workflow', $workflow->name);
     $beforeafter = optional_param('beforeafter', 0, PARAM_INT);
-    $PAGE->set_url('/blocks/workflow/editstep.php', array('workflowid' => $workflowid));
+    $PAGE->set_url('/blocks/workflow/editstep.php', ['workflowid' => $workflowid]);
 
     // Add the breadcrumbs.
     $PAGE->navbar->add($workflow->name, $returnurl);
@@ -74,7 +75,7 @@ $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
 // Moodle form to create/edit step.
-$stepedit = new step_edit('editstep.php', array('appliesto' => $appliesto));
+$stepedit = new step_edit('editstep.php', ['appliesto' => $appliesto]);
 
 if ($stepedit->is_cancelled()) {
     // Form was cancelled.
@@ -128,7 +129,7 @@ if (isset($step)) {
     $data->extranotify          = $step->extranotify;
     $data->extranotifyoffset    = $step->extranotifyoffset;
     $data->onextranotifyscript  = $step->onextranotifyscript;
-    $data = file_prepare_standard_editor($data, 'instructions', array('noclean' => true));
+    $data = file_prepare_standard_editor($data, 'instructions', ['noclean' => true]);
     $stepedit->set_data($data);
 } else {
     // Otherwise, this is a new step belonging to $workflowid.

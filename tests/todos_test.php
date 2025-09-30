@@ -34,8 +34,19 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class todos_test extends \block_workflow_testlib {
-    public function test_todo_validation() {
+/**
+ * Unit tests for the block_workflow plugin's todo functionality.
+ *
+ * This class contains test cases for verifying the behavior and features
+ * related to todos in the block_workflow plugin.
+ */
+final class todos_test extends \block_workflow_testlib {
+    /**
+     * Tests the validation method of the block_workflow_todo class.
+     *
+     * @covers \block_workflow_todo::validation
+     */
+    public function test_todo_validation(): void {
         // Create a new workflow.
         $workflow = $this->create_workflow();
 
@@ -71,7 +82,12 @@ class todos_test extends \block_workflow_testlib {
         $data->obsolete = BLOCK_WORKFLOW_OBSOLETE;
     }
 
-    public function test_todo_create() {
+    /**
+     * Tests the create_todo method of the block_workflow_todo class.
+     *
+     * @covers \block_workflow_todo::create_todo
+     */
+    public function test_todo_create(): void {
         // Create a new workflow.
         $workflow = $this->create_workflow();
 
@@ -108,7 +124,12 @@ class todos_test extends \block_workflow_testlib {
         unset($data->badfield);
     }
 
-    public function test_todo_update() {
+    /**
+     * Tests the update_todo method of the block_workflow_todo class.
+     *
+     * @covers \block_workflow_todo::update_todo
+     */
+    public function test_todo_update(): void {
         // Create a new workflow.
         $workflow = $this->create_workflow();
 
@@ -136,10 +157,15 @@ class todos_test extends \block_workflow_testlib {
         $todo->update_todo($data);
 
         // Compare the updated task.
-        $this->compare_todo($data, $todo, array('id'));
+        $this->compare_todo($data, $todo, ['id']);
     }
 
-    public function test_todo_loading() {
+    /**
+     * Tests the load_by_id method of the block_workflow_todo class.
+     *
+     * @covers \block_workflow_todo::load_by_id
+     */
+    public function test_todo_loading(): void {
         // Create a new workflow.
         $workflow = $this->create_workflow();
 
@@ -160,7 +186,12 @@ class todos_test extends \block_workflow_testlib {
         $this->compare_todo($todo, $reloaded);
     }
 
-    public function test_todo_clone() {
+    /**
+     * Tests the clone_todo method of the block_workflow_todo class.
+     *
+     * @covers \block_workflow_todo::clone_todo
+     */
+    public function test_todo_clone(): void {
         // Create a new workflow.
         $workflow = $this->create_workflow();
 
@@ -173,19 +204,24 @@ class todos_test extends \block_workflow_testlib {
         // Clone the todo.
         $clone = $todo->clone_todo($todo->id);
 
-        $this->compare_todo($todo, $clone, array('id'));
+        $this->compare_todo($todo, $clone, ['id']);
         $this->assertNotEquals($todo->id, $clone->id);
 
         // Add a second step and clone the task from the first step.
         $newstep = $this->create_step($workflow);
         $clone = $todo->clone_todo($todo->id, $newstep->id);
-        $this->compare_todo($todo, $clone, array('id', 'stepid'));
+        $this->compare_todo($todo, $clone, ['id', 'stepid']);
         $this->assertNotEquals($todo->id,        $clone->id);
         $this->assertNotEquals($todo->stepid,    $clone->stepid);
         $this->assertEquals($clone->stepid,      $newstep->id);
     }
 
-    public function test_todo_delete() {
+    /**
+     * Tests the delete_todo method of the block_workflow_todo class.
+     *
+     * @covers \block_workflow_todo::delete_todo
+     */
+    public function test_todo_delete(): void {
         // Create a new workflow.
         $workflow = $this->create_workflow();
 
@@ -204,7 +240,12 @@ class todos_test extends \block_workflow_testlib {
                 $reload, 'load_by_id', $todo->id);
     }
 
-    public function test_todo_toggle() {
+    /**
+     * Tests the toggle functionality of the block_workflow_todo class.
+     *
+     * @covers \block_workflow_todo::toggle
+     */
+    public function test_todo_toggle(): void {
         // Create a new workflow.
         $workflow = $this->create_workflow();
 
@@ -232,16 +273,21 @@ class todos_test extends \block_workflow_testlib {
         $return = block_workflow_todo::toggle_task($todo->id);
         $check  = new block_workflow_todo($todo->id);
         $this->assertEquals($check->obsolete, BLOCK_WORKFLOW_OBSOLETE);
-        $this->compare_todo($return, $check, array());
+        $this->compare_todo($return, $check, []);
 
         // And also to re-enable.
         $return = block_workflow_todo::toggle_task($todo->id);
         $check  = new block_workflow_todo($todo->id);
         $this->assertEquals($check->obsolete, BLOCK_WORKFLOW_ENABLED);
-        $this->compare_todo($return, $check, array());
+        $this->compare_todo($return, $check, []);
     }
 
-    public function test_todo_step() {
+    /**
+     * Tests the validation logic for the todo step in the workflow.
+     *
+     * @covers \block_workflow_todo::step
+     */
+    public function test_todo_step(): void {
         // Create a new workflow.
         $workflow = $this->create_workflow();
 

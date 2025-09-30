@@ -35,7 +35,10 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class lib_test extends \block_workflow_testlib {
+/**
+ * Unit test class for the block_workflow library.
+ */
+final class lib_test extends \block_workflow_testlib {
 
     /**
      * Test that each of the defined variables are set correctly
@@ -44,8 +47,10 @@ class lib_test extends \block_workflow_testlib {
      * - BLOCK_WORKFLOW_STATE_ABORTED
      * - BLOCK_WORKFLOW_ENABLED
      * - BLOCK_WORKFLOW_OBSOLETE
+     *
+     * @coversNothing
      */
-    public function test_defines() {
+    public function test_defines(): void {
         $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE,     'active');
         $this->assertEquals(BLOCK_WORKFLOW_STATE_COMPLETED,  'completed');
         $this->assertEquals(BLOCK_WORKFLOW_STATE_ABORTED,    'aborted');
@@ -53,7 +58,12 @@ class lib_test extends \block_workflow_testlib {
         $this->assertEquals(BLOCK_WORKFLOW_OBSOLETE,         1);
     }
 
-    public function test_workflow_validation() {
+    /**
+     * Tests the block_workflow_workflow validation method.
+     *
+     * @covers ::block_workflow_workflow
+     */
+    public function test_workflow_validation(): void {
         // Create a new workflow.
         $data = new stdClass();
         $workflow = new block_workflow_workflow();
@@ -92,7 +102,12 @@ class lib_test extends \block_workflow_testlib {
                 $workflow, 'create_workflow', $data);
     }
 
-    public function test_workflow_validation2() {
+    /**
+     * Tests the block_workflow_workflow validation method.
+     *
+     * @covers ::block_workflow_workflow
+     */
+    public function test_workflow_validation2(): void {
         // Create a new workflow.
         $data = new stdClass();
         $workflow = new block_workflow_workflow();
@@ -127,7 +142,12 @@ class lib_test extends \block_workflow_testlib {
                 $workflow, 'create_workflow', $data);
     }
 
-    public function test_workflow_validation3() {
+    /**
+     * Tests the block_workflow_workflow validation method.
+     *
+     * @covers ::block_workflow_workflow
+     */
+    public function test_workflow_validation3(): void {
         // Create a new workflow.
         $data = new stdClass();
         $workflow = new block_workflow_workflow();
@@ -200,8 +220,10 @@ class lib_test extends \block_workflow_testlib {
      * - adding a step and checking it's data;
      * - cloning that step and checking it's data; and
      * - re-ordering the steps and checking the resultant data.
+     *
+     * @covers ::block_workflow_workflow
      */
-    public function test_workflow() {
+    public function test_workflow(): void {
         // Create a new workflow object.
         $workflow = new block_workflow_workflow();
 
@@ -269,7 +291,13 @@ class lib_test extends \block_workflow_testlib {
         $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception', $workflow, 'create_workflow', $data);
 
     }
-    public function test_workflow_toggle() {
+
+    /**
+     * Tests the block_workflow_step toggle method.
+     *
+     * @covers ::block_workflow_workflow::toggle
+     */
+    public function test_workflow_toggle(): void {
         $workflow = new block_workflow_workflow();
 
         // Create a new workflow.
@@ -300,7 +328,12 @@ class lib_test extends \block_workflow_testlib {
         $this->assertEquals($workflow->context(), CONTEXT_COURSE);
     }
 
-    public function test_workflow_steps() {
+    /**
+     * Tests the block_workflow_step method.
+     *
+     * @covers ::block_workflow_step
+     */
+    public function test_workflow_steps(): void {
         // Create a new workflow.
         $data = new stdClass();
         $data->shortname            = 'courseworkflow';
@@ -385,7 +418,12 @@ class lib_test extends \block_workflow_testlib {
         $this->assertNull($workflow->atendgobacktostep);
     }
 
-    public function test_workflow_steps_2() {
+    /**
+     * Tests the block_workflow_step method.
+     *
+     * @covers ::block_workflow_step
+     */
+    public function test_workflow_steps_2(): void {
         // Create a new workflow.
         $data = new stdClass();
         $data->shortname            = 'courseworkflow';
@@ -510,7 +548,12 @@ class lib_test extends \block_workflow_testlib {
                 $step, 'load_workflow_stepno', -1, -1);
     }
 
-    public function test_workflow_extended_exception() {
+    /**
+     * Tests the workflow extended exception.
+     *
+     * @covers ::block_workflow_step
+     */
+    public function test_workflow_extended_exception(): void {
         // Create a new workflow.
         $data = new stdClass();
         $data->shortname            = 'courseworkflow';
@@ -567,7 +610,13 @@ class lib_test extends \block_workflow_testlib {
         $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
                 $newstep, 'create_step', $nsdata);
     }
-    public function test_workflow_extended() {
+
+    /**
+     * Tests the block_workflow_step.
+     *
+     * @covers ::block_workflow_step
+     */
+    public function test_workflow_extended(): void {
         // Create a new workflow.
         $data = new stdClass();
         $data->shortname            = 'courseworkflow';
@@ -616,7 +665,12 @@ class lib_test extends \block_workflow_testlib {
         $step->delete();
     }
 
-    public function test_workflow_clone_exception() {
+    /**
+     * Tests the block_workflow_workflow workflow clone exception method.
+     *
+     * @covers ::block_workflow_workflow
+     */
+    public function test_workflow_clone_exception(): void {
         // Create a new workflow.
         $data = new stdClass();
         $data->shortname            = 'courseworkflow';
@@ -654,7 +708,12 @@ class lib_test extends \block_workflow_testlib {
                 'block_workflow_workflow', 'clone_workflow', $workflow->id, $newdata);
     }
 
-    public function test_workflow_clone() {
+    /**
+     * Tests the block_workflow_workflow workflow clone method.
+     *
+     * @covers ::block_workflow_workflow
+     */
+    public function test_workflow_clone(): void {
         // Create a new workflow.
         $data = new stdClass();
         $data->shortname            = 'courseworkflow';
@@ -701,10 +760,10 @@ class lib_test extends \block_workflow_testlib {
                 $tmp, '__construct', $cloneid);
 
         // And then faking the form submission editor part too.
-        $newdata->description_editor = array(
+        $newdata->description_editor = [
             'text'      => 'Example text',
             'format'    => FORMAT_HTML,
-        );
+        ];
         $clone = block_workflow_workflow::clone_workflow($workflow->id, $newdata);
 
         // And remove them both.
@@ -712,7 +771,12 @@ class lib_test extends \block_workflow_testlib {
 
     }
 
-    public function test_course_workflow() {
+    /**
+     * Tests the block_workflow_workflow available_workflows method.
+     *
+     * @covers ::block_workflow_workflow
+     */
+    public function test_course_workflow(): void {
         $workflow = $this->create_workflow();
 
         // Retrieve a list of all workflows available to courses.
@@ -742,7 +806,12 @@ class lib_test extends \block_workflow_testlib {
                 $workflow, 'add_to_context', $this->contextid);
     }
 
-    public function test_course_workflow_2() {
+    /**
+     * Tests the available_workflows method.
+     *
+     * @covers ::block_workflow_workflow
+     */
+    public function test_course_workflow_2(): void {
         $workflow = $this->create_workflow();
 
         // Retrieve a list of all workflows available to courses.
@@ -828,7 +897,12 @@ class lib_test extends \block_workflow_testlib {
                     $workflow, 'remove_workflow', $this->contextid);
     }
 
-    public function test_activity_workflow() {
+    /**
+     * Tests the block_workflow_workflow method.
+     *
+     * @covers ::block_workflow_workflow
+     */
+    public function test_activity_workflow(): void {
         // Create a new workflow.
         $data = new stdClass();
         $data->shortname            = 'activityworkflow';
@@ -849,18 +923,34 @@ class lib_test extends \block_workflow_testlib {
         $this->assertEquals($workflow->context(), CONTEXT_MODULE);
     }
 
-    public function test_appliesto_list() {
+    /**
+     * Tests the block_workflow_appliesto_list method.
+     *
+     * @covers ::block_workflow_appliesto_list
+     */
+    public function test_appliesto_list(): void {
         $list = block_workflow_appliesto_list();
         $this->assertEquals('array', gettype($list));
         $this->assertNotEquals(count($list), 0);
     }
 
-    public function test_editor_options() {
+    /**
+     * Tests the block_workflow_editor_options method.
+     *
+     * @covers ::block_workflow_editor_options
+     */
+    public function test_editor_options(): void {
         $format = block_workflow_editor_options();
         $this->assertEquals($format['maxfiles'], 0);
     }
 
-    public function test_editor_format() {
+    /**
+     * Tests the block_workflow_editor_format, block_workflow_convert_editor_format method.
+     *
+     * @covers ::block_workflow_editor_format
+     * @covers ::block_workflow_convert_editor_format
+     */
+    public function test_editor_format(): void {
         $this->assertEquals(block_workflow_editor_format(FORMAT_HTML),   get_string('format_html', 'block_workflow'));
         $this->assertEquals(block_workflow_editor_format(FORMAT_PLAIN),  get_string('format_plain', 'block_workflow'));
         $this->assertEquals(block_workflow_editor_format(-1),            get_string('format_unknown', 'block_workflow'));
@@ -872,7 +962,12 @@ class lib_test extends \block_workflow_testlib {
                 null, 'block_workflow_convert_editor_format', 'baddata');
     }
 
-    public function test_appliesto_string() {
+    /**
+     * Tests the block_workflow_appliesto method.
+     *
+     * @covers ::block_workflow_appliesto
+     */
+    public function test_appliesto_string(): void {
         // Test that we get the correct strings from block_workflow_appliesto for both of it's routes.
         $this->assertEquals(block_workflow_appliesto('course'), get_string('course'));
         $this->assertEquals(block_workflow_appliesto('quiz'), get_string('pluginname', 'mod_quiz'));

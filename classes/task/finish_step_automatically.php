@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace block_workflow\task;
+
 /**
  * A scheduled task for workflow automatic step finisher.
  *
@@ -21,9 +23,6 @@
  * @copyright 2015 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace block_workflow\task;
-
 class finish_step_automatically extends \core\task\scheduled_task {
 
     /**
@@ -35,6 +34,11 @@ class finish_step_automatically extends \core\task\scheduled_task {
         return get_string('crontaskautostepfinisher', 'block_workflow');
     }
 
+    /**
+     * Executes the task to finish a workflow step automatically.
+     *
+     * @return void
+     */
     public function execute() {
         global $CFG, $DB;
 

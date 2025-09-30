@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once(dirname(__FILE__) . '/edittask_form.php');
@@ -40,15 +41,15 @@ require_capability('block/workflow:editdefinitions', context_system::instance())
 if ($taskid) {
     // An existing task was specified.
     $task->load_by_id($taskid);
-    $returnurl  = new moodle_url('/blocks/workflow/editstep.php', array('stepid' => $task->stepid));
+    $returnurl  = new moodle_url('/blocks/workflow/editstep.php', ['stepid' => $task->stepid]);
     $PAGE->set_title(get_string('edittask', 'block_workflow', $task->task));
-    $PAGE->set_url('/blocks/workflow/edittask.php', array('taskid' => $taskid));
+    $PAGE->set_url('/blocks/workflow/edittask.php', ['taskid' => $taskid]);
     $data = (object) $task;
 } else {
     // Creating a new task. We require the stepid.
     $stepid         = required_param('stepid', PARAM_INT);
     $step           = new block_workflow_step($stepid);
-    $returnurl      = new moodle_url('/blocks/workflow/editstep.php', array('stepid' => $step->id));
+    $returnurl      = new moodle_url('/blocks/workflow/editstep.php', ['stepid' => $step->id]);
     $PAGE->set_title(get_string('createtask', 'block_workflow', $step->name));
     $PAGE->set_url('/blocks/workflow/edittask.php');
     $data = new stdClass();

@@ -14,20 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Form for task finishing
- *
- * @package   block_workflow
- * @copyright 2011 Lancaster University Network Services Limited
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/formslib.php');
 
+/**
+ * Form class for finishing a workflow step in the Moodle block_workflow plugin.
+ *
+ * This class defines the form used to complete a workflow step.
+ *
+ * @package    block_workflow
+ * @copyright  2025 The Open University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class state_finishtask extends moodleform {
+
+    #[\Override]
     protected function definition() {
         $mform = $this->_form;
         $state = $this->_customdata['state'];

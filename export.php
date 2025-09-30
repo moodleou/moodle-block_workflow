@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/filelib.php');
@@ -58,7 +59,7 @@ $sx = $wx->addChild('steps');
 
 // Create a list of the workflow's steps.
 // We need to store any used templates here.
-$templatelist = array();
+$templatelist = [];
 foreach ($workflow->steps() as $step) {
     // Load the object as we'll need to call some of it's functions.
     $step = new block_workflow_step($step->id);
@@ -90,7 +91,7 @@ foreach ($workflow->steps() as $step) {
 
     // As we loop through each step, we need to check each script for use
     // of e-mail emails and retrieve those for later inclusion.
-    $commands = array();
+    $commands = [];
     $script = block_workflow_step::parse_script($step->onactivescript);
     $commands = array_merge($commands, $script->commands);
 
@@ -107,7 +108,7 @@ foreach ($workflow->steps() as $step) {
         $d = $class->parse($c->arguments, $step);
 
         // And retrieve the template.
-        $errors = array();
+        $errors = [];
         $t = $class->email($d->emailname, $errors);
         $templatelist[$d->emailname] = $t;
     }
@@ -143,5 +144,5 @@ send_file($dom->saveXML(), $filename, 0, 0, true, true);
  * @return  string      The checked and (potentially) modified text
  */
 function check_output_text($raw) {
-    return htmlspecialchars($raw, ENT_NOQUOTES, 'UTF-8');
+    return htmlspecialchars($raw ?? '', ENT_NOQUOTES, 'UTF-8');
 }

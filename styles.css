@@ -69,11 +69,6 @@
     display: block;
     font-size: 0.8em;
 }
-body.ie7 .moodle-dialogue-base .moodle-dialogue-hd .closebutton {
-    float: none;
-    position: absolute;
-    right: 5px;
-}
 #page-admin-blocks-workflow-manage #manage td.c2 {
     font-size: 0.8em;
 }

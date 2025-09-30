@@ -28,6 +28,9 @@ global $CFG;
 require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
 
 
+/**
+ * Data generator class for the block_workflow plugin.
+ */
 class block_workflow_generator extends testing_block_generator {
 
     /**
@@ -60,6 +63,12 @@ class block_workflow_generator extends testing_block_generator {
         return $workflow;
     }
 
+    /**
+     * Creates a workflow step with the provided record data.
+     *
+     * @param array $record Associative array containing the workflow step data.
+     * @return block_workflow_step The created workflow step instance.
+     */
     public function create_workflow_step(array $record) {
         $data = (object) $record;
 
@@ -79,6 +88,12 @@ class block_workflow_generator extends testing_block_generator {
         return $step;
     }
 
+    /**
+     * Creates an email object for testing purposes.
+     *
+     * @param string $shortname The shortname to assign to the email. Defaults to 'TESTMAIL'.
+     * @return block_workflow_email The created email object.
+     */
     public function create_email($shortname = 'TESTMAIL') {
         // Create a new email template.
         $email  = new block_workflow_email();
@@ -90,6 +105,12 @@ class block_workflow_generator extends testing_block_generator {
         return $email;
     }
 
+    /**
+     * Creates a new todo item for the specified workflow step.
+     *
+     * @param object $step The workflow step to create the todo item.
+     * @return block_workflow_todo The created todo item or relevant result.
+     */
     public function create_todo($step) {
         // Create a new todo.
         $todo = new block_workflow_todo();

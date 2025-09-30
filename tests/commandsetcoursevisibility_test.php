@@ -34,13 +34,26 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class commandsetcoursevisibility_test extends \block_workflow_testlib {
-    public function test_setcoursevisibility() {
+/**
+ * Unit tests for the commandsetcoursevisibility class in the block_workflow plugin.
+ */
+final class commandsetcoursevisibility_test extends \block_workflow_testlib {
+    /**
+     * Tests the block_workflow_command_setcoursevisibility method.
+     *
+     * @covers \block_workflow_command_setcoursevisibility
+     */
+    public function test_setcoursevisibility(): void {
         $command = new block_workflow_command_setcoursevisibility();
         $this->assertInstanceOf('block_workflow_command', $command);
     }
 
-    public function test_parse_no_state_hidden() {
+    /**
+     * Tests the block_workflow_command_setcoursevisibility parse method no state hidden.
+     *
+     * @covers \block_workflow_command_setcoursevisibility::parse
+     */
+    public function test_parse_no_state_hidden(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
 
@@ -64,7 +77,12 @@ class commandsetcoursevisibility_test extends \block_workflow_testlib {
         $this->assertFalse((bool)isset($result->id));
     }
 
-    public function test_parse_no_state_visible() {
+    /**
+     * Tests the block_workflow_command_setcoursevisibility parse method no state visible.
+     *
+     * @covers \block_workflow_command_setcoursevisibility::parse
+     */
+    public function test_parse_no_state_visible(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
 
@@ -88,7 +106,12 @@ class commandsetcoursevisibility_test extends \block_workflow_testlib {
         $this->assertFalse((bool)isset($result->id));
     }
 
-    public function test_parse_no_state_invalid_state() {
+    /**
+     * Tests the block_workflow_command_setcoursevisibility parse method no state invalid state.
+     *
+     * @covers \block_workflow_command_setcoursevisibility::parse
+     */
+    public function test_parse_no_state_invalid_state(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
 
@@ -112,7 +135,12 @@ class commandsetcoursevisibility_test extends \block_workflow_testlib {
         $this->assertFalse((bool)isset($result->id));
     }
 
-    public function test_parse_no_state_appliestoactivity() {
+    /**
+     * Tests the block_workflow_command_setcoursevisibility parse method no state appliestoactivity.
+     *
+     * @covers \block_workflow_command_setcoursevisibility::parse
+     */
+    public function test_parse_no_state_appliestoactivity(): void {
         $workflow = $this->create_activity_workflow('quiz', false);
         $step     = $this->create_step($workflow);
 
@@ -133,7 +161,12 @@ class commandsetcoursevisibility_test extends \block_workflow_testlib {
         $this->assertFalse((bool)isset($result->id));
     }
 
-    public function test_parse_with_state_hidden() {
+    /**
+     * Tests the block_workflow_command_setcoursevisibility parse method with state hidden.
+     *
+     * @covers \block_workflow_command_setcoursevisibility::parse
+     */
+    public function test_parse_with_state_hidden(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -158,7 +191,12 @@ class commandsetcoursevisibility_test extends \block_workflow_testlib {
         $this->assertEquals($result->id, $this->courseid);
     }
 
-    public function test_parse_with_state_visible() {
+    /**
+     * Tests the block_workflow_command_setcoursevisibility parse method with state visible.
+     *
+     * @covers \block_workflow_command_setcoursevisibility::parse
+     */
+    public function test_parse_with_state_visible(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -183,7 +221,12 @@ class commandsetcoursevisibility_test extends \block_workflow_testlib {
         $this->assertEquals($result->id, $this->courseid);
     }
 
-    public function test_parse_with_state_invalid_state() {
+    /**
+     * Tests the block_workflow_command_setcoursevisibility parse method with state invalid state.
+     *
+     * @covers \block_workflow_command_setcoursevisibility::parse
+     */
+    public function test_parse_with_state_invalid_state(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -208,7 +251,12 @@ class commandsetcoursevisibility_test extends \block_workflow_testlib {
         $this->assertEquals($result->id, $this->courseid);
     }
 
-    public function test_parse_with_state_appliestoactivity() {
+    /**
+     * Tests the block_workflow_command_setcoursevisibility parse method with state appliestoactivity.
+     *
+     * @covers \block_workflow_command_setcoursevisibility::parse
+     */
+    public function test_parse_with_state_appliestoactivity(): void {
         $workflow = $this->create_activity_workflow('quiz', false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -227,7 +275,12 @@ class commandsetcoursevisibility_test extends \block_workflow_testlib {
         $this->assertEquals(count($result->errors), 1);
     }
 
-    public function test_execute_hidden() {
+    /**
+     * Tests the block_workflow_command_setcoursevisibility execute hidden method.
+     *
+     * @covers \block_workflow_command_setcoursevisibility::execute
+     */
+    public function test_execute_hidden(): void {
         global $DB;
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
@@ -237,7 +290,7 @@ class commandsetcoursevisibility_test extends \block_workflow_testlib {
         $args = 'hidden';
 
         // Check that the course visibility is currently visible.
-        $check = $DB->get_record('course', array('id' => $this->courseid));
+        $check = $DB->get_record('course', ['id' => $this->courseid]);
         $this->assertEquals($check->visible, 1);
 
         // Try parsing without a context.
@@ -245,7 +298,7 @@ class commandsetcoursevisibility_test extends \block_workflow_testlib {
         $class->execute($args, $state);
 
         // Check that the course visibility is now hidden.
-        $check = $DB->get_record('course', array('id' => $this->courseid));
+        $check = $DB->get_record('course', ['id' => $this->courseid]);
         $this->assertEquals($check->visible, 0);
     }
 }

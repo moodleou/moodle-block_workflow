@@ -35,8 +35,16 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 
-class emails_test extends \block_workflow_testlib {
-    public function test_email_validation() {
+/**
+ * Unit tests for email-related functionality in the block_workflow plugin.
+ */
+final class emails_test extends \block_workflow_testlib {
+    /**
+     * Tests the block_workflow_email::create method.
+     *
+     * @covers \block_workflow_email::create
+     */
+    public function test_email_validation(): void {
         $data  = new stdClass();
         $email = new block_workflow_email();
 
@@ -68,7 +76,12 @@ class emails_test extends \block_workflow_testlib {
         unset($data->badfield);
     }
 
-    public function test_email_create() {
+    /**
+     * Tests the block_workflow_email::create method.
+     *
+     * @covers \block_workflow_email::create
+     */
+    public function test_email_create(): void {
         $data  = new stdClass();
         $data->shortname    = 'shortname';
         $data->subject      = 'Example Subject';
@@ -80,7 +93,7 @@ class emails_test extends \block_workflow_testlib {
         $return = $email->create($data);
 
         // The variable $email should match the entered data.
-        $this->compare_email($data, $email, array('id'));
+        $this->compare_email($data, $email, ['id']);
 
         // Check that the return value is also a block_workflow_email.
         $this->assertInstanceOf('block_workflow_email', $return);
@@ -89,7 +102,7 @@ class emails_test extends \block_workflow_testlib {
         $this->assertInstanceOf('block_workflow_email', $email);
 
         // And the two should match.
-        $this->compare_email($data, $email, array());
+        $this->compare_email($data, $email, []);
 
         // And trying to create another email with the same (valid) data should result in an
         // exception because the shortname is already in use.
@@ -109,7 +122,12 @@ class emails_test extends \block_workflow_testlib {
         $data->shortname = 'newshortname';
     }
 
-    public function test_email_update() {
+    /**
+     * Tests the block_workflow_email::update method.
+     *
+     * @covers \block_workflow_email::update
+     */
+    public function test_email_update(): void {
         $data  = new stdClass();
         $data->shortname    = 'shortname';
         $data->subject      = 'Example Subject';
@@ -121,7 +139,7 @@ class emails_test extends \block_workflow_testlib {
         $return = $email->create($data);
 
         // The variable $email should match the entered data.
-        $this->compare_email($data, $email, array('id'));
+        $this->compare_email($data, $email, ['id']);
 
         // Check that the return value is also a block_workflow_email.
         $this->assertInstanceOf('block_workflow_email', $return);
@@ -130,7 +148,7 @@ class emails_test extends \block_workflow_testlib {
         $this->assertInstanceOf('block_workflow_email', $email);
 
         // And the two should match.
-        $this->compare_email($data, $email, array());
+        $this->compare_email($data, $email, []);
 
         // Check validation on e-mail updates.
         $data->shortname = 'newshortname';
@@ -143,7 +161,12 @@ class emails_test extends \block_workflow_testlib {
         $this->assertEquals($updated->shortname, 'shortname');
     }
 
-    public function test_email_update_validation_exception() {
+    /**
+     * Tests the block_workflow_email::update method.
+     *
+     * @covers \block_workflow_email::update
+     */
+    public function test_email_update_validation_exception(): void {
         $email = $this->create_email();
         $data  = new stdClass();
 
@@ -154,7 +177,12 @@ class emails_test extends \block_workflow_testlib {
         unset($data->badfield);
     }
 
-    public function test_email_update_validation() {
+    /**
+     * Tests the block_workflow_email::update method.
+     *
+     * @covers \block_workflow_email::update
+     */
+    public function test_email_update_validation(): void {
         $email = $this->create_email();
         $data  = new stdClass();
         // And change the shortname.
@@ -163,7 +191,12 @@ class emails_test extends \block_workflow_testlib {
         $this->compare_email($data, $email);
     }
 
-    public function test_email_duplicate_shortnames_exception() {
+    /**
+     * Tests the block_workflow_email::create method.
+     *
+     * @covers \block_workflow_email::create
+     */
+    public function test_email_duplicate_shortnames_exception(): void {
         // Create an e-mail with shortname 'shortname'.
         $this->create_email('shortname');
         $email = new block_workflow_email();
@@ -178,7 +211,12 @@ class emails_test extends \block_workflow_testlib {
                 $email, 'create', $data);
     }
 
-    public function test_email_duplicate_shortnames() {
+    /**
+     * Tests the block_workflow_email::update method.
+     *
+     * @covers \block_workflow_email::update
+     */
+    public function test_email_duplicate_shortnames(): void {
         // Create an e-mail with shortname 'shortname'.
         $this->create_email('shortname');
         $email = new block_workflow_email();
@@ -196,7 +234,12 @@ class emails_test extends \block_workflow_testlib {
                 $email, 'update', $data);
     }
 
-    public function test_email_loading() {
+    /**
+     * Tests the block_workflow_email::load_email_shortname method.
+     *
+     * @covers \block_workflow_email::load_email_shortname
+     */
+    public function test_email_loading(): void {
         // Create a new e-mail.
         $email = $this->create_email('shortname');
 
@@ -229,7 +272,12 @@ class emails_test extends \block_workflow_testlib {
 
     }
 
-    public function test_email_listing() {
+    /**
+     * Tests the block_workflow_email::load_emails method.
+     *
+     * @covers \block_workflow_email::load_emails
+     */
+    public function test_email_listing(): void {
         // Initially we should have no emails.
         $list = block_workflow_email::load_emails();
         $this->assertEquals(count($list), 0);
@@ -256,7 +304,12 @@ class emails_test extends \block_workflow_testlib {
         $this->assertEquals(count($list), 1);
     }
 
-    public function test_email_not_used() {
+    /**
+     * Tests the block_workflow_command::is_deletable method.
+     *
+     * @covers \block_workflow_email::is_deletable
+     */
+    public function test_email_not_used(): void {
         // Create a new e-mail.
         $email = $this->create_email('shortname');
 
@@ -380,5 +433,51 @@ class emails_test extends \block_workflow_testlib {
 
         // And we shouldn't throw an exception when deleting.
         $email->delete();
+    }
+
+    /**
+     * Tests the block_workflow_command::execute method.
+     *
+     * @covers \block_workflow_command::execute
+     */
+    public function test_email_send_failed(): void {
+        // The workflow system has some logic (which I think is no longer required)
+        // which stops it from sending messages if a transaction is in progress.
+        // We should probably untangle that one day, but for now.
+        $this->preventResetByRollback();
+
+        // Disable the send email feature so message_send function will always fail.
+        set_config('block_workflow_notification_disable', 1, 'message');
+
+        // Create a new template e-mail.
+        $this->create_email('shortname');
+
+        $workflow = $this->create_workflow(false);
+        $this->create_step($workflow);
+        $state = $this->assign_workflow($workflow);
+        $sink = $this->redirectEvents();
+
+        // This command should assign and send email template to student.
+        $command = 'shortname to student';
+        $emailcommand = \block_workflow_command::create('block_workflow_command_email');
+        // Check that we throw an exception with correct error message.
+        $emailcommand->execute($command, $state);
+        $events = $sink->get_events();
+        $event = reset($events);
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\block_workflow\event\email_sent_status', $event);
+        $this->assertStringContainsString("Failed send email 'Example subject' to egstudent@localhost.com",
+            $event->other['error']);
+        $this->assertStringContainsString("The email to user with id", $event->get_description());
+
+        // Test send email successfully.
+        $sink = $this->redirectEvents();
+        set_config('block_workflow_notification_disable', 0, 'message');
+        $emailcommand->execute($command, $state);
+        $events = $sink->get_events();
+        // The first event is core\event\notification_sent.
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\block_workflow\event\email_sent_status', $events[1]);
+        $this->assertStringContainsString("The email was successfully sent to user with id", $events[1]->get_description());
     }
 }

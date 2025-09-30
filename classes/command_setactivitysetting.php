@@ -33,57 +33,14 @@
  *
  */
 class block_workflow_command_setactivitysetting extends block_workflow_command {
-    public function parse($args, $step, $state = null) {
-        global $DB;
-        $data = new stdClass();
-        $data->errors = array();
-
-        $workflow = $step->workflow();
-
-        // Check that this step workflow relatees to an activity.
-        if (!parent::is_activity($workflow)) {
-            $data->errors[] = get_string('notanactivity', 'block_workflow', 'setactivityvisibility');
-            return $data;
-        }
-
-        if ($state) {
-            $data->cm = get_coursemodule_from_id($workflow->appliesto, $state->context()->instanceid);
-        }
-
-        // We'll use the database_manager to check whether tables and fields exist.
-        $dbman = $DB->get_manager();
-
-        // Check that the $appliesto table exists.
-        $data->table = $workflow->appliesto;
-        if (!$dbman->table_exists($data->table)) {
-            $data->errors[] = get_string('invalidappliestotable', 'block_workflow', $workflow->appliesto);
-            return $data;
-        }
-
-        // Break down the line. It should be in the format:
-        // column to value
-        // where column is a column in the activity settings table.
-        $line = preg_split('/[\s+]/', $args);
-
-        // Get the column and check that it exists.
-        $data->column = array_shift($line);
-        if (!$dbman->field_exists($data->table, $data->column)) {
-            $data->errors[] = get_string('invalidactivitysettingcolumn', 'block_workflow', $data->column);
-            return $data;
-        }
-
-        // Shift off the 'to' component.
-        $to = array_shift($line);
-        if ($to !== 'to') {
-            $data->errors[] = get_string('invalidsyntaxmissingto', 'block_workflow');
-            return $data;
-        }
-
-        // What we'll be setting it to.
-        $data->value = array_shift($line);
-
-        return $data;
-    }
+    /**
+     * Parses the provided arguments and processes them based on the given step and state.
+     *
+     * @param array $args The arguments to be parsed.
+     * @param mixed $step The step to be processed.
+     * @param mixed|null $state Optional. The current state, if any. Defaults to null.
+     * @return void
+     */
     public function execute($args, $state) {
         global $DB;
 
@@ -93,7 +50,7 @@ class block_workflow_command_setactivitysetting extends block_workflow_command {
         $column = $data->column;
         $record->$column = $data->value;
 
-        $existing = $DB->get_record($data->table, array('id' => $data->cm->instance));
+        $existing = $DB->get_record($data->table, ['id' => $data->cm->instance]);
         $record->id = $existing->id;
         $DB->update_record($data->table, $record);
     }

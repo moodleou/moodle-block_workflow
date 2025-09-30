@@ -35,7 +35,7 @@ Feature: Workflow block - follow a workflow using TinyMCE
     And I upload "blocks/workflow/tests/fixtures/testworkflow.workflow.xml" file to "File" filemanager
     And I press "Import workflow"
     And I navigate to "Plugins > Text editors > Manage editors" in site administration
-    And I click on "Disable" "link" in the "Atto HTML editor" "table_row"
+    And I click on "Disable" "checkbox" in the "TinyMCE editor" "table_row"
     And I log out
 
     When I log in as "manager1"
@@ -126,3 +126,23 @@ Feature: Workflow block - follow a workflow using TinyMCE
     And I click on "Workflow overview" "button" in the "Workflow" "block"
     And I should see "Complete" in the "Configure basic site" "table_row"
     And I should see "Complete" in the "Prepare your web site" "table_row"
+
+  @javascript @_file_upload
+  Scenario: Add a workflow to a course and edit comment.
+    Given I log in as "admin"
+    When I navigate to "Plugins > Blocks > Workflows" in site administration
+    And I follow "Import workflow"
+    And I upload "blocks/workflow/tests/fixtures/testworkflow.workflow.xml" file to "File" filemanager
+    And I press "Import workflow"
+    And I am on "Course 1" course homepage
+    And I turn editing mode on
+    And I add the "Workflows" block
+    And I set the field "workflow" to "Test course workflow"
+    And I press "Edit comments"
+    And I set the field "Update workflow comment" to "This is a comment"
+    And I click on "Save changes" "button" in the "Edit comments" "dialogue"
+    And I press "Finish step"
+    And I should see "This is a comment"
+    And I click on "Finish step" "button" in the "Finish step" "dialogue"
+    And I press "Edit comments"
+    Then I should not see "This is a comment"

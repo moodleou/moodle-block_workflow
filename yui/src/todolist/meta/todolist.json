@@ -1,9 +1,0 @@
-{
-    "moodle-block_workflow-todolist": {
-        "requires": [
-            "base",
-            "node",
-            "event"
-        ]
-    }
-}

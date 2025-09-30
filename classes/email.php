@@ -34,10 +34,21 @@
  * @property-read string    $subject            The subject of the e-mail email
  */
 class block_workflow_email {
+
+    /** @var int id from the database. */
     public $id;
-    public $message;
+
+    /** @var string identifier used to refer to this message. */
     public $shortname;
+
+    /** @var string email subject. */
     public $subject;
+
+    /** @var string text of the email. */
+    public $message;
+
+    /** @var int format of the message. One of the FORMAT_... constants. */
+    public $messageformat;
 
     /**
      * Constructor to obtain an e-mail template
@@ -60,13 +71,13 @@ class block_workflow_email {
      * @param   stdClass $email Database record to overload into the
      * object   instance
      * @return  The instantiated block_workflow_email object
-     * @access  private
      */
-    private function _load($email) {
-        $this->id           = $email->id;
-        $this->message      = $email->message;
-        $this->shortname    = $email->shortname;
-        $this->subject      = $email->subject;
+    private function load($email) {
+        $this->id            = $email->id;
+        $this->shortname     = $email->shortname;
+        $this->subject       = $email->subject;
+        $this->message       = $email->message;
+        $this->messageformat = $email->messageformat;
         return $this;
     }
 
@@ -76,13 +87,13 @@ class block_workflow_email {
      * @return  array   The list of available settings
      */
     public function expected_settings() {
-        return array(
+        return [
             'id',
             'message',
             'messageformat',
             'shortname',
-            'subject'
-        );
+            'subject',
+        ];
     }
 
     /**
@@ -94,11 +105,11 @@ class block_workflow_email {
      */
     public function load_email_id($id) {
         global $DB;
-        $email = $DB->get_record('block_workflow_emails', array('id' => $id));
+        $email = $DB->get_record('block_workflow_emails', ['id' => $id]);
         if (!$email) {
             throw new block_workflow_invalid_email_exception(get_string('invalidid', 'block_workflow'));
         }
-        return $this->_load($email);
+        return $this->load($email);
     }
 
     /**
@@ -109,11 +120,11 @@ class block_workflow_email {
      */
     public function load_email_shortname($shortname) {
         global $DB;
-        $email = $DB->get_record('block_workflow_emails', array('shortname' => $shortname));
+        $email = $DB->get_record('block_workflow_emails', ['shortname' => $shortname]);
         if (!$email) {
             return false;
         }
-        return $this->_load($email);
+        return $this->load($email);
     }
 
     /**
@@ -165,8 +176,8 @@ class block_workflow_email {
             FROM {block_workflow_emails} emails
             ORDER BY shortname ASC
         ";
-        $params = array('email1' => '%email%', 'email2' => '%email%', 'email3' => '%email%',
-                        'to1' => '%to%', 'to2' => '%to%', 'to3' => '%to%');
+        $params = ['email1' => '%email%', 'email2' => '%email%', 'email3' => '%email%',
+                   'to1' => '%to%', 'to2' => '%to%', 'to3' => '%to%'];
         return $DB->get_records_sql($sql, $params);
     }
 
@@ -188,7 +199,7 @@ class block_workflow_email {
         }
 
         // Check whether this shortname is already in use.
-        if ($DB->get_record('block_workflow_emails', array('shortname' => $email->shortname))) {
+        if ($DB->get_record('block_workflow_emails', ['shortname' => $email->shortname])) {
             $transaction->rollback(new block_workflow_invalid_email_exception('shortnameinuse', 'block_workflow'));
         }
 
@@ -239,7 +250,7 @@ class block_workflow_email {
 
         // Check whether this shortname is already in use.
         if (isset($data->shortname) &&
-                ($id = $DB->get_field('block_workflow_emails', 'id', array('shortname' => $data->shortname)))) {
+                ($id = $DB->get_field('block_workflow_emails', 'id', ['shortname' => $data->shortname]))) {
             if ($id != $data->id) {
                 $transaction->rollback(new block_workflow_invalid_email_exception('shortnameinuse', 'block_workflow'));
             }
@@ -301,7 +312,7 @@ class block_workflow_email {
 
         // First check that we can delete this.
         $this->require_deletable();
-        $DB->delete_records('block_workflow_emails', array('id' => $this->id));
+        $DB->delete_records('block_workflow_emails', ['id' => $this->id]);
     }
 
     /**
@@ -321,22 +332,22 @@ class block_workflow_email {
         $sql = "SELECT activescripts.onactivescript AS script
                 FROM {block_workflow_steps} activescripts
                 WHERE " . $DB->sql_like('activescripts.onactivescript', '?', false);
-        $activescripts = $DB->get_records_sql($sql, array('%email%' . $this->shortname . '%to%'));
-        $count += $this->_used_count($activescripts);
+        $activescripts = $DB->get_records_sql($sql, ['%email%' . $this->shortname . '%to%']);
+        $count += $this->handle_used_count($activescripts);
 
         // Count the uses in the extranotifyscripts.
         $sql = "SELECT extranotifyscripts.onextranotifyscript AS script
                 FROM {block_workflow_steps} extranotifyscripts
                 WHERE " . $DB->sql_like('extranotifyscripts.onextranotifyscript', '?', false);
-        $extranotifyscripts = $DB->get_records_sql($sql, array('%email%' . $this->shortname . '%to%'));
-        $count += $this->_used_count($extranotifyscripts);
+        $extranotifyscripts = $DB->get_records_sql($sql, ['%email%' . $this->shortname . '%to%']);
+        $count += $this->handle_used_count($extranotifyscripts);
 
         // Count the uses in the completescripts.
         $sql = "SELECT completescripts.oncompletescript AS script
                 FROM {block_workflow_steps} completescripts
                 WHERE " . $DB->sql_like('completescripts.oncompletescript', '?', false);
-        $completescripts = $DB->get_records_sql($sql, array('%email%' . $this->shortname . '%to%'));
-        $count += $this->_used_count($completescripts);
+        $completescripts = $DB->get_records_sql($sql, ['%email%' . $this->shortname . '%to%']);
+        $count += $this->handle_used_count($completescripts);
 
         // Return the tital usage count.
         return $count;
@@ -348,7 +359,7 @@ class block_workflow_email {
      * @param   array   $scripts    An array of stdClass objects with a script value
      * @return  integer             The number of times the template is in use
      */
-    private function _used_count($scripts) {
+    private function handle_used_count($scripts) {
         // Keep track of the count.
         $count = 0;
 

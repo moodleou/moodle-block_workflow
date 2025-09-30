@@ -41,16 +41,52 @@
  * @property-read int       $commentformat      The format of the comment field
  */
 class block_workflow_step_state {
+    /**
+     * @var ?int $step The current step of the workflow. Null if not set.
+     */
     private $step  = null;
+    /**
+     * @var ?array $todos The list of tasks or actions associated with the step. Null if not set.
+     */
     private $todos = null;
 
+    /**
+     * @var int $id The unique identifier for the step state.
+     */
     public $id;
+    /**
+     * @var int $stepid The ID of the workflow step associated with this state.
+     */
     public $stepid;
+    /**
+     * @var int $contextid The context ID where this workflow step state is applied.
+     */
     public $contextid;
+    /**
+     * @var string $state The current state of the workflow step (e.g., 'inprogress', 'completed').
+     */
     public $state;
+    /**
+     * @var int $timemodified The timestamp of the last modification to this step state.
+     */
     public $timemodified;
+    /**
+     * @var ?string $comment Optional comment associated with the step state.
+     */
     public $comment;
+    /**
+     * @var int The format of the comment (e.g., plain text, HTML).
+     */
     public $commentformat;
+
+    /**
+     * @var ?string occasionally, so that it can be used in messges, we need
+     * to store the comment from the previous step as well. (A bit hacky, but ...).
+     */
+    public $previouscomment = null;
+
+    /** @var ?int format of $previouscomment, if present. */
+    public $previouscommentformat = null;
 
     /**
      * Constructor to obtain a step_state
@@ -73,9 +109,8 @@ class block_workflow_step_state {
      * @param stdClass $state Database record to overload into the
      * object instance
      * @return  The instantiated block_workflow_step_state object
-     * @access private
      */
-    private function _load($state) {
+    private function load($state) {
         $this->id               = $state->id;
         $this->stepid           = $state->stepid;
         $this->contextid        = $state->contextid;
@@ -96,11 +131,11 @@ class block_workflow_step_state {
      */
     public function load_state($stateid) {
         global $DB;
-        $state = $DB->get_record('block_workflow_step_states', array('id' => $stateid));
+        $state = $DB->get_record('block_workflow_step_states', ['id' => $stateid]);
         if (!$state) {
             throw new block_workflow_exception(get_string('invalidstate', 'block_workflow'));
         }
-        return $this->_load($state);
+        return $this->load($state);
     }
 
     /**
@@ -111,12 +146,12 @@ class block_workflow_step_state {
      */
     public function load_active_state($contextid) {
         global $DB;
-        $state = $DB->get_record('block_workflow_step_states', array(
-                'contextid' => $contextid, 'state' => BLOCK_WORKFLOW_STATE_ACTIVE));
+        $state = $DB->get_record('block_workflow_step_states',
+            ['contextid' => $contextid, 'state' => BLOCK_WORKFLOW_STATE_ACTIVE]);
         if (!$state) {
             return false;
         }
-        return $this->_load($state);
+        return $this->load($state);
     }
 
     /**
@@ -145,12 +180,11 @@ class block_workflow_step_state {
      */
     public function load_context_step($contextid, $stepid) {
         global $DB;
-        $state = $DB->get_record('block_workflow_step_states', array(
-                'contextid' => $contextid, 'stepid' => $stepid));
+        $state = $DB->get_record('block_workflow_step_states', ['contextid' => $contextid, 'stepid' => $stepid]);
         if (!$state) {
             throw new block_workflow_not_assigned_exception(get_string('invalidstate', 'block_workflow'));
         }
-        return $this->_load($state);
+        return $this->load($state);
     }
 
     /**
@@ -233,7 +267,7 @@ class block_workflow_step_state {
         switch ($this->state) {
             case BLOCK_WORKFLOW_STATE_ABORTED:
             case BLOCK_WORKFLOW_STATE_COMPLETED:
-                role_unassign_all(array('component' => 'block_workflow', 'itemid' => $this->id));
+                role_unassign_all(['component' => 'block_workflow', 'itemid' => $this->id]);
                 break;
             default:
                 break;
@@ -273,7 +307,7 @@ class block_workflow_step_state {
 
         // This is a workaround for a limitation of the message_send system.
         // This must be called outside of a transaction.
-        block_workflow_command_email::message_send();
+        block_workflow_command_email::message_send($this);
 
         // Return the updated step_state object.
         return $this->load_state($this->id);
@@ -287,7 +321,7 @@ class block_workflow_step_state {
      * @return  mixed   The next state or false if there is none
      */
     public function finish_step($newcomment, $newcommentformat) {
-        global $DB, $USER;
+        global $DB;
         $transaction = $DB->start_delegated_transaction();
 
         // Update the comment.
@@ -316,7 +350,7 @@ class block_workflow_step_state {
                 $nextstate = new block_workflow_step_state($newstate->id);
             }
 
-            $nextstate->previouscomment = $this->comment; // Hack alert!
+            $nextstate->previouscomment = $this->comment;
             $nextstate->previouscommentformat = $this->commentformat;
             $nextstate->change_status(BLOCK_WORKFLOW_STATE_ACTIVE);
         }
@@ -325,7 +359,7 @@ class block_workflow_step_state {
 
         // This is a workaround for a limitation of the message_send system.
         // This must be called outside of a transaction.
-        block_workflow_command_email::message_send();
+        block_workflow_command_email::message_send($nextstep ? $nextstate : $this);
 
         // Return the new state.
         if ($nextstep) {
@@ -364,7 +398,7 @@ class block_workflow_step_state {
 
             // This is a workaround for a limitation of the message_send system.
             // This must be called outside of a transaction.
-            block_workflow_command_email::message_send();
+            block_workflow_command_email::message_send($state);
 
             return;
         }
@@ -400,7 +434,7 @@ class block_workflow_step_state {
 
         // This is a workaround for a limitation of the message_send system.
         // This must be called outside of a transaction.
-        block_workflow_command_email::message_send();
+        block_workflow_command_email::message_send($nextstate);
 
         // Return a reference to the new state.
         return $nextstate;
@@ -421,30 +455,39 @@ class block_workflow_step_state {
                     LEFT JOIN {block_workflow_todo_done} done ON done.steptodoid = todos.id AND done.stepstateid = ?
                     WHERE todos.stepid = ? AND todos.obsolete = 0
                     ORDER BY todos.id';
-            $this->todos = $DB->get_records_sql($sql, array($this->id, $this->stepid));
+            $this->todos = $DB->get_records_sql($sql, [$this->id, $this->stepid]);
         }
         return $this->todos;
     }
 
     /**
      * Toggle the completed status of a task for a step state
-     * @param   int     $todoid  The ID of the task
+     *
+     * @param int $todoid  The ID of the task
+     * @param bool whether user check/uncheck the link.
      * @return  boolean The new state of the task
      */
-    public function todo_toggle($todoid) {
+    public function todo_toggle(int $todoid, bool $check): bool {
         global $DB, $USER;
         $transaction = $DB->start_delegated_transaction();
 
         // Try and pick up the current task.
-        $todo = $DB->get_record('block_workflow_todo_done', array('stepstateid' => $this->id, 'steptodoid' => $todoid));
-
+        $todo = $DB->get_record('block_workflow_todo_done', ['stepstateid' => $this->id, 'steptodoid' => $todoid]);
+        // Has completed to do and user want to completed it. Do nothing.
+        if ($todo && $check) {
+            return true;
+        }
+        // Don't have to do and user want to uncheck it.
+        if (!$check && !$todo) {
+            return false;
+        }
         // Trigger an event for the toggled completed status of this to-do.
         $event = \block_workflow\event\todo_triggered::create_from_step_state($this, $todoid, !$todo);
         $event->trigger();
 
-        if ($todo) {
+        if (!$check) {
             // Remove the current record. There is no past history at present.
-            $DB->delete_records('block_workflow_todo_done', array('id' => $todo->id));
+            $DB->delete_records('block_workflow_todo_done', ['id' => $todo->id]);
             $transaction->allow_commit();
             return false;
         } else {
@@ -473,7 +516,7 @@ class block_workflow_step_state {
                 INNER JOIN {user} u ON u.id = changes.userid
                 WHERE changes.stepstateid = ?
                 ORDER BY changes.timestamp DESC';
-        return $DB->get_records_sql($sql, array($stateid));
+        return $DB->get_records_sql($sql, [$stateid]);
     }
 
     /**
@@ -492,7 +535,7 @@ class block_workflow_step_state {
 
         list ($sortorder, $notused) = users_order_by_sql('u');
         $roleinfo = role_get_names($context);
-        $rolenames = array();
+        $rolenames = [];
         foreach ($roleinfo as $role) {
             $rolenames[$role->shortname] = $role->localname;
         }
@@ -507,11 +550,11 @@ class block_workflow_step_state {
 
         $userroles = $DB->get_recordset_sql($sql, array_merge($fieldssql->params, $params));
 
-        $users = array();
+        $users = [];
         foreach ($userroles as $userrole) {
             if (!array_key_exists($userrole->id, $users)) {
                 $users[$userrole->id] = $userrole;
-                $users[$userrole->id]->roles = array($rolenames[$userrole->shortname]);
+                $users[$userrole->id]->roles = [$rolenames[$userrole->shortname]];
             } else {
                 $users[$userrole->id]->roles[] = $rolenames[$userrole->shortname];
             }

@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 
@@ -44,14 +45,14 @@ if ($cm) {
 require_capability('block/workflow:view', $PAGE->context);
 
 // Set the page URL.
-$PAGE->set_url('/blocks/workflow/overview.php', array('contextid' => $contextid, 'workflowid' => $workflowid));
+$PAGE->set_url('/blocks/workflow/overview.php', ['contextid' => $contextid, 'workflowid' => $workflowid]);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_course($course);
 
 // Grab the workflow and states.
 $workflow = new block_workflow_workflow($workflowid);
 $stepstates = $workflow->step_states($contextid, $workflowid);
-$tparams = array('contexttitle' => $context->get_context_name(), 'workflowname' => $workflow->name);
+$tparams = ['contexttitle' => $context->get_context_name(), 'workflowname' => $workflow->name];
 
 // Check that this workflow is assigned to this context.
 $statelist = array_filter($stepstates, function ($a) {

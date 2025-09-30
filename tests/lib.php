@@ -20,7 +20,6 @@
  * @package   block_workflow
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @group block_workflow
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -29,7 +28,16 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
 
 
+/**
+ * Class block_workflow_testing_context_hack.
+ */
 class block_workflow_testing_context_hack extends context_system {
+    /**
+     * Clears the context caches for the provided test database.
+     *
+     * @param object $testdb The test database instance whose context caches should be cleared.
+     * @return void
+     */
     public static function clear_context_caches($testdb) {
 
         // We need to reset the contexcache.
@@ -49,14 +57,32 @@ class block_workflow_testing_context_hack extends context_system {
     }
 }
 
+/**
+ * Abstract test library for the block_workflow plugin.
+ */
 abstract class block_workflow_testlib extends advanced_testcase {
 
-    // Add code coverage for the libraries.
-    public static $includecoverage = array('blocks/workflow/locallib.php');
-    // The test course's ID, and contextid for future reference.
+    /**
+     * @var array  Add code coverage for the libraries.
+     */
+    public static $includecoverage = ['blocks/workflow/locallib.php'];
+    /**
+     * @var int The test course's ID, and contextid for future reference.
+     */
     protected $courseid;
+    /**
+     * @var int The context ID associated with this instance.
+     */
     protected $contextid;
+
+    /**
+     * @var array List of roles relevant to the workflow.
+     */
     protected $roles;
+
+    /**
+     * @var array List of users involved in the workflow.
+     */
     protected $users;
 
     /**
@@ -107,31 +133,32 @@ abstract class block_workflow_testlib extends advanced_testcase {
         $this->contextid = $context->id;
 
         // Create some roles.
-        $roles = array(
+        $roles = [
             'manager'           => 'manager',
             'coursecreator'     => 'coursecreator',
             'teacher'           => 'teacher',
             'editingteacher'    => 'editingteacher',
             'student'           => 'student',
-        );
+        ];
         foreach ($roles as $shortname => $archetype) {
-            $role = $DB->get_record('role', array('shortname' => $shortname));
+            $role = $DB->get_record('role', ['shortname' => $shortname]);
             $this->roles[$shortname] = $role->id;
         }
 
         // Create some users.
-        $users = array(
+        $users = [
             'egmanager'         => 'manager',
             'egteacher'         => 'teacher',
             'egeditingteacher'  => 'editingteacher',
             'egcoursecreator'   => 'coursecreator',
             'egstudent'         => 'student',
-        );
+        ];
         foreach ($users as $username => $role) {
             $user = new StdClass;
             $user->username     = $username;
             $user->firstname    = $username;
             $user->lastname     = $username;
+            $user->email        = $username . '@localhost.com';
             $user->id = $DB->insert_record('user', $user);
             $assignment = new stdClass();
             $assignment->roleid = $this->roles[$role];
@@ -142,7 +169,6 @@ abstract class block_workflow_testlib extends advanced_testcase {
         }
 
         $generator->get_plugin_generator('mod_quiz')->create_instance(['course' => $course->id]);
-        $generator->get_plugin_generator('mod_chat')->create_instance(['course' => $course->id]);
     }
 
     /**
@@ -154,7 +180,7 @@ abstract class block_workflow_testlib extends advanced_testcase {
      * @param   object   $step   The object to compare with using assertEquals
      * @param   array    $ignore    Which fields to ignore
      */
-    protected function compare_step($source, $with, $ignore = array('id', 'stepno')) {
+    protected function compare_step($source, $with, $ignore = ['id', 'stepno']) {
         // If we're given a step, then grab it's expected settings.
         if (is_a($source, 'block_workflow_step')) {
             $fields = $source->expected_settings();
@@ -174,7 +200,7 @@ abstract class block_workflow_testlib extends advanced_testcase {
      * @param   object   $workflow  The object to compare with using assertEqualss
      * @param   array    $ignore    Which fields to ignore
      */
-    protected function compare_workflow($source, $with, $ignore = array('id', 'shortname')) {
+    protected function compare_workflow($source, $with, $ignore = ['id', 'shortname']) {
         // If we're given a workflow, then grab it's expected settings.
         if (is_a($source, 'block_workflow_workflow')) {
             $fields = $source->expected_settings();
@@ -194,7 +220,7 @@ abstract class block_workflow_testlib extends advanced_testcase {
      * @param   object   $todo      The object to compare with using assertEqualss
      * @param   array    $ignore    Which fields to ignore
      */
-    protected function compare_email($source, $with, $ignore = array('id', 'shortname')) {
+    protected function compare_email($source, $with, $ignore = ['id', 'shortname']) {
         // If we're given a todo, then grab it's expected settings.
         if (is_a($source, 'block_workflow_email')) {
             $fields = $source->expected_settings();
@@ -214,7 +240,7 @@ abstract class block_workflow_testlib extends advanced_testcase {
      * @param   object   $todo      The object to compare with using assertEqualss
      * @param   array    $ignore    Which fields to ignore
      */
-    protected function compare_todo($source, $with, $ignore = array('id', 'obsolete')) {
+    protected function compare_todo($source, $with, $ignore = ['id', 'obsolete']) {
         // If we're given a todo, then grab it's expected settings.
         if (is_a($source, 'block_workflow_todo')) {
             $fields = $source->expected_settings();
@@ -225,6 +251,15 @@ abstract class block_workflow_testlib extends advanced_testcase {
         $this->compare_object($source, $with, $fields, $ignore);
     }
 
+    /**
+     * Compares two objects based on specified fields, ignoring certain fields.
+     *
+     * @param object $source The source object to compare.
+     * @param object $target The target object to compare against.
+     * @param array $fields The list of fields to compare between the objects.
+     * @param array $ignore The list of fields to ignore during comparison.
+     * @return void
+     */
     protected function compare_object($source, $target, $fields, $ignore) {
         // Check each field.
         foreach ($fields as $name) {
@@ -245,7 +280,7 @@ abstract class block_workflow_testlib extends advanced_testcase {
      * @param   string  $command The function to run on $object
      * @param   mixed   $args    Any arguments to pass to the function
      */
-    protected function expect_exception_without_halting($et, $class = null, $command) {
+    protected function expect_exception_without_halting($et, $class, $command) {
         $args = func_get_args();
         array_shift($args);
         array_shift($args);
@@ -253,7 +288,7 @@ abstract class block_workflow_testlib extends advanced_testcase {
 
         try {
             if ($class) {
-                $func = array($class, $command);
+                $func = [$class, $command];
             } else {
                 $func = $command;
             }
@@ -267,6 +302,12 @@ abstract class block_workflow_testlib extends advanced_testcase {
         }
     }
 
+    /**
+     * Creates a workflow instance for testing purposes.
+     *
+     * @param bool $createstep Whether to create a workflow step (default: true).
+     * @return block_workflow_workflow The created workflow instance or relevant test object.
+     */
     protected function create_workflow($createstep = true) {
         // Create a new workflow.
         $data = new stdClass();
@@ -282,6 +323,12 @@ abstract class block_workflow_testlib extends advanced_testcase {
         return $workflow;
     }
 
+    /**
+     * Creates a new step for the given workflow.
+     *
+     * @param object $workflow The workflow object to which the step will be added.
+     * @return block_workflow_step The created step object.
+     */
     protected function create_step($workflow) {
         // Create a new step.
         $step = new block_workflow_step();
@@ -293,6 +340,12 @@ abstract class block_workflow_testlib extends advanced_testcase {
         return $step;
     }
 
+    /**
+     * Creates an email object for testing purposes.
+     *
+     * @param string $shortname Optional. The short name to assign to the email. Default is 'TESTMAIL'.
+     * @return block_workflow_email The created email object.
+     */
     protected function create_email($shortname = 'TESTMAIL') {
         // Create a new todo.
         $email  = new block_workflow_email();
@@ -304,6 +357,12 @@ abstract class block_workflow_testlib extends advanced_testcase {
         return $email;
     }
 
+    /**
+     * Creates a new todo item for the specified workflow step.
+     *
+     * @param object $step The workflow step for which to create the todo item.
+     * @return block_workflow_todo The created todo item.
+     */
     protected function create_todo($step) {
         // Create a new todo.
         $todo = new block_workflow_todo();
@@ -314,6 +373,12 @@ abstract class block_workflow_testlib extends advanced_testcase {
         return $todo;
     }
 
+    /**
+     * Assigns a workflow to the current context or object.
+     *
+     * @param object $workflow The workflow instance.
+     * @return mixed
+     */
     protected function assign_workflow($workflow) {
         global $DB;
 
@@ -330,12 +395,19 @@ abstract class block_workflow_testlib extends advanced_testcase {
                 INNER JOIN {context} c ON c.instanceid = cm.id
                 INNER JOIN {modules} md ON md.id = cm.module
                 WHERE md.name = ? AND cm.course = ? LIMIT 1";
-        $instance = $DB->get_record_sql($sql, array($module, $this->courseid));
+        $instance = $DB->get_record_sql($sql, [$module, $this->courseid]);
 
         // Create the activity for this type of workflow.
         return $workflow->add_to_context($instance->id);
     }
 
+    /**
+     * Creates a workflow for a specified activity type.
+     *
+     * @param string $appliesto The type of activity the workflow applies to.
+     * @param bool $createstep Whether to create an initial step in the workflow. Defaults to true.
+     * @return block_workflow_workflow The created workflow object or relevant data structure.
+     */
     protected function create_activity_workflow($appliesto, $createstep = true) {
         // Create a new workflow.
         $data = new stdClass();
@@ -412,6 +484,13 @@ abstract class block_workflow_testlib extends advanced_testcase {
         $DB->execute("TRUNCATE vl_v_crs_version_pres");
     }
 
+    /**
+     * Calculates and returns a date based on the specified number of days before or after the current date.
+     *
+     * @param int $days The number of days to add or subtract from the current date.
+     * @param string $beforeafter Determines whether to calculate the date 'before' or 'after' the current date. Default is 'after'.
+     * @return int The calculated data.
+     */
     protected function get_days($days, $beforeafter = 'after') {
         if ($beforeafter === 'before') {
             return -($days * 24 * 60 * 60);
@@ -452,7 +531,7 @@ abstract class block_workflow_testlib extends advanced_testcase {
         // Update current step.
         $newstep = new block_workflow_step($step1->id);
         $newstep->update_step($step1);
-        return array($workflow, $step1);
+        return [$workflow, $step1];
     }
 
     /**
@@ -465,32 +544,32 @@ abstract class block_workflow_testlib extends advanced_testcase {
      */
     protected function create_expected_active_step($state, $step, $appliesto, $course, $cmid = 0, $type = 'autofinish') {
         if ($type == 'autofinish') {
-            return array($state->id => (object)array(
-                    'stateid' => $state->id,
-                    'stepid' => $step->id,
-                    'state' => BLOCK_WORKFLOW_STATE_ACTIVE,
-                    'workflowid' => $step->workflowid,
-                    'appliesto' => $appliesto,
-                    'stepname' => $step->name,
-                    'autofinish' => $step->autofinish,
-                    'autofinishoffset' => $step->autofinishoffset,
-                    'courseid' => ($course ? $course->id : null),
-                    'courseshortname' => ($course ? $course->shortname : null),
-                    'moduleid' => $cmid)
-            );
-        }
-        return array($state->id => (object)array(
+            return [$state->id => (object)[
                 'stateid' => $state->id,
                 'stepid' => $step->id,
                 'state' => BLOCK_WORKFLOW_STATE_ACTIVE,
                 'workflowid' => $step->workflowid,
                 'appliesto' => $appliesto,
                 'stepname' => $step->name,
-                'extranotify' => $step->extranotify,
-                'extranotifyoffset' => "$step->extranotifyoffset",
+                'autofinish' => $step->autofinish,
+                'autofinishoffset' => $step->autofinishoffset,
                 'courseid' => ($course ? $course->id : null),
                 'courseshortname' => ($course ? $course->shortname : null),
-                'moduleid' => $cmid)
-        );
+                'moduleid' => $cmid,
+            ]];
+        }
+        return [$state->id => (object)[
+            'stateid' => $state->id,
+            'stepid' => $step->id,
+            'state' => BLOCK_WORKFLOW_STATE_ACTIVE,
+            'workflowid' => $step->workflowid,
+            'appliesto' => $appliesto,
+            'stepname' => $step->name,
+            'extranotify' => $step->extranotify,
+            'extranotifyoffset' => "$step->extranotifyoffset",
+            'courseid' => ($course ? $course->id : null),
+            'courseshortname' => ($course ? $course->shortname : null),
+            'moduleid' => $cmid,
+        ]];
     }
 }

@@ -14,20 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Email edit form
- *
- * @package   block_workflow
- * @copyright 2011 Lancaster University Network Services Limited
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/formslib.php');
 
+/**
+ * Form definition for editing email settings in the workflow block.
+ *
+ * This class extends moodleform to provide a form for editing email-related
+ * configuration within the Moodle workflow block.
+ *
+ * @package   block_workflow
+ * @copyright  2025 The Open University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class email_edit extends moodleform {
+
+    #[\Override]
     protected function definition() {
         $mform = $this->_form;
         $mform->addElement('header', 'general', get_string('emailsettings', 'block_workflow'));
@@ -56,6 +60,7 @@ class email_edit extends moodleform {
         $this->add_action_buttons();
     }
 
+    #[\Override]
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

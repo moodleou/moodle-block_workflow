@@ -22,6 +22,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once(dirname(__FILE__) . '/../locallib.php');
+
 /**
  * Workflow class
  *
@@ -41,13 +45,28 @@
  */
 class block_workflow_workflow {
 
+    /** @var int Workflow ID */
     public $id;
+
+    /** @var string Short name of the workflow */
     public $shortname;
+
+    /** @var string Name of the workflow */
     public $name;
+
+    /** @var string Description of the workflow */
     public $description;
+
+    /** @var int Format of the description (e.g., FORMAT_HTML) */
     public $descriptionformat;
+
+    /** @var string Context or entity this workflow applies to */
     public $appliesto;
+
+    /** @var int|null Step to go back to at the end, or null if not applicable */
     public $atendgobacktostep;
+
+    /** @var int Indicates if the workflow is obsolete (1 = obsolete, 0 = active) */
     public $obsolete;
 
     /**
@@ -71,9 +90,8 @@ class block_workflow_workflow {
      * @param stdClass $workflow Database record to overload into the
      * object instance
      * @return The instantiated block_workflow_workflow object
-     * @access private
      */
-    private function _load($workflow) {
+    private function load($workflow) {
         $this->id                   = $workflow->id;
         $this->shortname            = $workflow->shortname;
         $this->name                 = $workflow->name;
@@ -91,15 +109,16 @@ class block_workflow_workflow {
      * @return  array   The list of available settings
      */
     public function expected_settings() {
-        return array('id',
+        return [
+            'id',
             'shortname',
             'name',
             'description',
             'descriptionformat',
             'appliesto',
             'atendgobacktostep',
-            'obsolete'
-        );
+            'obsolete',
+        ];
     }
 
     /**
@@ -111,11 +130,11 @@ class block_workflow_workflow {
      */
     public function load_workflow($workflowid) {
         global $DB;
-        $workflow = $DB->get_record('block_workflow_workflows', array('id' => $workflowid));
+        $workflow = $DB->get_record('block_workflow_workflows', ['id' => $workflowid]);
         if (!$workflow) {
             throw new block_workflow_invalid_workflow_exception(get_string('invalidworkflow', 'block_workflow'));
         }
-        return $this->_load($workflow);
+        return $this->load($workflow);
     }
 
     /**
@@ -127,11 +146,11 @@ class block_workflow_workflow {
      */
     public function load_workflow_from_shortname($shortname) {
         global $DB;
-        $workflow = $DB->get_record('block_workflow_workflows', array('shortname' => $shortname));
+        $workflow = $DB->get_record('block_workflow_workflows', ['shortname' => $shortname]);
         if (!$workflow) {
             throw new block_workflow_invalid_workflow_exception(get_string('invalidworkflow', 'block_workflow'));
         }
-        return $this->_load($workflow);
+        return $this->load($workflow);
     }
 
     /**
@@ -151,7 +170,7 @@ class block_workflow_workflow {
             WHERE states.contextid = ?
             GROUP BY workflows.id
             ORDER BY MAX(states.timemodified) DESC";
-        $workflows = $DB->get_records_sql($sql, array($contextid));
+        $workflows = $DB->get_records_sql($sql, [$contextid]);
         return $workflows;
     }
 
@@ -176,13 +195,13 @@ class block_workflow_workflow {
         }
 
         // Check whether this shortname is already in use.
-        if ($DB->get_record('block_workflow_workflows', array('shortname' => $workflow->shortname))) {
+        if ($DB->get_record('block_workflow_workflows', ['shortname' => $workflow->shortname])) {
             if ($makenamesunique) {
                 // Create new name by adding a digit and incrementing it if
                 // name already has digit at the end.
                 $shortnameclean = preg_replace('/\d+$/', '', $workflow->shortname);
                 $sql = 'SELECT shortname FROM {block_workflow_workflows} WHERE shortname LIKE ? ORDER BY shortname DESC LIMIT 1';
-                $lastshortname = $DB->get_record_sql($sql, array($shortnameclean."%"));
+                $lastshortname = $DB->get_record_sql($sql, [$shortnameclean."%"]);
                 if (preg_match('/\d+$/', $lastshortname->shortname)) {
                     $workflow->shortname = $lastshortname->shortname;
                     $workflow->shortname++;
@@ -200,16 +219,21 @@ class block_workflow_workflow {
         }
 
         // Check whether this name is already in use.
-        if ($DB->get_record('block_workflow_workflows', array('name' => $workflow->name))) {
+        if ($DB->get_record('block_workflow_workflows', ['name' => $workflow->name])) {
             if ($makenamesunique) {
                 // Create new name by adding a digit and incrementing it if
                 // name already has digit at the end.
                 $nameclean = preg_replace('/\d+$/', '', $workflow->name);
                 $sql = 'SELECT name FROM {block_workflow_workflows} WHERE name LIKE ? ORDER BY name DESC LIMIT 1';
-                $lastname = $DB->get_record_sql($sql, array($nameclean."%"));
+                $lastname = $DB->get_record_sql($sql, [$nameclean."%"]);
                 if (preg_match('/\d+$/', $lastname->name)) {
                     $workflow->name = $lastname->name;
-                    $workflow->name++;
+                    // Safe increment of trailing number (preserves leading zeros).
+                    // E.g: workflow01 becomes workflow02, workflow99 becomes workflow100.
+                    $workflow->name = preg_replace_callback('/(\d+)$/', function ($m) {
+                        $num = (int) $m[1] + 1;
+                        return str_pad((string) $num, strlen($m[1]), '0', STR_PAD_LEFT);
+                    }, $workflow->name);
                 } else {
                     $workflow->name .= '1';
                 }
@@ -295,7 +319,6 @@ class block_workflow_workflow {
      * @param Object  $data  An object containing any data to override
      * @return  The newly created block_workflow_workflow object
      * @throws  block_workflow_invalid_workflow_exception if the supplied shortname is already in use
-     * @static
      */
     public static function clone_workflow($srcid, $data) {
         global $DB;
@@ -321,7 +344,7 @@ class block_workflow_workflow {
         $dst = (object) array_merge((array) $src, (array) $data);
 
         // Check whether this shortname is already in use.
-        if ($DB->get_record('block_workflow_workflows', array('shortname' => $dst->shortname))) {
+        if ($DB->get_record('block_workflow_workflows', ['shortname' => $dst->shortname])) {
             $transaction->rollback(new block_workflow_invalid_workflow_exception('shortnameinuse', 'block_workflow'));
         }
 
@@ -371,32 +394,30 @@ class block_workflow_workflow {
         $this->require_deletable();
 
         // First remove any steps and their associated doers and todos.
-        $steps = $DB->get_records('block_workflow_step_states', array('id' => $this->id), null, 'id');
+        $steps = $DB->get_records('block_workflow_step_states', ['id' => $this->id], null, 'id');
         $steplist = array_map(function ($a) {
             return $a->id;
         }, $steps);
 
         $DB->delete_records_list('block_workflow_step_doers', 'stepid', $steplist);
         $DB->delete_records_list('block_workflow_step_todos', 'stepid', $steplist);
-        $DB->delete_records('block_workflow_steps', array('workflowid' => $this->id));
+        $DB->delete_records('block_workflow_steps', ['workflowid' => $this->id]);
 
         // Finally, remove the workflow itself.
-        $DB->delete_records('block_workflow_workflows', array('id' => $this->id));
+        $DB->delete_records('block_workflow_workflows', ['id' => $this->id]);
         $transaction->allow_commit();
     }
 
     /**
-     * Return an array of available workflows
+     * Return an array of available workflows.
      *
-     * @param   String for  The context in which the workflow is for
-     * @return  array of stdClass objects as returned by the database
-     *          abstraction layer
+     * @param string $for type of context the workflows should apply to.
+     * @return stdClass[] of stdClass objects representing workflows.
      */
-    public static function available_workflows($for) {
+    public static function available_workflows(string $for): array {
         global $DB;
-        $workflows = $DB->get_records('block_workflow_workflows',
-                array('appliesto' => $for, 'obsolete' => 0), 'name');
-        return $workflows;
+        return $DB->get_records('block_workflow_workflows',
+                ['appliesto' => $for, 'obsolete' => 0], 'name');
     }
 
     /**
@@ -432,7 +453,7 @@ class block_workflow_workflow {
 
         // Check whether this workflow has been previously assigned to this context.
         $existingstate = $DB->get_record('block_workflow_step_states',
-                array('stepid' => $step->id, 'contextid' => $contextid));
+                ['stepid' => $step->id, 'contextid' => $contextid]);
         if ($existingstate) {
             $state->id              = $existingstate->id;
             $DB->update_record('block_workflow_step_states', $state);
@@ -465,7 +486,7 @@ class block_workflow_workflow {
 
         // This is a workaround for a limitation of the message_send system.
         // This must be called outside of a transaction.
-        block_workflow_command_email::message_send();
+        block_workflow_command_email::message_send($state);
 
         return $state;
     }
@@ -515,7 +536,7 @@ class block_workflow_workflow {
         $DB->delete_records_list('block_workflow_todo_done', 'stepstateid', $statelist);
 
         // Remove the states.
-        $DB->delete_records('block_workflow_step_states', array('contextid' => $contextid));
+        $DB->delete_records('block_workflow_step_states', ['contextid' => $contextid]);
 
         // These are all of the required steps for removing a workflow from a context, so commit.
         $transaction->allow_commit();
@@ -539,7 +560,7 @@ class block_workflow_workflow {
 
         // Check that we've been given a valid step to loop back to.
         if ($atendgobacktostep && !$DB->get_record('block_workflow_steps',
-                array('workflowid' => $this->id, 'stepno' => $atendgobacktostep))) {
+                ['workflowid' => $this->id, 'stepno' => $atendgobacktostep])) {
             $transaction->rollback(new block_workflow_invalid_workflow_exception('invalidstepno', 'block_workflow'));
         }
 
@@ -649,7 +670,7 @@ class block_workflow_workflow {
         if ($activeonly) {
             $sql .= " AND st.state IN ('active')";
         }
-        return $DB->count_records_sql($sql, array($id));
+        return $DB->count_records_sql($sql, [$id]);
     }
 
     /**
@@ -675,13 +696,13 @@ class block_workflow_workflow {
                 FROM {block_workflow_steps}
                 WHERE workflowid = ? AND stepno > ?
                 ORDER BY stepno ASC';
-        $steps = $DB->get_records_sql($sql, array($this->id, $from));
+        $steps = $DB->get_records_sql($sql, [$this->id, $from]);
 
         // Check whether the steps are incorrectly ordered in any way.
         $sql = 'SELECT COUNT(stepno) AS count, MAX(stepno) AS max, MIN(stepno) AS min
                 FROM {block_workflow_steps}
                 WHERE workflowid = ?';
-        $checksteps = $DB->get_record_sql($sql, array($this->id));
+        $checksteps = $DB->get_record_sql($sql, [$this->id]);
 
         if (($checksteps->count != $checksteps->max) || ($checksteps->min != 0)) {
             $topstep = $checksteps->max + 1;
@@ -718,7 +739,7 @@ class block_workflow_workflow {
 
         // Retrieve all of the steps for this workflowid, in order of their
         // ascending stepno.
-        $steps = $DB->get_records('block_workflow_steps', array('workflowid' => $this->id), 'stepno ASC');
+        $steps = $DB->get_records('block_workflow_steps', ['workflowid' => $this->id], 'stepno ASC');
 
         return $steps;
     }
@@ -794,7 +815,7 @@ class block_workflow_workflow {
 
         ORDER BY steps.stepno";
 
-        $steps = $DB->get_records_sql($sql, array('contextid' => $contextid, 'workflowid' => $this->id));
+        $steps = $DB->get_records_sql($sql, ['contextid' => $contextid, 'workflowid' => $this->id]);
         return $steps;
     }
 
@@ -817,7 +838,7 @@ class block_workflow_workflow {
 
         // Check whether this shortname is already in use.
         if (isset($data->shortname) &&
-                ($id = $DB->get_field('block_workflow_workflows', 'id', array('shortname' => $data->shortname)))) {
+                ($id = $DB->get_field('block_workflow_workflows', 'id', ['shortname' => $data->shortname]))) {
             if ($id != $data->id) {
                 $transaction->rollback(new block_workflow_invalid_workflow_exception('shortnameinuse', 'block_workflow'));
             }

@@ -21,6 +21,7 @@
  * @copyright 2011 Lancaster University Network Services Limited
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -44,11 +45,11 @@ $step->require_deletable();
 
 // The confirmation strings.
 $confirmstr = get_string('deletestepcheck', 'block_workflow', $step->name);
-$confirmurl = new moodle_url('/blocks/workflow/deletestep.php', array('stepid' => $stepid, 'confirm' => 1));
-$returnurl  = new moodle_url('/blocks/workflow/editsteps.php', array('workflowid' => $step->workflowid));
+$confirmurl = new moodle_url('/blocks/workflow/deletestep.php', ['stepid' => $stepid, 'confirm' => 1]);
+$returnurl  = new moodle_url('/blocks/workflow/editsteps.php', ['workflowid' => $step->workflowid]);
 
 // Set page url.
-$PAGE->set_url('/blocks/workflow/deletestep.php', array('stepid' => $stepid));
+$PAGE->set_url('/blocks/workflow/deletestep.php', ['stepid' => $stepid]);
 
 // Set the heading and page title.
 $title = get_string('confirmstepdeletetitle', 'block_workflow', $step->name);

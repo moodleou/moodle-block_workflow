@@ -26,7 +26,14 @@ defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 require_once($CFG->libdir . '/formslib.php');
 
+/**
+ * Form definition for editing a workflow task in the Moodle block_workflow plugin.
+ *
+ * This class extends the moodleform base class to provide fields and validation
+ * for editing or creating workflow tasks within the workflow block.
+ */
 class task_edit extends moodleform {
+    #[\Override]
     protected function definition() {
         $mform = $this->_form;
         $mform->addElement('text', 'task', get_string('task', 'block_workflow'));

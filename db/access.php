@@ -24,59 +24,59 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
+$capabilities = [
 
-    'block/workflow:addinstance' => array(
+    'block/workflow:addinstance' => [
         'riskbitmask' => RISK_SPAM | RISK_XSS,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
-        'archetypes' => array(
+        'archetypes' => [
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ),
+            'manager' => CAP_ALLOW,
+        ],
 
-        'clonepermissionsfrom' => 'moodle/site:manageblocks'
-    ),
+        'clonepermissionsfrom' => 'moodle/site:manageblocks',
+    ],
 
     // Allows access to, and use of the workflow definition.
     // By default given to manager.
-    'block/workflow:editdefinitions'    => array(
+    'block/workflow:editdefinitions'    => [
         'captype'       => 'write',
         'contextlevel'  => CONTEXT_SYSTEM,
-        'archetypes'    => array(
+        'archetypes'    => [
             'manager'   => CAP_ALLOW,
-        )
-    ),
+        ],
+    ],
 
     // Allows users to see the workflow block.
     // By default given to manager and editingteacher.
-    'block/workflow:view'   => array(
+    'block/workflow:view'   => [
         'captype'       => 'read',
         'contextlevel'  => CONTEXT_COURSE,
-        'archetypes'    => array(
+        'archetypes'    => [
             'manager'           => CAP_ALLOW,
             'editingteacher'    => CAP_ALLOW,
-        )
-    ),
+        ],
+    ],
 
     // Allows use of the 'Jump to step' button.
     // By default given to manager.
-    'block/workflow:manage' => array(
+    'block/workflow:manage' => [
         'captype'       => 'write',
         'contextlevel'  => CONTEXT_COURSE,
-        'archetypes'    => array(
+        'archetypes'    => [
             'manager'   => CAP_ALLOW,
-        )
-    ),
+        ],
+    ],
 
     // Allows use of the 'Finish step' button.
     // By default given to manager.
-    'block/workflow:dostep' => array(
+    'block/workflow:dostep' => [
         'captype'       => 'write',
         'contextlevel'  => CONTEXT_COURSE,
-        'archetypes'    => array(
+        'archetypes'    => [
             'manager'   => CAP_ALLOW,
-        )
-    )
-);
+        ],
+    ],
+];

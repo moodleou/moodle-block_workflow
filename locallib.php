@@ -90,10 +90,10 @@ function block_workflow_load_workflows() {
  */
 function block_workflow_appliesto_list() {
     // Applies to should contain courses ...
-    $return = array('course' => get_string('course'));
+    $return = ['course' => get_string('course')];
 
     // ... and any installed modules.
-    $mods = get_plugin_list('mod');
+    $mods = core_component::get_plugin_list('mod');
     foreach ($mods as $name => $path) {
         $return[$name] = get_string('pluginname', 'mod_' . $name);
     }
@@ -138,7 +138,7 @@ function block_workflow_contextlevel_roles($contextlevel) {
             WHERE cl.contextlevel = ?
             ORDER BY roles.sortorder ASC
             ";
-    return role_fix_names($DB->get_records_sql($sql, array($contextlevel)));
+    return role_fix_names($DB->get_records_sql($sql, [$contextlevel]));
 }
 
 /**
@@ -152,7 +152,7 @@ function block_workflow_contextlevel_roles($contextlevel) {
  * @return  array   Containing a list of default properties
  */
 function block_workflow_editor_options() {
-    $options = array();
+    $options = [];
 
     // Disallow files.
     $options['maxfiles'] = 0;
@@ -195,10 +195,10 @@ function block_workflow_editor_format($type) {
  * @return  int        The editor format
  */
 function block_workflow_convert_editor_format($format) {
-    $knownformats = array(
+    $knownformats = [
         get_string('format_html', 'block_workflow')  => FORMAT_HTML,
         get_string('format_plain', 'block_workflow') => FORMAT_PLAIN,
-    );
+    ];
     if (isset($knownformats[$format])) {
         return $knownformats[$format];
     } else {
@@ -218,7 +218,7 @@ function block_workflow_convert_editor_format($format) {
 function block_workflow_can_make_changes($state) {
     global $USER;
 
-    static $canmakechanges = array();
+    static $canmakechanges = [];
 
     $context = $state->context();
 
@@ -270,9 +270,9 @@ function block_workflow_get_active_steps_with_fields_not_null($stepoptions) {
                     AND (ctx.contextlevel = :coursecotext OR ctx.contextlevel = :modulecontext)
                     ORDER BY state.id ASC";
 
-    $options = array('state' => BLOCK_WORKFLOW_STATE_ACTIVE,
+    $options = ['state' => BLOCK_WORKFLOW_STATE_ACTIVE,
             'coursecotext' => CONTEXT_COURSE,
-            'modulecontext' => CONTEXT_MODULE);
+            'modulecontext' => CONTEXT_MODULE];
 
     return $DB->get_records_sql($sql, $options);
 }
@@ -296,15 +296,15 @@ function block_workflow_get_offset_time($courseshortname, $courseid, $moduleid, 
                 SELECT MIN($dbfield)
                   FROM $table
                  WHERE vle_course_short_name = ?
-                ", array($courseshortname));
+                ", [$courseshortname]);
         $timestamp = 0;
         if ($date) {
             $timestamp = strtotime($date);
         }
     } else if ($dbtable === 'course') {
-        $timestamp = $DB->get_field('course', $dbfield, array('id' => $courseid));
+        $timestamp = $DB->get_field('course', $dbfield, ['id' => $courseid]);
     } else {
-        $timestamp = $DB->get_field($dbtable, $dbfield, array('id' => $moduleid));
+        $timestamp = $DB->get_field($dbtable, $dbfield, ['id' => $moduleid]);
     }
     if ($timestamp) {
         return $timestamp + $offset;
@@ -318,7 +318,7 @@ function block_workflow_get_offset_time($courseshortname, $courseid, $moduleid, 
  * @return void
  */
 function block_workflow_send_extra_notification() {
-    $options = array('extranotify', 'extranotifyoffset', 'onextranotifyscript');
+    $options = ['extranotify', 'extranotifyoffset', 'onextranotifyscript'];
     $activesteps = block_workflow_get_active_steps_with_fields_not_null($options);
 
     if (!$activesteps) {
@@ -343,7 +343,7 @@ function block_workflow_send_extra_notification() {
                 }
 
                 // Cron setup user.
-                cron_setup_user();
+                \core\cron::setup_user();
             }
         } catch (Exception $e) {
             block_workflow_report_scheduled_task_error('send extra notifications', $e, $activestep);
@@ -356,7 +356,7 @@ function block_workflow_send_extra_notification() {
  * @return void
  */
 function block_workflow_autofinish_steps() {
-    $options = array('autofinish', 'autofinishoffset', null);
+    $options = ['autofinish', 'autofinishoffset', null];
     $activesteps = block_workflow_get_active_steps_with_fields_not_null($options);
 
     if (!$activesteps) {
@@ -379,7 +379,7 @@ function block_workflow_autofinish_steps() {
                 $state->finish_step($newcomment, FORMAT_HTML);
 
                 // Cron setup user.
-                cron_setup_user();
+                \core\cron::setup_user();
             }
         } catch (Exception $e) {
             block_workflow_report_scheduled_task_error(

@@ -35,22 +35,41 @@ global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
 require_once($CFG->dirroot.'/lib/grade/grade_item.php');
 
-class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
+/**
+ * Unit tests for the commandsetgradeitemvisibility class in the block_workflow plugin.
+ */
+final class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
+    /**
+     * Generates a module instance of the specified type.
+     *
+     * @param string $modname The name of the module to generate.
+     * @return mixed The generated module instance.
+     */
     private function generate_module($modname) {
         global $CFG;
         if (!is_readable($CFG->dirroot . '/mod/externalquiz/tests/generator/lib.php')) {
             $this->markTestSkipped('This test requires mod_externalquiz to be installed.');
         }
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_' . $modname);
-        return $generator->create_instance(array('course' => $this->courseid));
+        return $generator->create_instance(['course' => $this->courseid]);
     }
 
-    public function test_setgradeitemvisibility() {
+    /**
+     * Tests the setgradeitemvisibility method.
+     *
+     * @covers \block_workflow_command_setgradeitemvisibility
+     */
+    public function test_setgradeitemvisibility(): void {
         $command = new block_workflow_command_setgradeitemvisibility();
         $this->assertInstanceOf('block_workflow_command', $command);
     }
 
-    public function test_parse_no_state_visible() {
+    /**
+     * Tests the block_workflow_command_setgradeitemvisibility parse no state visible.
+     *
+     * @covers \block_workflow_command_setgradeitemvisibility::parse
+     */
+    public function test_parse_no_state_visible(): void {
         $workflow = $this->create_activity_workflow('assign', false);
         $step     = $this->create_step($workflow);
 
@@ -74,7 +93,12 @@ class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         $this->assertFalse(isset($result->id));
     }
 
-    public function test_parse_no_state_hidden() {
+    /**
+     * Tests the block_workflow_command_setgradeitemvisibility parse no state hidden.
+     *
+     * @covers \block_workflow_command_setgradeitemvisibility::parse
+     */
+    public function test_parse_no_state_hidden(): void {
         $workflow = $this->create_activity_workflow('assign', false);
         $step     = $this->create_step($workflow);
 
@@ -98,7 +122,12 @@ class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         $this->assertFalse(isset($result->id));
     }
 
-    public function test_parse_no_state_invalid_state() {
+    /**
+     * Tests the block_workflow_command_setgradeitemvisibility parse no state invalid state.
+     *
+     * @covers \block_workflow_command_setgradeitemvisibility::parse
+     */
+    public function test_parse_no_state_invalid_state(): void {
         $workflow = $this->create_activity_workflow('assign', false);
         $step     = $this->create_step($workflow);
 
@@ -114,8 +143,8 @@ class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
 
         // There should be one error.
         $this->assertEquals(count($result->errors), 1);
-        $this->assertEquals($result->errors, array(
-                get_string('invalidvisibilitysetting', 'block_workflow', $args)));
+        $this->assertEquals($result->errors, [
+                get_string('invalidvisibilitysetting', 'block_workflow', $args)]);
 
         // Test: $result should have no visible.
         $this->assertFalse(isset($result->visibility));
@@ -124,7 +153,12 @@ class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         $this->assertFalse(isset($result->id));
     }
 
-    public function test_parse_no_state_appliestocourse() {
+    /**
+     * Tests the block_workflow_command_setgradeitemvisibility parse no state appliestocourse.
+     *
+     * @covers \block_workflow_command_setgradeitemvisibility::parse
+     */
+    public function test_parse_no_state_appliestocourse(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
 
@@ -140,14 +174,19 @@ class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
 
         // There should be one error.
         $this->assertEquals(count($result->errors), 1);
-        $this->assertEquals($result->errors, array(
-                get_string('notanactivity', 'block_workflow', 'setgradeitemvisibility')));
+        $this->assertEquals($result->errors, [
+                get_string('notanactivity', 'block_workflow', 'setgradeitemvisibility')]);
 
         // Test: $result should have no id.
         $this->assertFalse(isset($result->id));
     }
 
-    public function test_parse_no_state_appliesto_a_activity_which_controls_gradeitemvisibility() {
+    /**
+     * Tests the block_workflow_command_setgradeitemvisibility parse no state applies.
+     *
+     * @covers \block_workflow_command_setgradeitemvisibility::parse
+     */
+    public function test_parse_no_state_appliesto_a_activity_which_controls_gradeitemvisibility(): void {
         $workflow = $this->create_activity_workflow('quiz', false);
         $step = $this->create_step($workflow);
 
@@ -160,11 +199,16 @@ class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
 
         // There should be one error.
         $this->assertEquals(count($result->errors), 1);
-        $this->assertEquals($result->errors, array(
-                get_string('notcontrollablegradeitem', 'block_workflow', 'setgradeitemvisibility')));
+        $this->assertEquals($result->errors, [
+                get_string('notcontrollablegradeitem', 'block_workflow', 'setgradeitemvisibility')]);
     }
 
-    public function test_parse_with_state_visible() {
+    /**
+     * Tests the block_workflow_command_setgradeitemvisibility parse with state visible.
+     *
+     * @covers \block_workflow_command_setgradeitemvisibility::parse
+     */
+    public function test_parse_with_state_visible(): void {
         $this->generate_module('assign');
         $workflow = $this->create_activity_workflow('assign', false);
         $step     = $this->create_step($workflow);
@@ -190,7 +234,12 @@ class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         $this->assertEquals('assign', $result->cm->modname);
     }
 
-    public function test_parse_with_state_hidden() {
+    /**
+     * Tests the block_workflow_command_setgradeitemvisibility parse with state hidden.
+     *
+     * @covers \block_workflow_command_setgradeitemvisibility::parse
+     */
+    public function test_parse_with_state_hidden(): void {
         $this->generate_module('forum');
         $workflow = $this->create_activity_workflow('forum', false);
         $step     = $this->create_step($workflow);
@@ -216,7 +265,12 @@ class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         $this->assertEquals('forum', $result->cm->modname);
     }
 
-    public function test_parse_with_state_invalid_state() {
+    /**
+     * Tests the block_workflow_command_setgradeitemvisibility parse with state invalid state.
+     *
+     * @covers \block_workflow_command_setgradeitemvisibility::parse
+     */
+    public function test_parse_with_state_invalid_state(): void {
         $this->generate_module('assign');
         $workflow = $this->create_activity_workflow('assign', false);
         $step     = $this->create_step($workflow);
@@ -242,7 +296,12 @@ class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         $this->assertEquals('assign', $result->cm->modname);
     }
 
-    public function test_parse_with_state_appliestocourse() {
+    /**
+     * Tests the block_workflow_command_setgradeitemvisibility parse with state appliestocourse.
+     *
+     * @covers \block_workflow_command_setgradeitemvisibility::parse
+     */
+    public function test_parse_with_state_appliestocourse(): void {
         $workflow = $this->create_workflow(false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
@@ -255,15 +314,21 @@ class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         $result = $class->parse($args, $step, $state);
 
         // Test: $result should have have the validation error.
-        $this->assertEquals(array(get_string('notanactivity', 'block_workflow', 'setgradeitemvisibility')),
+        $this->assertEquals([get_string('notanactivity', 'block_workflow', 'setgradeitemvisibility')],
                  $result->errors);
 
         // There should be one error.
         $this->assertCount(1, $result->errors);
     }
 
-    public function test_parse_with_state_no_support_for_grade() {
-        $workflow = $this->create_activity_workflow('chat', false);
+    /**
+     * Tests the block_workflow_command_setgradeitemvisibility parse methods with state no support for grade.
+     *
+     * @covers \block_workflow_command_setgradeitemvisibility::parse
+     */
+    public function test_parse_with_state_no_support_for_grade(): void {
+        $this->generate_module('forum');
+        $workflow = $this->create_activity_workflow('forum', false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
 
@@ -274,20 +339,25 @@ class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         $result = $class->parse($args, $step, $state);
 
         // Test: $result should have have the validation error.
-        $this->assertEquals(array(get_string('notgradesupported', 'block_workflow', 'setgradeitemvisibility')),
+        $this->assertEquals([get_string('notgradesupported', 'block_workflow', 'setgradeitemvisibility')],
                 $result->errors);
 
         $this->assertCount(1, $result->errors);
     }
 
-    public function test_execute_hidden() {
+    /**
+     * Tests the block_workflow_command_setgradeitemvisibility execute hidden methods.
+     *
+     * @covers \block_workflow_command_setgradeitemvisibility::execute
+     */
+    public function test_execute_hidden(): void {
         global $DB;
         $assign = $this->generate_module('externalquiz');
 
         // Check the value of the field hidden in grade_items table before executing setgradeitemvisibility command.
         $hiddenfieldbefore = $DB->get_field('grade_items', 'hidden',
-                array('courseid' => $this->courseid, 'itemtype' => 'mod',
-                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id));
+                ['courseid' => $this->courseid, 'itemtype' => 'mod',
+                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id]);
         $this->assertEquals($hiddenfieldbefore, 0);
 
         // Create a workflow which applies to 'assign' module with one step.
@@ -298,23 +368,28 @@ class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         $wfc = block_workflow_command::create('block_workflow_command_setgradeitemvisibility');
         $wfc->execute('hidden', $state);
         $hiddenfieldafter = $DB->get_field('grade_items', 'hidden',
-                array('courseid' => $this->courseid, 'itemtype' => 'mod',
-                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id));
+                ['courseid' => $this->courseid, 'itemtype' => 'mod',
+                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id]);
         $this->assertEquals($hiddenfieldafter, 1);
     }
 
-    public function test_execute_visible() {
+    /**
+     * Tests the block_workflow_command_setgradeitemvisibility execute methods.
+     *
+     * @covers \block_workflow_command_setgradeitemvisibility::execute
+     */
+    public function test_execute_visible(): void {
         global $DB;
         $assign = $this->generate_module('externalquiz');
 
         $DB->set_field('grade_items', 'hidden', 1,
-                array('courseid' => $this->courseid, 'itemtype' => 'mod',
-                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id));
+                ['courseid' => $this->courseid, 'itemtype' => 'mod',
+                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id]);
 
         // Check the value of the field hidden in grade_items table before executing setgradeitemvisibility command.
         $hiddenfieldbefore = $DB->get_field('grade_items', 'hidden',
-                array('courseid' => $this->courseid, 'itemtype' => 'mod',
-                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id));
+                ['courseid' => $this->courseid, 'itemtype' => 'mod',
+                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id]);
         $this->assertEquals($hiddenfieldbefore, 1);
 
         // Create a workflow which applies to 'assign' module with one step.
@@ -325,8 +400,8 @@ class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         $wfc = block_workflow_command::create('block_workflow_command_setgradeitemvisibility');
         $wfc->execute('visible', $state);
         $hiddenfieldafter = $DB->get_field('grade_items', 'hidden',
-                array('courseid' => $this->courseid, 'itemtype' => 'mod',
-                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id));
+                ['courseid' => $this->courseid, 'itemtype' => 'mod',
+                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id]);
         $this->assertEquals($hiddenfieldafter, 0);
     }
 }
