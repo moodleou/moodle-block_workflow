@@ -228,7 +228,12 @@ class block_workflow_workflow {
                 $lastname = $DB->get_record_sql($sql, [$nameclean."%"]);
                 if (preg_match('/\d+$/', $lastname->name)) {
                     $workflow->name = $lastname->name;
-                    $workflow->name++;
+                    // Safe increment of trailing number (preserves leading zeros).
+                    // E.g: workflow01 becomes workflow02, workflow99 becomes workflow100.
+                    $workflow->name = preg_replace_callback('/(\d+)$/', function ($m) {
+                        $num = (int) $m[1] + 1;
+                        return str_pad((string) $num, strlen($m[1]), '0', STR_PAD_LEFT);
+                    }, $workflow->name);
                 } else {
                     $workflow->name .= '1';
                 }
