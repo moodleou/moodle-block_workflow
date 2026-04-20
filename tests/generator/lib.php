@@ -32,7 +32,6 @@ require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
  * Data generator class for the block_workflow plugin.
  */
 class block_workflow_generator extends testing_block_generator {
-
     /**
      * Create a workflow.
      *

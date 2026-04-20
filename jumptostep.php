@@ -31,7 +31,7 @@ $stepid     = required_param('stepid', PARAM_INT);
 $confirm    = optional_param('confirm', false, PARAM_BOOL);
 
 // Determine the context and cm.
-list($context, $course, $cm) = get_context_info_array($contextid);
+[$context, $course, $cm] = get_context_info_array($contextid);
 
 // Require login.
 require_login($course, false, $cm);
@@ -97,8 +97,10 @@ $PAGE->set_title(get_string('jumptosteptitle', 'block_workflow', $strparams));
 $confirmstr = get_string('jumptostepcheck', 'block_workflow', $strparams);
 
 // Generate the confirmation button.
-$confirmurl = new moodle_url('/blocks/workflow/jumptostep.php',
-        ['contextid' => $contextid, 'stepid' => $stepid, 'confirm' => 1]);
+$confirmurl = new moodle_url(
+    '/blocks/workflow/jumptostep.php',
+    ['contextid' => $contextid, 'stepid' => $stepid, 'confirm' => 1]
+);
 $confirmbutton  = new single_button($confirmurl, get_string('confirm'), 'post');
 
 echo $OUTPUT->header();

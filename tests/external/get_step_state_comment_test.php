@@ -28,7 +28,6 @@ require_once(dirname(__FILE__) . '/external_api_base_lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class get_step_state_comment_test extends external_api_base_lib {
-
     /**
      * Test get step state comment successfully.
      *

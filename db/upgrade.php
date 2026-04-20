@@ -76,8 +76,12 @@ function xmldb_block_workflow_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
             if ($CFG->texteditors !== 'textarea') {
-                $rs = $DB->get_recordset('block_workflow_emails',
-                        ['messageformat' => FORMAT_MOODLE], '', 'id,message,messageformat');
+                $rs = $DB->get_recordset(
+                    'block_workflow_emails',
+                    ['messageformat' => FORMAT_MOODLE],
+                    '',
+                    'id,message,messageformat'
+                );
                 foreach ($rs as $b) {
                     $b->message = text_to_html($b->message, false, false, true);
                     $b->messageformat = FORMAT_HTML;
@@ -99,8 +103,13 @@ function xmldb_block_workflow_upgrade($oldversion) {
 
     // Fix broken autofinish values.
     if ($oldversion < 2014030500) {
-        $DB->set_field_select('block_workflow_steps', 'autofinish', null,
-                'autofinish IN (?, ?)', ['', 'donotautomaticallyfinish']);
+        $DB->set_field_select(
+            'block_workflow_steps',
+            'autofinish',
+            null,
+            'autofinish IN (?, ?)',
+            ['', 'donotautomaticallyfinish']
+        );
         upgrade_block_savepoint(true, 2014030500, 'workflow');
     }
 
@@ -136,7 +145,6 @@ function xmldb_block_workflow_upgrade($oldversion) {
     }
 
     if ($oldversion < 2018111201) {
-
         // Define key roleid (foreign) to be added to block_workflow_step_doers.
         $table = new xmldb_table('block_workflow_step_doers');
         $key = new xmldb_key('roleid', XMLDB_KEY_FOREIGN, ['roleid'], 'role', ['id']);
@@ -149,7 +157,6 @@ function xmldb_block_workflow_upgrade($oldversion) {
     }
 
     if ($oldversion < 2018111300) {
-
         // Because of previous issues, there may be a duplicate index
         // {blocworkstepdoer_ste2_ix}. We drop this manually, not using
         // $dbman->drop_key, because we want to be sure to drop the ...2... index.

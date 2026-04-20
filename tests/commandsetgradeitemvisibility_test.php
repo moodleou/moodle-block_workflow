@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
 // Include our test library so that we can use the same mocking system for all tests.
 global $CFG;
 require_once(dirname(__FILE__) . '/lib.php');
-require_once($CFG->dirroot.'/lib/grade/grade_item.php');
+require_once($CFG->dirroot . '/lib/grade/grade_item.php');
 
 /**
  * Unit tests for the commandsetgradeitemvisibility class in the block_workflow plugin.
@@ -314,8 +314,10 @@ final class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         $result = $class->parse($args, $step, $state);
 
         // Test: $result should have have the validation error.
-        $this->assertEquals([get_string('notanactivity', 'block_workflow', 'setgradeitemvisibility')],
-                 $result->errors);
+        $this->assertEquals(
+            [get_string('notanactivity', 'block_workflow', 'setgradeitemvisibility')],
+            $result->errors
+        );
 
         // There should be one error.
         $this->assertCount(1, $result->errors);
@@ -327,8 +329,8 @@ final class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
      * @covers \block_workflow_command_setgradeitemvisibility::parse
      */
     public function test_parse_with_state_no_support_for_grade(): void {
-        $this->generate_module('forum');
-        $workflow = $this->create_activity_workflow('forum', false);
+        $this->generate_module('choice');
+        $workflow = $this->create_activity_workflow('choice', false);
         $step     = $this->create_step($workflow);
         $state    = $this->assign_workflow($workflow);
 
@@ -339,8 +341,10 @@ final class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         $result = $class->parse($args, $step, $state);
 
         // Test: $result should have have the validation error.
-        $this->assertEquals([get_string('notgradesupported', 'block_workflow', 'setgradeitemvisibility')],
-                $result->errors);
+        $this->assertEquals(
+            [get_string('notgradesupported', 'block_workflow', 'setgradeitemvisibility')],
+            $result->errors
+        );
 
         $this->assertCount(1, $result->errors);
     }
@@ -355,9 +359,16 @@ final class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         $assign = $this->generate_module('externalquiz');
 
         // Check the value of the field hidden in grade_items table before executing setgradeitemvisibility command.
-        $hiddenfieldbefore = $DB->get_field('grade_items', 'hidden',
-                ['courseid' => $this->courseid, 'itemtype' => 'mod',
-                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id]);
+        $hiddenfieldbefore = $DB->get_field(
+            'grade_items',
+            'hidden',
+            [
+                'courseid' => $this->courseid,
+                'itemtype' => 'mod',
+                'itemmodule' => 'externalquiz',
+                'iteminstance' => $assign->id,
+            ]
+        );
         $this->assertEquals($hiddenfieldbefore, 0);
 
         // Create a workflow which applies to 'assign' module with one step.
@@ -367,9 +378,16 @@ final class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         // Create the workflow command 'setgradeitemvisibility hidden'.
         $wfc = block_workflow_command::create('block_workflow_command_setgradeitemvisibility');
         $wfc->execute('hidden', $state);
-        $hiddenfieldafter = $DB->get_field('grade_items', 'hidden',
-                ['courseid' => $this->courseid, 'itemtype' => 'mod',
-                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id]);
+        $hiddenfieldafter = $DB->get_field(
+            'grade_items',
+            'hidden',
+            [
+                'courseid' => $this->courseid,
+                'itemtype' => 'mod',
+                'itemmodule' => 'externalquiz',
+                'iteminstance' => $assign->id,
+            ]
+        );
         $this->assertEquals($hiddenfieldafter, 1);
     }
 
@@ -382,14 +400,29 @@ final class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         global $DB;
         $assign = $this->generate_module('externalquiz');
 
-        $DB->set_field('grade_items', 'hidden', 1,
-                ['courseid' => $this->courseid, 'itemtype' => 'mod',
-                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id]);
+        $DB->set_field(
+            'grade_items',
+            'hidden',
+            1,
+            [
+                'courseid' => $this->courseid,
+                'itemtype' => 'mod',
+                'itemmodule' => 'externalquiz',
+                'iteminstance' => $assign->id,
+            ]
+        );
 
         // Check the value of the field hidden in grade_items table before executing setgradeitemvisibility command.
-        $hiddenfieldbefore = $DB->get_field('grade_items', 'hidden',
-                ['courseid' => $this->courseid, 'itemtype' => 'mod',
-                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id]);
+        $hiddenfieldbefore = $DB->get_field(
+            'grade_items',
+            'hidden',
+            [
+                'courseid' => $this->courseid,
+                'itemtype' => 'mod',
+                'itemmodule' => 'externalquiz',
+                'iteminstance' => $assign->id,
+            ]
+        );
         $this->assertEquals($hiddenfieldbefore, 1);
 
         // Create a workflow which applies to 'assign' module with one step.
@@ -399,9 +432,16 @@ final class commandsetgradeitemvisibility_test extends \block_workflow_testlib {
         // Create the workflow command 'setgradeitemvisibility visible'.
         $wfc = block_workflow_command::create('block_workflow_command_setgradeitemvisibility');
         $wfc->execute('visible', $state);
-        $hiddenfieldafter = $DB->get_field('grade_items', 'hidden',
-                ['courseid' => $this->courseid, 'itemtype' => 'mod',
-                        'itemmodule' => 'externalquiz', 'iteminstance' => $assign->id]);
+        $hiddenfieldafter = $DB->get_field(
+            'grade_items',
+            'hidden',
+            [
+                'courseid' => $this->courseid,
+                'itemtype' => 'mod',
+                'itemmodule' => 'externalquiz',
+                'iteminstance' => $assign->id,
+            ]
+        );
         $this->assertEquals($hiddenfieldafter, 0);
     }
 }

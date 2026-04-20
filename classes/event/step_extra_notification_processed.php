@@ -42,7 +42,6 @@ namespace block_workflow\event;
  * }
  */
 class step_extra_notification_processed extends \core\event\base {
-
     /**
      * Init method.
      *
@@ -103,8 +102,7 @@ class step_extra_notification_processed extends \core\event\base {
      * @return null|\moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/blocks/workflow/editstep.php',
-                ['stepid' => $this->other['stepid']]);
+        return new \moodle_url('/blocks/workflow/editstep.php', ['stepid' => $this->other['stepid']]);
     }
 
     /**

@@ -30,7 +30,7 @@ $contextid  = required_param('contextid', PARAM_INT);
 $workflowid = required_param('workflowid', PARAM_INT);
 
 // Determine the context and cm.
-list($context, $course, $cm) = get_context_info_array($contextid);
+[$context, $course, $cm] = get_context_info_array($contextid);
 
 // Require login.
 require_login($course, false, $cm);

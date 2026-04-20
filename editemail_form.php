@@ -30,25 +30,28 @@ require_once($CFG->libdir . '/formslib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class email_edit extends moodleform {
-
     #[\Override]
     protected function definition() {
         $mform = $this->_form;
         $mform->addElement('header', 'general', get_string('emailsettings', 'block_workflow'));
 
         // Template data.
-        $mform->addElement('text',      'shortname',    get_string('shortname', 'block_workflow'));
+        $mform->addElement('text', 'shortname', get_string('shortname', 'block_workflow'));
         $mform->setType('shortname', PARAM_TEXT);
         $mform->addRule('shortname', null, 'required', null, 'client');
         $mform->addRule('shortname', null, 'maxlength', 255);
         $mform->addRule('shortname', null, 'alphanumeric');
 
-        $mform->addElement('text',      'subject',      get_string('emailsubject', 'block_workflow'));
+        $mform->addElement('text', 'subject', get_string('emailsubject', 'block_workflow'));
         $mform->setType('subject', PARAM_TEXT);
         $mform->addRule('subject', null, 'required', null, 'client');
 
-        $mform->addElement('editor',  'message', get_string('emailmessage', 'block_workflow'),
-                block_workflow_editor_options());
+        $mform->addElement(
+            'editor',
+            'message',
+            get_string('emailmessage', 'block_workflow'),
+            block_workflow_editor_options()
+        );
         $mform->addRule('message', null, 'required', null, 'client');
         $mform->setType('message', PARAM_RAW);
 

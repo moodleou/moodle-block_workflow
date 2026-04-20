@@ -29,7 +29,6 @@ require_once($CFG->libdir . '/formslib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edit_workflow extends moodleform {
-
     #[\Override]
     protected function definition() {
         $mform = $this->_form;
@@ -37,26 +36,43 @@ class edit_workflow extends moodleform {
         $mform->addElement('header', 'general', get_string('workflowsettings', 'block_workflow'));
 
         // Workflow base data.
-        $mform->addElement('text',     'shortname',           get_string('shortname', 'block_workflow'),
-                ['size' => 80, 'maxlength' => 255]);
+        $mform->addElement(
+            'text',
+            'shortname',
+            get_string('shortname', 'block_workflow'),
+            ['size' => 80, 'maxlength' => 255]
+        );
         $mform->setType('shortname', PARAM_TEXT);
         $mform->addRule('shortname', null, 'required', null, 'client');
         $mform->addRule('shortname', null, 'maxlength', 255);
 
-        $mform->addElement('text',     'name',                get_string('name', 'block_workflow'),
-                ['size' => 80, 'maxlength' => 255]);
+        $mform->addElement(
+            'text',
+            'name',
+            get_string('name', 'block_workflow'),
+            ['size' => 80, 'maxlength' => 255]
+        );
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', null, 'maxlength', 255);
 
-        $mform->addElement('editor',   'description_editor',  get_string('description', 'block_workflow'),
-                block_workflow_editor_options());
+        $mform->addElement(
+            'editor',
+            'description_editor',
+            get_string('description', 'block_workflow'),
+            block_workflow_editor_options()
+        );
         $mform->addRule('description_editor', null, 'required', null, 'client');
         $mform->setType('description_editor', PARAM_RAW);
 
         // What this workflow applies to.
         $appliesto = block_workflow_appliesto_list();
-        $mform->addElement('select',   'appliesto',           get_string('appliesto', 'block_workflow'), $appliesto);
+        $mform->addElement(
+            'select',
+            'appliesto',
+            get_string('appliesto', 'block_workflow'),
+            $appliesto
+        );
         $mform->setType('appliesto', PARAM_TEXT);
         if (!$this->_customdata['is_deletable']) {
             $mform->hardFreeze('appliesto');
@@ -72,8 +88,12 @@ class edit_workflow extends moodleform {
         }
 
         if ($finalstep) {
-            $mform->addElement('select',   'atendgobacktostep',
-                    get_string('atendgobacktostep', 'block_workflow', $finalstep->stepno), $steplist);
+            $mform->addElement(
+                'select',
+                'atendgobacktostep',
+                get_string('atendgobacktostep', 'block_workflow', $finalstep->stepno),
+                $steplist
+            );
             $mform->setType('atendgobacktostep', PARAM_INT);
         }
 
@@ -81,11 +101,11 @@ class edit_workflow extends moodleform {
         $enabledoptions = [];
         $enabledoptions['0'] = get_string('enabled', 'block_workflow');
         $enabledoptions['1'] = get_string('disabled', 'block_workflow');
-        $mform->addElement('select',   'obsolete', get_string('status', 'block_workflow'), $enabledoptions);
+        $mform->addElement('select', 'obsolete', get_string('status', 'block_workflow'), $enabledoptions);
         $mform->setDefault('obsolete', 1);
         $mform->setType('obsolete', PARAM_INT);
 
-        $mform->addElement('hidden',   'workflowid');
+        $mform->addElement('hidden', 'workflowid');
         $mform->setType('workflowid', PARAM_INT);
         $this->add_action_buttons();
     }

@@ -42,7 +42,6 @@ namespace block_workflow\event;
  * }
  */
 class todo_triggered extends \core\event\base {
-
     /**
      * Init method.
      *
@@ -110,8 +109,10 @@ class todo_triggered extends \core\event\base {
      * @return null|\moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/blocks/workflow/overview.php',
-                ['contextid' => $this->contextid, 'workflowid' => $this->other['workflowid']]);
+        return new \moodle_url(
+            '/blocks/workflow/overview.php',
+            ['contextid' => $this->contextid, 'workflowid' => $this->other['workflowid']]
+        );
     }
 
     /**

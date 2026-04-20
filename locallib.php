@@ -42,19 +42,19 @@ require_once($CFG->dirroot . '/blocks/workflow/classes/command_setactivitylinked
 
 
 /** @var string An active state for a step_state. */
-define('BLOCK_WORKFLOW_STATE_ACTIVE',       'active');
+define('BLOCK_WORKFLOW_STATE_ACTIVE', 'active');
 
 /** @var string A completed state for a step_state. */
-define('BLOCK_WORKFLOW_STATE_COMPLETED',    'completed');
+define('BLOCK_WORKFLOW_STATE_COMPLETED', 'completed');
 
 /** @var string An aborted state for a step_state. */
-define('BLOCK_WORKFLOW_STATE_ABORTED',      'aborted');
+define('BLOCK_WORKFLOW_STATE_ABORTED', 'aborted');
 
 /** @var int The enabled state for a workflow. */
-define('BLOCK_WORKFLOW_ENABLED',            0);
+define('BLOCK_WORKFLOW_ENABLED', 0);
 
 /** @var int The obsolste state for a workflow. */
-define('BLOCK_WORKFLOW_OBSOLETE',           1);
+define('BLOCK_WORKFLOW_OBSOLETE', 1);
 
 /** @var int The maximum comment length to be disapled in block. */
 define('BLOCK_WORKFLOW_MAX_COMMENT_LENGTH', 200);
@@ -250,7 +250,7 @@ function block_workflow_can_make_changes($state) {
  */
 function block_workflow_get_active_steps_with_fields_not_null($stepoptions) {
     global $DB;
-    list($offsettype, $offset, $textarea) = $stepoptions;
+    [$offsettype, $offset, $textarea] = $stepoptions;
     $where = $textarea ? ' AND step.onextranotifyscript IS NOT NULL ' : '';
 
     $sql = "SELECT state.id AS stateid, state.stepid, state.state,
@@ -270,9 +270,11 @@ function block_workflow_get_active_steps_with_fields_not_null($stepoptions) {
                     AND (ctx.contextlevel = :coursecotext OR ctx.contextlevel = :modulecontext)
                     ORDER BY state.id ASC";
 
-    $options = ['state' => BLOCK_WORKFLOW_STATE_ACTIVE,
-            'coursecotext' => CONTEXT_COURSE,
-            'modulecontext' => CONTEXT_MODULE];
+    $options = [
+        'state' => BLOCK_WORKFLOW_STATE_ACTIVE,
+        'coursecotext' => CONTEXT_COURSE,
+        'modulecontext' => CONTEXT_MODULE,
+    ];
 
     return $DB->get_records_sql($sql, $options);
 }
@@ -288,7 +290,7 @@ function block_workflow_get_active_steps_with_fields_not_null($stepoptions) {
  */
 function block_workflow_get_offset_time($courseshortname, $courseid, $moduleid, $offsettype, $offset) {
     global $DB;
-    list($dbtable, $dbfield) = explode(';', $offsettype);
+    [$dbtable, $dbfield] = explode(';', $offsettype);
 
     if ($dbtable === 'vl_v_crs_version_pres') {
         $table = \local_oudataload\util::table('vl_v_crs_version_pres');
@@ -328,8 +330,13 @@ function block_workflow_send_extra_notification() {
 
     foreach ($activesteps as $key => $activestep) {
         try {
-            $notificationtime = block_workflow_get_offset_time($activestep->courseshortname,
-                    $activestep->courseid, $activestep->moduleid, $activestep->extranotify, $activestep->extranotifyoffset);
+            $notificationtime = block_workflow_get_offset_time(
+                $activestep->courseshortname,
+                $activestep->courseid,
+                $activestep->moduleid,
+                $activestep->extranotify,
+                $activestep->extranotifyoffset
+            );
 
             // Is is the time to notify?
             if ($notificationtime && $notificationtime < $now) {
@@ -366,14 +373,22 @@ function block_workflow_autofinish_steps() {
 
     foreach ($activesteps as $key => $activestep) {
         try {
-            $autofinishtime = block_workflow_get_offset_time($activestep->courseshortname,
-                    $activestep->courseid, $activestep->moduleid, $activestep->autofinish, $activestep->autofinishoffset);
+            $autofinishtime = block_workflow_get_offset_time(
+                $activestep->courseshortname,
+                $activestep->courseid,
+                $activestep->moduleid,
+                $activestep->autofinish,
+                $activestep->autofinishoffset
+            );
 
             // Is is the time to finish the step automatically?
             if ($autofinishtime < $now) {
                 // Add a comment and finish the step automatically.
-                $newcomment = get_string('finishstepautomatically',  'block_workflow',
-                                            date('H:i:s') . ' on ' . date('jS \of F Y'));
+                $newcomment = get_string(
+                    'finishstepautomatically',
+                    'block_workflow',
+                    date('H:i:s') . ' on ' . date('jS \of F Y')
+                );
 
                 $state = new block_workflow_step_state($activestep->stateid);
                 $state->finish_step($newcomment, FORMAT_HTML);
@@ -383,7 +398,10 @@ function block_workflow_autofinish_steps() {
             }
         } catch (Exception $e) {
             block_workflow_report_scheduled_task_error(
-                    'automatic step finisher', $e, $activestep);
+                'automatic step finisher',
+                $e,
+                $activestep
+            );
         }
     }
 }

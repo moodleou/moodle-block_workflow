@@ -80,7 +80,6 @@ class block_workflow extends block_base {
         $state = new block_workflow_step_state();
         // Retrieve the active state for this contextid.
         if ($state->load_active_state($this->instance->parentcontextid)) {
-
             // Update block title.
             $this->title = $state->step()->workflow()->name;
 
@@ -117,7 +116,11 @@ class block_workflow extends block_base {
             $addableworkflows = block_workflow_workflow::available_workflows($appliesto);
 
             $this->content->text = $renderer->block_display_no_more_steps(
-                    $this->instance->parentcontextid, $canadd, $addableworkflows, $previous);
+                $this->instance->parentcontextid,
+                $canadd,
+                $addableworkflows,
+                $previous
+            );
         }
 
         return $this->content;

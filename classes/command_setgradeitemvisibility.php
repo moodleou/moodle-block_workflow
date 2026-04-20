@@ -32,7 +32,6 @@
  *
  */
 class block_workflow_command_setgradeitemvisibility extends block_workflow_command {
-
     /** @var int Constant for hidden grade items */
     const HIDDEN = 1;
 
@@ -78,8 +77,10 @@ class block_workflow_command_setgradeitemvisibility extends block_workflow_comma
 
         // Check that the workflow is valid for the given state and context.
         if ($state) {
-            $data->cm = get_coursemodule_from_id($state->step()->workflow()->appliesto,
-                    $state->context()->instanceid);
+            $data->cm = get_coursemodule_from_id(
+                $state->step()->workflow()->appliesto,
+                $state->context()->instanceid
+            );
         }
         return $data;
     }

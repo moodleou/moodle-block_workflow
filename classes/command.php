@@ -31,7 +31,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_workflow_command {
-
     /**
      * Helper function to return a new instance of the specified command class
      *
@@ -39,7 +38,7 @@ class block_workflow_command {
      * @return  object          The instantiated class
      */
     public static function create($class) {
-        return new $class;
+        return new $class();
     }
 
     /**
@@ -76,7 +75,8 @@ class block_workflow_command {
         if ($return->errors) {
             // Throw an exception -- only show the first error.
             throw new block_workflow_invalid_command_exception(
-                    get_string('invalidscript', 'block_workflow', $return->errors[0]));
+                get_string('invalidscript', 'block_workflow', $return->errors[0])
+            );
         }
         return true;
     }

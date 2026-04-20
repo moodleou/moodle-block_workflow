@@ -40,7 +40,6 @@ namespace block_workflow\event;
  * Class representing a user in the system.
  */
 class email_sent_status extends \core\event\base {
-
     /**
      * Init method.
      *
@@ -101,7 +100,6 @@ class email_sent_status extends \core\event\base {
                 "'" . $this->other['stepname'] . "'" . " (id = " . $this->other['stepid'] . ")." .
                 ' Error: '  . $this->other['error'];
         }
-
     }
 
     /**
@@ -111,8 +109,10 @@ class email_sent_status extends \core\event\base {
      * @return null|\moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/blocks/workflow/overview.php',
-            ['contextid' => $this->contextid, 'workflowid' => $this->other['workflowid']]);
+        return new \moodle_url(
+            '/blocks/workflow/overview.php',
+            ['contextid' => $this->contextid, 'workflowid' => $this->other['workflowid']]
+        );
     }
 
     /**

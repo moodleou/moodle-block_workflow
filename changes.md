@@ -1,5 +1,9 @@
 # Change log for the Workflow block
 
+## Changes in 2.5
+* This version works with Moodle 5.1.
+
+
 ## Changes in 2.4
 * This version works with Moodle 5.0.
 * Automation test failures are fixed.
@@ -19,6 +23,7 @@
   * Theme: Technical debt - remove IE-specific rules
   * Workflow: Enable logs to show whether a workflow email is sent
 * Upgrade the CI to support Moodle 5.0 (PHP 8.3), and update the branch to support branch MOODLE_405_STABLE, and MOODLE_500_STABLE.
+
 
 ## Changes in 2.3
 

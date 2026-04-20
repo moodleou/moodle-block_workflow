@@ -33,7 +33,6 @@
  *
  */
 class block_workflow_command_override extends block_workflow_command {
-
     /**
      * Parses the provided arguments and processes the workflow step and state.
      *

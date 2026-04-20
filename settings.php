@@ -24,5 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$settings = new admin_externalpage('blocksettingworkflow', get_string('pluginname', 'block_workflow'),
-                                   new moodle_url('/blocks/workflow/manage.php'), 'block/workflow:editdefinitions');
+$settings = new admin_externalpage(
+    'blocksettingworkflow',
+    get_string('pluginname', 'block_workflow'),
+    new moodle_url('/blocks/workflow/manage.php'),
+    'block/workflow:editdefinitions'
+);

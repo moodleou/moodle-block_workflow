@@ -31,7 +31,7 @@ $stateid    = required_param('stateid', PARAM_INT);
 $state      = new block_workflow_step_state($stateid);
 
 // Determine the context and cm.
-list($context, $course, $cm) = get_context_info_array($state->contextid);
+[$context, $course, $cm] = get_context_info_array($state->contextid);
 
 // Require login.
 require_login($course, false, $cm);

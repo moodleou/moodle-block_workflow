@@ -37,7 +37,6 @@ require_once(dirname(__FILE__) . '/lib.php');
  * Unit test class for the block_workflow command functionality.
  */
 final class command_test extends \block_workflow_testlib {
-
     /**
      * Test the role_exists function
      * - Positive test for a known good role

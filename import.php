@@ -57,14 +57,15 @@ if ($importform->is_cancelled()) {
     if (!$xml) {
         $errors = get_string('xmlloadfailed', 'block_workflow');
         foreach (libxml_get_errors() as $error) {
-            $errors .= $error->message.', ';
+            $errors .= $error->message . ', ';
         }
         throw new block_workflow_invalid_import_exception($errors);
     }
     // Is it a workflow XML?
     if (!($xml->getName() == 'workflow')) {
         throw new block_workflow_invalid_import_exception(
-               get_string('notaworkflow', 'block_workflow'));
+            get_string('notaworkflow', 'block_workflow')
+        );
     }
 
     // Import email templates.
@@ -111,8 +112,9 @@ if ($importform->is_cancelled()) {
         $attributes = $importedstep->attributes();
         $stepno = (string)$attributes['no'];
         if (in_array($stepno, $steporder)) {
-            $transaction->rollback(new block_workflow_invalid_import_exception(
-                    get_string('notuniquestep', 'block_workflow', $stepno)));
+            $transaction->rollback(
+                new block_workflow_invalid_import_exception(get_string('notuniquestep', 'block_workflow', $stepno))
+            );
         }
         $steporder[] = $stepno;
     }
@@ -122,8 +124,9 @@ if ($importform->is_cancelled()) {
     if (!empty($atendgobacktostep)) {
         // Ensure atendgobackto points to existing step.
         if (!array_key_exists($atendgobacktostep, $steporder)) {
-            $transaction->rollback(new block_workflow_invalid_import_exception(
-                    get_string('stepnotexist', 'block_workflow', $atendgobacktostep)));
+            $transaction->rollback(
+                new block_workflow_invalid_import_exception(get_string('stepnotexist', 'block_workflow', $atendgobacktostep))
+            );
         }
         $atendgobacktostepkey = $steporder[$atendgobacktostep];
     } else {
@@ -183,8 +186,9 @@ if ($importform->is_cancelled()) {
         foreach ($importedstep->doer as $doer) {
             $doer = trim($doer);
             if (!array_key_exists($doer, $roles)) {
-                $transaction->rollback(new block_workflow_invalid_import_exception(
-                        get_string('nosuchrole', 'block_workflow', $doer)));
+                $transaction->rollback(
+                    new block_workflow_invalid_import_exception(get_string('nosuchrole', 'block_workflow', $doer))
+                );
             }
             $step->toggle_role($roles[$doer]);
         }
@@ -201,8 +205,14 @@ if ($importform->is_cancelled()) {
     $transaction->allow_commit();
 
     // Redirect.
-    redirect(new moodle_url('/blocks/workflow/editsteps.php', ['workflowid' => $workflow->id]),
-            $extramessage . get_string('importsuccess', 'block_workflow'), 10);
+    redirect(
+        new moodle_url(
+            '/blocks/workflow/editsteps.php',
+            ['workflowid' => $workflow->id]
+        ),
+        $extramessage . get_string('importsuccess', 'block_workflow'),
+        10
+    );
 }
 
 // Display the page.
@@ -226,7 +236,8 @@ echo $OUTPUT->footer();
 function clean_and_check_field_validity($fieldname, $xml, $noempty = true, $html = false) {
     if (!isset($xml->$fieldname)) {
         throw new block_workflow_invalid_import_exception(
-                get_string('missingfield', 'block_workflow', $fieldname));
+            get_string('missingfield', 'block_workflow', $fieldname)
+        );
     }
 
     if ($html) {
@@ -235,12 +246,12 @@ function clean_and_check_field_validity($fieldname, $xml, $noempty = true, $html
         $field = clean_param($field, PARAM_RAW);
     } else {
         $field = clean_param(trim((string) $xml->$fieldname), PARAM_CLEANHTML); // Not a great param type.
-
     }
 
     if ($noempty && strlen($field) < 1) {
         throw new block_workflow_invalid_import_exception(
-                get_string('emptyfield', 'block_workflow', $fieldname));
+            get_string('emptyfield', 'block_workflow', $fieldname)
+        );
     }
 
     return $field;

@@ -41,7 +41,6 @@ require_once(dirname(__FILE__) . '/lib.php');
  * test cases for assigning roles via workflow commands.
  */
 final class commandassignrole_test extends \block_workflow_testlib {
-
     /**
      * Tests the assignrole method.
      *

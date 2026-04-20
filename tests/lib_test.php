@@ -39,7 +39,6 @@ require_once(dirname(__FILE__) . '/lib.php');
  * Unit test class for the block_workflow library.
  */
 final class lib_test extends \block_workflow_testlib {
-
     /**
      * Test that each of the defined variables are set correctly
      * - BLOCK_WORKFLOW_STATE_ACTIVE
@@ -51,11 +50,11 @@ final class lib_test extends \block_workflow_testlib {
      * @coversNothing
      */
     public function test_defines(): void {
-        $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE,     'active');
-        $this->assertEquals(BLOCK_WORKFLOW_STATE_COMPLETED,  'completed');
-        $this->assertEquals(BLOCK_WORKFLOW_STATE_ABORTED,    'aborted');
-        $this->assertEquals(BLOCK_WORKFLOW_ENABLED,          0);
-        $this->assertEquals(BLOCK_WORKFLOW_OBSOLETE,         1);
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_ACTIVE, 'active');
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_COMPLETED, 'completed');
+        $this->assertEquals(BLOCK_WORKFLOW_STATE_ABORTED, 'aborted');
+        $this->assertEquals(BLOCK_WORKFLOW_ENABLED, 0);
+        $this->assertEquals(BLOCK_WORKFLOW_OBSOLETE, 1);
     }
 
     /**
@@ -69,37 +68,61 @@ final class lib_test extends \block_workflow_testlib {
         $workflow = new block_workflow_workflow();
 
         // Currently missing a shortname.
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'create_workflow', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'create_workflow',
+            $data
+        );
 
         // And a name.
-        $data->shortname            = 'courseworkflow';
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'create_workflow', $data);
+        $data->shortname = 'courseworkflow';
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'create_workflow',
+            $data
+        );
 
         // And now has an invalid appliesto.
-        $data->name                 = 'First Course Workflow';
-        $data->appliesto            = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'create_workflow', $data);
+        $data->name = 'First Course Workflow';
+        $data->appliesto = 'baddata';
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'create_workflow',
+            $data
+        );
 
         // And now an invalid obsolete status.
-        $data->appliesto            = 'course';
-        $data->obsolete             = -1;
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'create_workflow', $data);
+        $data->appliesto = 'course';
+        $data->obsolete = -1;
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'create_workflow',
+            $data
+        );
 
         // And now specify an atendgobacktostep.
-        $data->obsolete             = 0;
-        $data->atendgobacktostep    = 9;
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'create_workflow', $data);
+        $data->obsolete = 0;
+        $data->atendgobacktostep = 9;
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'create_workflow',
+            $data
+        );
 
         // And now a random field.
         unset($data->atendgobacktostep);
-        $data->badfield             = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'create_workflow', $data);
+        $data->badfield = 'baddata';
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'create_workflow',
+            $data
+        );
     }
 
     /**
@@ -132,14 +155,22 @@ final class lib_test extends \block_workflow_testlib {
 
         // This has the same shortname, but a different name.
         $data->name                 = 'differentname';
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'create_workflow', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'create_workflow',
+            $data
+        );
 
         // And now a different shortname, and the same name.
         $data->shortname            = 'somethingdifferent';
         $data->name                 = 'First Course Workflow';
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'create_workflow', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'create_workflow',
+            $data
+        );
     }
 
     /**
@@ -184,32 +215,52 @@ final class lib_test extends \block_workflow_testlib {
 
         // Check with a used shortname.
         $data->shortname = 'courseworkflow';
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'update', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'update',
+            $data
+        );
         unset($data->shortname);
 
         // Invalid appliesto.
         $data->appliesto = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'update', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'update',
+            $data
+        );
         unset($data->appliesto);
 
         // Invalid atendgobackto.
         $data->atendgobacktostep = 10;
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
-                $workflow, 'update', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_step_exception',
+            $workflow,
+            'update',
+            $data
+        );
         unset($data->atendgobacktostep);
 
         // Invalid obsolete.
         $data->obsolete = -1;
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'update', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'update',
+            $data
+        );
         unset($data->obsolete);
 
         // Random settings.
         $data->badfield = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'update', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'update',
+            $data
+        );
         unset($data->badfield);
     }
 
@@ -229,8 +280,12 @@ final class lib_test extends \block_workflow_testlib {
 
         // Check that an exception is thrown when trying to load an invalid
         // workflow by id.
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'load_workflow', -1);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'load_workflow',
+            -1
+        );
 
         // Create a new workflow.
         $data = new stdClass();
@@ -262,13 +317,21 @@ final class lib_test extends \block_workflow_testlib {
 
         // Check that an exception is thrown when trying to load an invalid
         // workflow by id.
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'load_workflow', -1);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'load_workflow',
+            -1
+        );
 
         // Check that an exception is thrown when trying to load an invalid
         // workflow by shortname.
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'load_workflow_from_shortname', 'invalidshortname');
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'load_workflow_from_shortname',
+            'invalidshortname'
+        );
 
         // Test that we can get the workflow by it's shortname.
         $return = $workflow->load_workflow_from_shortname($data->shortname);
@@ -279,17 +342,16 @@ final class lib_test extends \block_workflow_testlib {
         // The create function should also reload the object into $email too.
         $this->assertSame($return, $workflow);
         // Check that each field is equal.
-        $this->assertEquals($workflow->shortname,            $data->shortname);
-        $this->assertEquals($workflow->name,                 $data->name);
-        $this->assertEquals($workflow->description,          $data->description);
-        $this->assertEquals($workflow->descriptionformat,    $data->descriptionformat);
-        $this->assertEquals($workflow->obsolete,             $data->obsolete);
-        $this->assertEquals($workflow->appliesto,            $data->appliesto);
+        $this->assertEquals($workflow->shortname, $data->shortname);
+        $this->assertEquals($workflow->name, $data->name);
+        $this->assertEquals($workflow->description, $data->description);
+        $this->assertEquals($workflow->descriptionformat, $data->descriptionformat);
+        $this->assertEquals($workflow->obsolete, $data->obsolete);
+        $this->assertEquals($workflow->appliesto, $data->appliesto);
 
         // Check that attempts to create another object with the same
         // shortname throw an error.
         $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception', $workflow, 'create_workflow', $data);
-
     }
 
     /**
@@ -364,12 +426,12 @@ final class lib_test extends \block_workflow_testlib {
         $this->assertNotNull($step->id);
 
         // And check that the values are acceptable.
-        $this->assertEquals($step->name,                 get_string('defaultstepname',           'block_workflow'));
-        $this->assertEquals($step->instructions,         get_string('defaultstepinstructions',   'block_workflow'));
-        $this->assertEquals($step->instructionsformat,   FORMAT_HTML);
-        $this->assertEquals($step->stepno,               1);
-        $this->assertEquals($step->onactivescript,       get_string('defaultonactivescript',     'block_workflow'));
-        $this->assertEquals($step->oncompletescript,     get_string('defaultoncompletescript',   'block_workflow'));
+        $this->assertEquals($step->name, get_string('defaultstepname', 'block_workflow'));
+        $this->assertEquals($step->instructions, get_string('defaultstepinstructions', 'block_workflow'));
+        $this->assertEquals($step->instructionsformat, FORMAT_HTML);
+        $this->assertEquals($step->stepno, 1);
+        $this->assertEquals($step->onactivescript, get_string('defaultonactivescript', 'block_workflow'));
+        $this->assertEquals($step->oncompletescript, get_string('defaultoncompletescript', 'block_workflow'));
 
         // Create a new step in the workflow.
         $nsdata = new stdClass();
@@ -412,8 +474,12 @@ final class lib_test extends \block_workflow_testlib {
 
         // Change the stepno that the workflow loops back to at the end.
         // First to something invalid.
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $workflow, 'atendgobacktostep', -1);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $workflow,
+            'atendgobacktostep',
+            -1
+        );
         // Confirm that it's still set to null.
         $this->assertNull($workflow->atendgobacktostep);
     }
@@ -535,17 +601,30 @@ final class lib_test extends \block_workflow_testlib {
 
         // Double check that the step has gone.
         $test = new block_workflow_step();
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
-                $step, 'load_step', $clone->id);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_step_exception',
+            $step,
+            'load_step',
+            $clone->id
+        );
 
         // Giving a bogus stepid to load_step should throw an exception.
         $step = new block_workflow_step();
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
-                $step, 'load_step', -1);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_step_exception',
+            $step,
+            'load_step',
+            -1
+        );
 
         // As should an invalid workflowid/stepno combination.
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
-                $step, 'load_workflow_stepno', -1, -1);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_step_exception',
+            $step,
+            'load_workflow_stepno',
+            -1,
+            -1
+        );
     }
 
     /**
@@ -584,12 +663,18 @@ final class lib_test extends \block_workflow_testlib {
         $this->assertFalse($deletable);
 
         // And require_deletable should throw an exception.
-        $this->expect_exception_without_halting('block_workflow_exception',
-                $step, 'require_deletable');
+        $this->expect_exception_without_halting(
+            'block_workflow_exception',
+            $step,
+            'require_deletable'
+        );
 
         // As should delete.
-        $this->expect_exception_without_halting('block_workflow_exception',
-                $step, 'delete');
+        $this->expect_exception_without_halting(
+            'block_workflow_exception',
+            $step,
+            'delete'
+        );
 
         // Try to create a step.
         // Create a new step in the workflow.
@@ -597,18 +682,15 @@ final class lib_test extends \block_workflow_testlib {
 
         $nsdata = new stdClass();
         // We're currently missing a workflowid.
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
-                $newstep, 'create_step', $nsdata);
+        $this->expect_exception_without_halting('block_workflow_invalid_step_exception', $newstep, 'create_step', $nsdata);
 
-        $nsdata->workflowid         = $workflow->id;
+        $nsdata->workflowid = $workflow->id;
         // Now we're missing a name.
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
-                $newstep, 'create_step', $nsdata);
+        $this->expect_exception_without_halting('block_workflow_invalid_step_exception', $newstep, 'create_step', $nsdata);
 
-        $nsdata->name               = 'Second Step';
+        $nsdata->name = 'Second Step';
         // Now we're missing instructions.
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
-                $newstep, 'create_step', $nsdata);
+        $this->expect_exception_without_halting('block_workflow_invalid_step_exception', $newstep, 'create_step', $nsdata);
     }
 
     /**
@@ -704,10 +786,14 @@ final class lib_test extends \block_workflow_testlib {
 
         // Now we'll try cloning the workflow - first with no changes.
         $newdata = new stdClass();
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                'block_workflow_workflow', 'clone_workflow', $workflow->id, $newdata);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            'block_workflow_workflow',
+            'clone_workflow',
+            $workflow->id,
+            $newdata
+        );
     }
-
     /**
      * Tests the block_workflow_workflow workflow clone method.
      *
@@ -756,8 +842,12 @@ final class lib_test extends \block_workflow_testlib {
 
         // And confirm that it's gone.
         $tmp = new block_workflow_workflow();
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $tmp, '__construct', $cloneid);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $tmp,
+            '__construct',
+            $cloneid
+        );
 
         // And then faking the form submission editor part too.
         $newdata->description_editor = [
@@ -768,9 +858,7 @@ final class lib_test extends \block_workflow_testlib {
 
         // And remove them both.
         $clone->delete();
-
     }
-
     /**
      * Tests the block_workflow_workflow available_workflows method.
      *
@@ -802,8 +890,12 @@ final class lib_test extends \block_workflow_testlib {
         $this->assertInstanceOf('block_workflow_step_state', $state);
 
         // Trying to add it again will throw a block_workflow_exception.
-        $this->expect_exception_without_halting('block_workflow_exception',
-                $workflow, 'add_to_context', $this->contextid);
+        $this->expect_exception_without_halting(
+            'block_workflow_exception',
+            $workflow,
+            'add_to_context',
+            $this->contextid
+        );
     }
 
     /**
@@ -841,8 +933,12 @@ final class lib_test extends \block_workflow_testlib {
 
         // And check that we don't get an active step.
         $step = new block_workflow_step();
-        $this->expect_exception_without_halting('block_workflow_not_assigned_exception',
-                    $step, 'load_active_step', $this->contextid);
+        $this->expect_exception_without_halting(
+            'block_workflow_not_assigned_exception',
+            $step,
+            'load_active_step',
+            $this->contextid
+        );
 
         // And we should now be able to add it back.
             $state = $workflow->add_to_context($this->contextid);
@@ -881,20 +977,27 @@ final class lib_test extends \block_workflow_testlib {
             $this->assertFalse($deletable);
 
             // The method require_deletable should throw an exception.
-            $this->expect_exception_without_halting('block_workflow_exception',
-                    $workflow, 'require_deletable');
+            $this->expect_exception_without_halting('block_workflow_exception', $workflow, 'require_deletable');
 
             // We should be able to remove the workflow from the context.
             $workflow->remove_workflow($this->contextid);
 
             // And confirm again.
             $step = new block_workflow_step();
-            $this->expect_exception_without_halting('block_workflow_not_assigned_exception',
-                    $step, 'load_active_step', $this->contextid);
+            $this->expect_exception_without_halting(
+                'block_workflow_not_assigned_exception',
+                $step,
+                'load_active_step',
+                $this->contextid
+            );
 
             // We can't remove it again -- it's not in use.
-            $this->expect_exception_without_halting('block_workflow_not_assigned_exception',
-                    $workflow, 'remove_workflow', $this->contextid);
+            $this->expect_exception_without_halting(
+                'block_workflow_not_assigned_exception',
+                $workflow,
+                'remove_workflow',
+                $this->contextid
+            );
     }
 
     /**
@@ -951,15 +1054,19 @@ final class lib_test extends \block_workflow_testlib {
      * @covers ::block_workflow_convert_editor_format
      */
     public function test_editor_format(): void {
-        $this->assertEquals(block_workflow_editor_format(FORMAT_HTML),   get_string('format_html', 'block_workflow'));
-        $this->assertEquals(block_workflow_editor_format(FORMAT_PLAIN),  get_string('format_plain', 'block_workflow'));
-        $this->assertEquals(block_workflow_editor_format(-1),            get_string('format_unknown', 'block_workflow'));
+        $this->assertEquals(block_workflow_editor_format(FORMAT_HTML), get_string('format_html', 'block_workflow'));
+        $this->assertEquals(block_workflow_editor_format(FORMAT_PLAIN), get_string('format_plain', 'block_workflow'));
+        $this->assertEquals(block_workflow_editor_format(-1), get_string('format_unknown', 'block_workflow'));
 
         // Check the editor_format used for imports.
         $this->assertEquals(block_workflow_convert_editor_format(block_workflow_editor_format(FORMAT_HTML)), FORMAT_HTML);
         $this->assertEquals(block_workflow_convert_editor_format(block_workflow_editor_format(FORMAT_PLAIN)), FORMAT_PLAIN);
-        $this->expect_exception_without_halting('block_workflow_exception',
-                null, 'block_workflow_convert_editor_format', 'baddata');
+        $this->expect_exception_without_halting(
+            'block_workflow_exception',
+            null,
+            'block_workflow_convert_editor_format',
+            'baddata'
+        );
     }
 
     /**

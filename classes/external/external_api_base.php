@@ -16,10 +16,10 @@
 
 namespace block_workflow\external;
 
+use block_workflow_ajax_exception;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use block_workflow_step_state;
-use block_workflow_ajax_exception;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -33,7 +33,6 @@ require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class external_api_base extends external_api {
-
     /**
      * Handle security check when we call the webservice.
      *

@@ -44,7 +44,6 @@ require_once(dirname(__FILE__) . '/../locallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class walkthrough_test extends \advanced_testcase {
-
     /**
      * Test some of the basic workflow actions including:
      * - creating a new workflow;

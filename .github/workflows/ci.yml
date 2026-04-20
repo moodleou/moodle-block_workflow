@@ -11,11 +11,11 @@ jobs:
         include:
           - { php: '8.2', moodle-branch: MOODLE_405_STABLE, database: pgsql }
           - { php: '8.3', moodle-branch: MOODLE_500_STABLE, database: pgsql }
-          - { php: '8.3', moodle-branch: main, database: pgsql }
+          - { php: '8.4', moodle-branch: MOODLE_501_STABLE, database: pgsql }
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:16
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'

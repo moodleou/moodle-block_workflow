@@ -59,8 +59,10 @@ $PAGE->navbar->add(get_string('deletetask', 'block_workflow'));
 $confirmstr = get_string('deletetaskcheck', 'block_workflow', $strparams);
 
 // Generate the confirmation button.
-$confirmurl = new moodle_url('/blocks/workflow/deletetask.php',
-    ['id' => $todo->id, 'confirm' => 1]);
+$confirmurl = new moodle_url(
+    '/blocks/workflow/deletetask.php',
+    ['id' => $todo->id, 'confirm' => 1]
+);
 $confirmbutton  = new single_button($confirmurl, get_string('confirm'), 'post');
 
 // Set page url.
