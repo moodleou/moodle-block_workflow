@@ -36,7 +36,6 @@ require_once($CFG->dirroot . '/blocks/workflow/tests/lib.php');
  * Unit tests for the autostepfinisher functionality in the block_workflow plugin.
  */
 final class autostepfinisher_test extends \block_workflow_testlib {
-
     /**
      * Tests the block_workflow_autofinish_steps method.
      *
@@ -72,12 +71,15 @@ final class autostepfinisher_test extends \block_workflow_testlib {
                  "VALUES ('$courseshortname', '$studentopendate')");
 
         $courseondataloadtable = $DB->get_record_sql(
-                'SELECT * FROM vl_v_crs_version_pres ' .
-                'WHERE vle_course_short_name = ?', [$courseshortname], MUST_EXIST);
+            'SELECT * FROM vl_v_crs_version_pres ' .
+            'WHERE vle_course_short_name = ?',
+            [$courseshortname],
+            MUST_EXIST
+        );
 
         // Create a new workflow object which applies to course.
         $stepoptions = ['autofinish' => 'course;startdate', 'autofinishoffset' => $before5days];
-        list($courseworkflow, $step1) = $this->create_a_workflow_with_one_step($stepoptions);
+        [$courseworkflow, $step1] = $this->create_a_workflow_with_one_step($stepoptions);
 
         // Required DB tables are not populated and therefore following methods return empty arrays.
         $stepoptions = ['autofinish', 'autofinishoffset', null];

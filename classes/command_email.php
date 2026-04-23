@@ -32,7 +32,6 @@
  *
  */
 class block_workflow_command_email extends block_workflow_command {
-
     /**
      * Parse the supplied arguments into a email name, and list of roles
      *
@@ -262,9 +261,12 @@ class block_workflow_command_email extends block_workflow_command {
         }
 
         // Replace %%usernames%%.
-        $usernames = array_map(function($a) {
-            return fullname($a);
-        }, $email->users);
+        $usernames = array_map(
+            function ($a) {
+                return fullname($a);
+            },
+            $email->users
+        );
         $usernames = implode(', ', $usernames);
         $subject = str_replace('%%usernames%%', $usernames, $subject);
         $string = str_replace('%%usernames%%', $usernames, $string);
@@ -301,8 +303,15 @@ class block_workflow_command_email extends block_workflow_command {
             $comment = '';
             $format = FORMAT_HTML;
         }
-        $string = str_replace('%%comment%%', format_text($comment, $format,
-                ['context' => $email->context]), $string);
+        $string = str_replace(
+            '%%comment%%',
+            format_text(
+                $comment,
+                $format,
+                ['context' => $email->context]
+            ),
+            $string
+        );
 
         // Re-assign the message.
         $email->email->message = $string;
@@ -338,8 +347,12 @@ class block_workflow_command_email extends block_workflow_command {
                 try {
                     if (!message_send($eventdata)) {
                         throw new block_workflow_exception(
-                            get_string('emailfailed', 'block_workflow',
-                                ['email' => $eventdata->userto->email, 'subject' => $eventdata->subject]));
+                            get_string(
+                                'emailfailed',
+                                'block_workflow',
+                                ['email' => $eventdata->userto->email, 'subject' => $eventdata->subject]
+                            )
+                        );
                     } else {
                         $event = \block_workflow\event\email_sent_status::create_from_step_state($state);
                         $event->trigger();

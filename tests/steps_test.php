@@ -59,46 +59,78 @@ final class steps_test extends \block_workflow_testlib {
 
         // Validate Step Creation.
         // Missing workflowid.
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
-                $step, 'create_step', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_step_exception',
+            $step,
+            'create_step',
+            $data
+        );
         $data->workflowid = $workflow->id;
 
         // Missing name.
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
-                $step, 'create_step', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_step_exception',
+            $step,
+            'create_step',
+            $data
+        );
         // Empty name.
         $data->name = '';
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
-                $step, 'create_step', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_step_exception',
+            $step,
+            'create_step',
+            $data
+        );
         $data->name = 'step';
 
         // Missing instructions.
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
-            $step, 'create_step', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_step_exception',
+            $step,
+            'create_step',
+            $data
+        );
         $data->instructions = '';
 
         // Invalid workflowid.
         $data->workflowid = -1;
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $step, 'create_step', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $step,
+            'create_step',
+            $data
+        );
         $data->workflowid = $workflow->id;
 
         // Invalid setting.
         $data->badfield = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
-                $step, 'create_step', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_step_exception',
+            $step,
+            'create_step',
+            $data
+        );
         unset($data->badfield);
 
         // A bad onactivescript.
         $data->onactivescript = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_command_exception',
-                $step, 'create_step', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_command_exception',
+            $step,
+            'create_step',
+            $data
+        );
         unset($data->onactivescript);
 
         // A bad oncompletescript.
         $data->oncompletescript = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_command_exception',
-                $step, 'create_step', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_command_exception',
+            $step,
+            'create_step',
+            $data
+        );
         unset($data->oncompletescript);
     }
 
@@ -189,26 +221,42 @@ final class steps_test extends \block_workflow_testlib {
 
         // A bad workflowid.
         $data->workflowid = -1;
-        $this->expect_exception_without_halting('block_workflow_invalid_workflow_exception',
-                $step, 'update_step', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_workflow_exception',
+            $step,
+            'update_step',
+            $data
+        );
         unset($data->workflowid);
 
         // Invalid setting.
         $data->badfield = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
-                $step, 'update_step', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_step_exception',
+            $step,
+            'update_step',
+            $data
+        );
         unset($data->badfield);
 
         // A bad onactivescript.
         $data->onactivescript = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_command_exception',
-                $step, 'update_step', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_command_exception',
+            $step,
+            'update_step',
+            $data
+        );
         unset($data->onactivescript);
 
         // A bad oncompletescript.
         $data->oncompletescript = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_command_exception',
-                $step, 'update_step', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_command_exception',
+            $step,
+            'update_step',
+            $data
+        );
         unset($data->oncompletescript);
     }
 
@@ -439,8 +487,12 @@ final class steps_test extends \block_workflow_testlib {
         $this->assertFalse($step->is_script_valid($script));
 
         // The method require_script_valid should throw an exception.
-        $this->expect_exception_without_halting('block_workflow_invalid_command_exception',
-                $step, 'require_script_valid', $script);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_command_exception',
+            $step,
+            'require_script_valid',
+            $script
+        );
 
         // The method get_validation_errors should give us one error.
         $errors = $step->get_validation_errors($script);
@@ -626,8 +678,12 @@ final class steps_test extends \block_workflow_testlib {
         $this->assertEquals($step->workflowid, 1);
 
         // Attempting to set again should throw an exception.
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception', $step,
-                'set_workflow', 1);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_step_exception',
+            $step,
+            'set_workflow',
+            1
+        );
     }
 
     /**
@@ -682,9 +738,8 @@ final class steps_test extends \block_workflow_testlib {
         $manualenrol = enrol_get_plugin('manual');
         $manualenrol->add_default_instance($course);
         $instance1 = $DB->get_record('enrol', ['enrol' => 'manual', 'courseid' => $course->id]);
-
         foreach ($users as $i => $user) {
-            $manualenrol->enrol_user($instance1,  $user->id, $roleids[$roles[$i]->shortname]);
+            $manualenrol->enrol_user($instance1, $user->id, $roleids[$roles[$i]->shortname]);
         }
         $expectedroles = [];
 

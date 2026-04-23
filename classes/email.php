@@ -34,7 +34,6 @@
  * @property-read string    $subject            The subject of the e-mail email
  */
 class block_workflow_email {
-
     /** @var int id from the database. */
     public $id;
 
@@ -105,9 +104,14 @@ class block_workflow_email {
      */
     public function load_email_id($id) {
         global $DB;
-        $email = $DB->get_record('block_workflow_emails', ['id' => $id]);
+        $email = $DB->get_record(
+            'block_workflow_emails',
+            ['id' => $id]
+        );
         if (!$email) {
-            throw new block_workflow_invalid_email_exception(get_string('invalidid', 'block_workflow'));
+            throw new block_workflow_invalid_email_exception(
+                get_string('invalidid', 'block_workflow')
+            );
         }
         return $this->load($email);
     }
@@ -120,7 +124,10 @@ class block_workflow_email {
      */
     public function load_email_shortname($shortname) {
         global $DB;
-        $email = $DB->get_record('block_workflow_emails', ['shortname' => $shortname]);
+        $email = $DB->get_record(
+            'block_workflow_emails',
+            ['shortname' => $shortname]
+        );
         if (!$email) {
             return false;
         }
@@ -137,7 +144,9 @@ class block_workflow_email {
     public function require_email_shortname($shortname) {
         $email = $this->load_email_shortname($shortname);
         if (!$email) {
-            throw new block_workflow_invalid_email_exception(get_string('invalidemailshortname', 'block_workflow', $shortname));
+            throw new block_workflow_invalid_email_exception(
+                get_string('invalidemailshortname', 'block_workflow', $shortname)
+            );
         }
         return $email;
     }
@@ -158,20 +167,32 @@ class block_workflow_email {
             (
                 SELECT COUNT(activescripts.id)
                 FROM {block_workflow_steps} activescripts
-                WHERE " . $DB->sql_like('activescripts.onactivescript',
-                        $DB->sql_concat(':email1', 'emails.shortname', ':to1'), false) . "
+                WHERE " .
+            $DB->sql_like(
+                'activescripts.onactivescript',
+                $DB->sql_concat(':email1', 'emails.shortname', ':to1'),
+                false
+            ) . "
             ) AS activecount,
             (
                 SELECT COUNT(extranotifyscripts.id)
                 FROM {block_workflow_steps} extranotifyscripts
-                WHERE " . $DB->sql_like('extranotifyscripts.onextranotifyscript',
-                        $DB->sql_concat(':email2', 'emails.shortname', ':to2'), false) . "
+                WHERE " .
+            $DB->sql_like(
+                'extranotifyscripts.onextranotifyscript',
+                $DB->sql_concat(':email2', 'emails.shortname', ':to2'),
+                false
+            ) . "
             ) AS extranotifycount,
             (
                 SELECT COUNT(completescripts.id)
                 FROM {block_workflow_steps} completescripts
-                WHERE " . $DB->sql_like('completescripts.oncompletescript',
-                        $DB->sql_concat(':email3', 'emails.shortname', ':to3'), false) . "
+                WHERE " .
+            $DB->sql_like(
+                'completescripts.oncompletescript',
+                $DB->sql_concat(':email3', 'emails.shortname', ':to3'),
+                false
+            ) . "
             ) AS completecount
             FROM {block_workflow_emails} emails
             ORDER BY shortname ASC
@@ -218,7 +239,8 @@ class block_workflow_email {
         foreach ((array) $email as $k => $v) {
             if (!in_array($k, $expectedsettings)) {
                 $transaction->rollback(new block_workflow_invalid_email_exception(
-                        get_string('invalidfield', 'block_workflow', $k)));
+                    get_string('invalidfield', 'block_workflow', $k)
+                ));
             }
         }
 
@@ -249,8 +271,10 @@ class block_workflow_email {
         $transaction = $DB->start_delegated_transaction();
 
         // Check whether this shortname is already in use.
-        if (isset($data->shortname) &&
-                ($id = $DB->get_field('block_workflow_emails', 'id', ['shortname' => $data->shortname]))) {
+        if (
+            isset($data->shortname)
+            && ($id = $DB->get_field('block_workflow_emails', 'id', ['shortname' => $data->shortname]))
+        ) {
             if ($id != $data->id) {
                 $transaction->rollback(new block_workflow_invalid_email_exception('shortnameinuse', 'block_workflow'));
             }
@@ -261,7 +285,8 @@ class block_workflow_email {
         foreach ((array) $data as $k => $v) {
             if (!in_array($k, $expectedsettings)) {
                 $transaction->rollback(new block_workflow_invalid_email_exception(
-                        get_string('invalidfield', 'block_workflow', $k)));
+                    get_string('invalidfield', 'block_workflow', $k)
+                ));
             }
         }
 

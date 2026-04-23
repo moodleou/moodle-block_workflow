@@ -146,8 +146,10 @@ class block_workflow_step_state {
      */
     public function load_active_state($contextid) {
         global $DB;
-        $state = $DB->get_record('block_workflow_step_states',
-            ['contextid' => $contextid, 'state' => BLOCK_WORKFLOW_STATE_ACTIVE]);
+        $state = $DB->get_record(
+            'block_workflow_step_states',
+            ['contextid' => $contextid, 'state' => BLOCK_WORKFLOW_STATE_ACTIVE]
+        );
         if (!$state) {
             return false;
         }
@@ -246,7 +248,7 @@ class block_workflow_step_state {
         $transaction = $DB->start_delegated_transaction();
 
         // Make a record of the change.
-        $change = new stdClass;
+        $change = new stdClass();
         $change->stepstateid    = $this->id;
         $change->newstate       = $newstatus;
         $change->userid         = $USER->id;
@@ -254,7 +256,7 @@ class block_workflow_step_state {
         $DB->insert_record('block_workflow_state_changes', $change);
 
         // Make the change.
-        $state = new stdClass;
+        $state = new stdClass();
         $state->id              = $this->id;
         $state->timemodified    = $change->timestamp;
         $state->state           = $newstatus;
@@ -336,10 +338,9 @@ class block_workflow_step_state {
                 // Try and load an existing state to change status for.
                 $nextstate = new block_workflow_step_state();
                 $nextstate->load_context_step($this->contextid, $nextstep->id);
-
             } catch (block_workflow_not_assigned_exception $e) {
                 // No step_state for this step on this context so create a new state.
-                $newstate = new stdClass;
+                $newstate = new stdClass();
                 $newstate->stepid           = $nextstep->id;
                 $newstate->contextid        = $this->contextid;
                 $newstate->state            = BLOCK_WORKFLOW_STATE_ACTIVE;
@@ -408,10 +409,9 @@ class block_workflow_step_state {
             // Try and load an existing state to change status for.
             $nextstate = new block_workflow_step_state();
             $nextstate->load_context_step($this->contextid, $newstepid);
-
         } catch (block_workflow_not_assigned_exception $e) {
             // No step_state for this step on this context so create a new state.
-            $newstate = new stdClass;
+            $newstate = new stdClass();
             $newstate->stepid           = $newstepid;
             $newstate->contextid        = $state->contextid;
             $newstate->state            = BLOCK_WORKFLOW_STATE_ACTIVE;
@@ -426,7 +426,10 @@ class block_workflow_step_state {
         $a->fromstep = $state->step()->name;
         $a->comment = $state->comment;
         $nextstate->previouscomment = get_string(
-                'jumptostepcommentaddition', 'block_workflow', $a); // Hack alert!
+            'jumptostepcommentaddition',
+            'block_workflow',
+            $a
+        ); // Hack alert!
         $nextstate->previouscommentformat = $state->commentformat;
         $nextstate->change_status(BLOCK_WORKFLOW_STATE_ACTIVE);
 
@@ -533,13 +536,13 @@ class block_workflow_step_state {
         $fields = \core_user\fields::for_identity($context);
         $fieldssql = $fields->get_sql('u');
 
-        list ($sortorder, $notused) = users_order_by_sql('u');
+        [$sortorder, $notused] = users_order_by_sql('u');
         $roleinfo = role_get_names($context);
         $rolenames = [];
         foreach ($roleinfo as $role) {
             $rolenames[$role->shortname] = $role->localname;
         }
-        list($roleids, $params) = $DB->get_in_or_equal(array_keys($roles));
+        [$roleids, $params] = $DB->get_in_or_equal(array_keys($roles));
         $sql = "SELECT u.* {$fieldssql->selects}, r.shortname
                 FROM {user} u
                 {$fieldssql->joins}
@@ -563,5 +566,4 @@ class block_workflow_step_state {
 
         return $users;
     }
-
 }

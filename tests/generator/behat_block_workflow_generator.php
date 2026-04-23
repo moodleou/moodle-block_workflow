@@ -26,7 +26,6 @@
  * Behat data generator for the block_workflow plugin.
  */
 class behat_block_workflow_generator extends behat_generator_base {
-
     /**
      * Returns an array of creatable entities for the block_workflow generator.
      *

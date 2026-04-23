@@ -50,29 +50,49 @@ final class emails_test extends \block_workflow_testlib {
 
         // Attempt to create an email with various types of bad data.
         // Currently missing a shortname.
-        $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
-                $email, 'create', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_email_exception',
+            $email,
+            'create',
+            $data
+        );
 
         // Now an empty shortname.
         $data->shortname = '';
-        $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
-                $email, 'create', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_email_exception',
+            $email,
+            'create',
+            $data
+        );
         $data->shortname    = 'shortname';
 
         // Now a missing message.
-        $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
-                $email, 'create', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_email_exception',
+            $email,
+            'create',
+            $data
+        );
         $data->message      = 'Example Message';
 
         // Now a missing subject.
-        $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
-                $email, 'create', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_email_exception',
+            $email,
+            'create',
+            $data
+        );
         $data->subject      = 'Example Subject';
 
         // Now we've got an extra field.
         $data->badfield     = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
-                $email, 'create', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_email_exception',
+            $email,
+            'create',
+            $data
+        );
         unset($data->badfield);
     }
 
@@ -106,16 +126,24 @@ final class emails_test extends \block_workflow_testlib {
 
         // And trying to create another email with the same (valid) data should result in an
         // exception because the shortname is already in use.
-        $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
-                $email, 'create', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_email_exception',
+            $email,
+            'create',
+            $data
+        );
 
         // Check validation on e-mail updates.
         $data = new stdClass();
 
         // Try giving it a bad field.
         $data->badfield = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
-                $email, 'update', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_email_exception',
+            $email,
+            'update',
+            $data
+        );
 
         // Remove the badfield and give it a new shortname.
         unset($data->badfield);
@@ -172,8 +200,12 @@ final class emails_test extends \block_workflow_testlib {
 
         // Try giving it a bad field.
         $data->badfield = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
-                $email, 'update', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_email_exception',
+            $email,
+            'update',
+            $data
+        );
         unset($data->badfield);
     }
 
@@ -207,8 +239,12 @@ final class emails_test extends \block_workflow_testlib {
         $data->message   = 'message';
         $data->subject   = 'subject';
 
-        $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
-                $email, 'create', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_email_exception',
+            $email,
+            'create',
+            $data
+        );
     }
 
     /**
@@ -230,8 +266,12 @@ final class emails_test extends \block_workflow_testlib {
 
         // We shouldn't be able to update this to match the first mail either.
         $data->shortname = 'shortname';
-        $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
-                $email, 'update', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_email_exception',
+            $email,
+            'update',
+            $data
+        );
     }
 
     /**
@@ -259,17 +299,18 @@ final class emails_test extends \block_workflow_testlib {
         $this->assertInstanceOf('block_workflow_email', $result);
 
         // And with bad data.
-        $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
-                $reloader, '__construct', -1);
+        $this->expect_exception_without_halting('block_workflow_invalid_email_exception', $reloader, '__construct', -1);
 
-        $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
-                $reloader, 'load_email_id', -1);
+        $this->expect_exception_without_halting('block_workflow_invalid_email_exception', $reloader, 'load_email_id', -1);
 
         $result = $reloader->load_email_shortname('invalidshortname');
         $this->assertFalse((bool)$result);
-        $this->expect_exception_without_halting('block_workflow_invalid_email_exception',
-                $reloader, 'require_email_shortname', 'invalidshortname');
-
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_email_exception',
+            $reloader,
+            'require_email_shortname',
+            'invalidshortname'
+        );
     }
 
     /**
@@ -348,12 +389,10 @@ final class emails_test extends \block_workflow_testlib {
         $this->assertFalse((bool)$deletable);
 
         // Check that we throw an exception.
-        $this->expect_exception_without_halting('block_workflow_exception',
-                $email, 'require_deletable');
+        $this->expect_exception_without_halting('block_workflow_exception', $email, 'require_deletable');
 
         // And that we through an exception when actually trying to delete it.
-        $this->expect_exception_without_halting('block_workflow_exception',
-                $email, 'delete');
+        $this->expect_exception_without_halting('block_workflow_exception', $email, 'delete');
 
         // Add the email to an oncompletescript and remove from the onactivescript.
         $data = new stdClass();
@@ -376,12 +415,10 @@ final class emails_test extends \block_workflow_testlib {
         $this->assertFalse((bool)$deletable);
 
         // Check that we throw an exception.
-        $this->expect_exception_without_halting('block_workflow_exception',
-                $email, 'require_deletable');
+        $this->expect_exception_without_halting('block_workflow_exception', $email, 'require_deletable');
 
         // And that we through an exception when actually trying to delete it.
-        $this->expect_exception_without_halting('block_workflow_exception',
-                $email, 'delete');
+        $this->expect_exception_without_halting('block_workflow_exception', $email, 'delete');
 
         // Adding to both should produce the same results.
         $data = new stdClass();
@@ -404,12 +441,10 @@ final class emails_test extends \block_workflow_testlib {
         $this->assertFalse((bool)$deletable);
 
         // Check that we throw an exception.
-        $this->expect_exception_without_halting('block_workflow_exception',
-                $email, 'require_deletable');
+        $this->expect_exception_without_halting('block_workflow_exception', $email, 'require_deletable');
 
         // And that we through an exception when actually trying to delete it.
-        $this->expect_exception_without_halting('block_workflow_exception',
-                $email, 'delete');
+        $this->expect_exception_without_halting('block_workflow_exception', $email, 'delete');
 
         // And removing from all scripts should make everything deletable.
         $data = new stdClass();
@@ -420,7 +455,7 @@ final class emails_test extends \block_workflow_testlib {
         // Check that it's marked as used.
         $list = block_workflow_email::load_emails();
         $check = array_shift($list);
-        $this->assertEquals($check->activecount,   0);
+        $this->assertEquals($check->activecount, 0);
         $this->assertEquals($check->completecount, 0);
 
         // The used_count (accurate count) should be 0.
@@ -466,8 +501,10 @@ final class emails_test extends \block_workflow_testlib {
         $event = reset($events);
         // Check that the event data is valid.
         $this->assertInstanceOf('\block_workflow\event\email_sent_status', $event);
-        $this->assertStringContainsString("Failed send email 'Example subject' to egstudent@localhost.com",
-            $event->other['error']);
+        $this->assertStringContainsString(
+            "Failed send email 'Example subject' to egstudent@localhost.com",
+            $event->other['error']
+        );
         $this->assertStringContainsString("The email to user with id", $event->get_description());
 
         // Test send email successfully.

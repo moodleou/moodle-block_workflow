@@ -40,12 +40,10 @@ use core_privacy\local\request\userlist;
  */
 class provider implements
         // This plugin has data.
-        \core_privacy\local\metadata\provider,
-
-        // This plugin currently implements the original plugin\provider interface.
-        \core_privacy\local\request\plugin\provider,
-        \core_privacy\local\request\core_userlist_provider {
-
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\core_userlist_provider,
+    // This plugin currently implements the original plugin\provider interface.
+    \core_privacy\local\request\plugin\provider {
     /**
      * Returns meta data about this system.
      *
@@ -125,9 +123,7 @@ class provider implements
         ];
 
         $userlist->add_from_sql('userid', $sql, $params);
-
     }
-
     /**
      * Export all user data for the specified user, in the specified contexts.
      *

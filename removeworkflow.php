@@ -28,11 +28,11 @@ require_once($CFG->libdir . '/adminlib.php');
 
 // Get the submitted paramaters.
 $workflowid = required_param('workflowid', PARAM_INT);
-$contextid  = required_param('contextid',  PARAM_INT);
+$contextid  = required_param('contextid', PARAM_INT);
 $confirm    = optional_param('confirm', false, PARAM_BOOL);
 
 // Determine the context and cm.
-list($context, $course, $cm) = get_context_info_array($contextid);
+[$context, $course, $cm] = get_context_info_array($contextid);
 
 // Require login.
 require_login($course, false, $cm);
@@ -57,9 +57,12 @@ $tparams = ['workflowname' => $workflow->name, 'contexttitle' => $context->get_c
 
 // Check that this workflow is assigned to this context.
 $stepstates = $workflow->step_states($contextid);
-$statelist = array_filter($stepstates, function($a) {
-    return isset($a->stateid);
-});
+$statelist = array_filter(
+    $stepstates,
+    function ($a) {
+        return isset($a->stateid);
+    }
+);
 if (count($statelist) == 0) {
     throw new block_workflow_not_assigned_exception(get_string('workflownotassignedtocontext', 'block_workflow', $tparams));
 }
@@ -77,10 +80,14 @@ $PAGE->navbar->add(get_string('remove', 'block_workflow'));
 
 // The confirmation strings.
 $confirmstr = get_string('removeworkflowcheck', 'block_workflow', $tparams);
-$confirmurl = new moodle_url('/blocks/workflow/removeworkflow.php',
-        ['workflowid' => $workflowid, 'contextid' => $contextid, 'confirm' => 1]);
-$returnurl  = new moodle_url('/blocks/workflow/overview.php',
-        ['workflowid' => $workflowid, 'contextid' => $contextid]);
+$confirmurl = new moodle_url(
+    '/blocks/workflow/removeworkflow.php',
+    ['workflowid' => $workflowid, 'contextid' => $contextid, 'confirm' => 1]
+);
+$returnurl  = new moodle_url(
+    '/blocks/workflow/overview.php',
+    ['workflowid' => $workflowid, 'contextid' => $contextid]
+);
 
 if ($confirm) {
     // Confirm the session key to stop CSRF.

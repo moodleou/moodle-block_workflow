@@ -28,7 +28,6 @@ require_once(dirname(__FILE__) . '/external_api_base_lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class update_step_state_comment_test extends external_api_base_lib {
-
     /**
      * Test update step_state comment successfully.
      *
@@ -36,8 +35,11 @@ final class update_step_state_comment_test extends external_api_base_lib {
      */
     public function test_update_step_state_comment(): void {
         // Call the external service function.
-        $returnvalue = update_step_state_comment::execute($this->state1id,
-            '<b>New comment</b>', FORMAT_HTML);
+        $returnvalue = update_step_state_comment::execute(
+            $this->state1id,
+            '<b>New comment</b>',
+            FORMAT_HTML
+        );
 
         // We need to execute the return values cleaning process to simulate
         // the web service server.

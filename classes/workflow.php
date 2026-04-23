@@ -44,7 +44,6 @@ require_once(dirname(__FILE__) . '/../locallib.php');
  * @property-read int       $obsolete           The visibility of this workflow
  */
 class block_workflow_workflow {
-
     /** @var int Workflow ID */
     public $id;
 
@@ -201,7 +200,7 @@ class block_workflow_workflow {
                 // name already has digit at the end.
                 $shortnameclean = preg_replace('/\d+$/', '', $workflow->shortname);
                 $sql = 'SELECT shortname FROM {block_workflow_workflows} WHERE shortname LIKE ? ORDER BY shortname DESC LIMIT 1';
-                $lastshortname = $DB->get_record_sql($sql, [$shortnameclean."%"]);
+                $lastshortname = $DB->get_record_sql($sql, [$shortnameclean . "%"]);
                 if (preg_match('/\d+$/', $lastshortname->shortname)) {
                     $workflow->shortname = $lastshortname->shortname;
                     $workflow->shortname++;
@@ -225,7 +224,7 @@ class block_workflow_workflow {
                 // name already has digit at the end.
                 $nameclean = preg_replace('/\d+$/', '', $workflow->name);
                 $sql = 'SELECT name FROM {block_workflow_workflows} WHERE name LIKE ? ORDER BY name DESC LIMIT 1';
-                $lastname = $DB->get_record_sql($sql, [$nameclean."%"]);
+                $lastname = $DB->get_record_sql($sql, [$nameclean . "%"]);
                 if (preg_match('/\d+$/', $lastname->name)) {
                     $workflow->name = $lastname->name;
                     // Safe increment of trailing number (preserves leading zeros).
@@ -275,16 +274,18 @@ class block_workflow_workflow {
 
         // Remove any atendgobacktostep -- the steps can't exist yet.
         if (isset($workflow->atendgobacktostep)) {
-            $transaction->rollback(new block_workflow_invalid_workflow_exception(
-                    get_string('atendgobackatworkflowcreate', 'block_workflow')));
+            $transaction->rollback(
+                new block_workflow_invalid_workflow_exception(get_string('atendgobackatworkflowcreate', 'block_workflow'))
+            );
         }
 
         // Check that each of the submitted data is a valid field.
         $expectedsettings = $this->expected_settings();
         foreach ((array) $workflow as $k => $v) {
             if (!in_array($k, $expectedsettings)) {
-                $transaction->rollback(new block_workflow_invalid_workflow_exception(
-                        get_string('invalidfield', 'block_workflow', $k)));
+                $transaction->rollback(
+                    new block_workflow_invalid_workflow_exception(get_string('invalidfield', 'block_workflow', $k))
+                );
             }
         }
 
@@ -293,13 +294,13 @@ class block_workflow_workflow {
 
         if ($createstep) {
             // Create the initial step using default options.
-            $emptystep = new stdClass;
-            $emptystep->workflowid          = $workflow->id;
-            $emptystep->name                = get_string('defaultstepname',         'block_workflow');
-            $emptystep->instructions        = get_string('defaultstepinstructions', 'block_workflow');
-            $emptystep->instructionsformat  = FORMAT_HTML;
-            $emptystep->onactivescript      = get_string('defaultonactivescript',   'block_workflow');
-            $emptystep->oncompletescript    = get_string('defaultoncompletescript', 'block_workflow');
+            $emptystep = new stdClass();
+            $emptystep->workflowid = $workflow->id;
+            $emptystep->name = get_string('defaultstepname', 'block_workflow');
+            $emptystep->instructions = get_string('defaultstepinstructions', 'block_workflow');
+            $emptystep->instructionsformat = FORMAT_HTML;
+            $emptystep->onactivescript = get_string('defaultonactivescript', 'block_workflow');
+            $emptystep->oncompletescript = get_string('defaultoncompletescript', 'block_workflow');
             $emptystep->onextranotifyscript = get_string('defaultonextranotifyscript', 'block_workflow');
 
             $step = new block_workflow_step();
@@ -416,8 +417,11 @@ class block_workflow_workflow {
      */
     public static function available_workflows(string $for): array {
         global $DB;
-        return $DB->get_records('block_workflow_workflows',
-                ['appliesto' => $for, 'obsolete' => 0], 'name');
+        return $DB->get_records(
+            'block_workflow_workflows',
+            ['appliesto' => $for, 'obsolete' => 0],
+            'name'
+        );
     }
 
     /**
@@ -436,7 +440,6 @@ class block_workflow_workflow {
         try {
             $step->load_active_step($contextid);
             $transaction->rollback(new block_workflow_exception(get_string('workflowalreadyassigned', 'block_workflow')));
-
         } catch (block_workflow_not_assigned_exception $e) { // @codingStandardsIgnoreLine
             // A workflow shouldn't be assigned to this context already. A
             // context may only have one workflow assigned at a time.
@@ -452,12 +455,13 @@ class block_workflow_workflow {
         $state->state               = BLOCK_WORKFLOW_STATE_ACTIVE;
 
         // Check whether this workflow has been previously assigned to this context.
-        $existingstate = $DB->get_record('block_workflow_step_states',
-                ['stepid' => $step->id, 'contextid' => $contextid]);
+        $existingstate = $DB->get_record(
+            'block_workflow_step_states',
+            ['stepid' => $step->id, 'contextid' => $contextid]
+        );
         if ($existingstate) {
             $state->id              = $existingstate->id;
             $DB->update_record('block_workflow_step_states', $state);
-
         } else {
             // Create a new state to associate the workflow with the context.
             $state->comment             = '';
@@ -468,7 +472,7 @@ class block_workflow_workflow {
         $state = new block_workflow_step_state($state->id);
 
         // Make a note of the change.
-        $statechange = new stdClass;
+        $statechange = new stdClass();
         $statechange->stepstateid   = $state->id;
         $statechange->newstate      = BLOCK_WORKFLOW_STATE_ACTIVE;
         $statechange->userid        = $USER->id;
@@ -509,7 +513,8 @@ class block_workflow_workflow {
         });
         if (count($used) == 0) {
             $transaction->rollback(new block_workflow_not_assigned_exception(
-                    get_string('workflownotassigned', 'block_workflow', $this->name)));
+                get_string('workflownotassigned', 'block_workflow', $this->name)
+            ));
         }
 
         // We can only abort if the workflow is assigned to this contextid.
@@ -519,8 +524,9 @@ class block_workflow_workflow {
 
             // Abort the step by jumping to no step at all.
             $state->jump_to_step();
-
-        } catch (block_workflow_not_assigned_exception $e) { // @codingStandardsIgnoreLine
+        // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+        } catch (block_workflow_not_assigned_exception $e) {
+            // @codingStandardsIgnoreLine
             // The workflow may be inactive so it's safe to catch this exception.
         }
 
@@ -559,8 +565,13 @@ class block_workflow_workflow {
         $transaction = $DB->start_delegated_transaction();
 
         // Check that we've been given a valid step to loop back to.
-        if ($atendgobacktostep && !$DB->get_record('block_workflow_steps',
-                ['workflowid' => $this->id, 'stepno' => $atendgobacktostep])) {
+        if (
+            $atendgobacktostep
+            && !$DB->get_record(
+                'block_workflow_steps',
+                ['workflowid' => $this->id, 'stepno' => $atendgobacktostep]
+            )
+        ) {
             $transaction->rollback(new block_workflow_invalid_workflow_exception('invalidstepno', 'block_workflow'));
         }
 
@@ -837,8 +848,10 @@ class block_workflow_workflow {
         $transaction = $DB->start_delegated_transaction();
 
         // Check whether this shortname is already in use.
-        if (isset($data->shortname) &&
-                ($id = $DB->get_field('block_workflow_workflows', 'id', ['shortname' => $data->shortname]))) {
+        if (
+            isset($data->shortname)
+            && ($id = $DB->get_field('block_workflow_workflows', 'id', ['shortname' => $data->shortname]))
+        ) {
             if ($id != $data->id) {
                 $transaction->rollback(new block_workflow_invalid_workflow_exception('shortnameinuse', 'block_workflow'));
             }
@@ -872,7 +885,8 @@ class block_workflow_workflow {
         foreach ((array) $data as $k => $v) {
             if (!in_array($k, $expectedsettings)) {
                 $transaction->rollback(new block_workflow_invalid_workflow_exception(
-                        get_string('invalidfield', 'block_workflow', $k)));
+                    get_string('invalidfield', 'block_workflow', $k)
+                ));
             }
         }
 

@@ -186,15 +186,18 @@ class block_workflow_todo {
 
         // Don't allow the stepid to be updated.
         if (isset($data->stepid) && ($data->stepid != $this->stepid)) {
-            $transaction->rollback(new block_workflow_invalid_todo_exception(
-                    get_string('todocannotchangestepid', 'block_workflow')));
+            $transaction->rollback(
+                new block_workflow_invalid_todo_exception(get_string('todocannotchangestepid', 'block_workflow'))
+            );
         }
 
         // Check that each of the submitted fields is a valid field.
         $expectedsettings = $this->expected_settings();
         foreach ((array) $data as $k => $v) {
             if (!in_array($k, $expectedsettings)) {
-                $transaction->rollback(new block_workflow_invalid_todo_exception(get_string('invalidfield', 'block_workflow', $k)));
+                $transaction->rollback(
+                    new block_workflow_invalid_todo_exception(get_string('invalidfield', 'block_workflow', $k))
+                );
             }
         }
 
@@ -324,5 +327,4 @@ class block_workflow_todo {
         }
         return $this->step;
     }
-
 }

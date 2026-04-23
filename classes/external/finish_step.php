@@ -29,7 +29,6 @@ use block_workflow_workflow;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class finish_step extends external_api_base {
-
     /**
      * Returns description of method parameters
      *
@@ -53,8 +52,10 @@ class finish_step extends external_api_base {
      */
     public static function execute(int $stateid, string $text, int $format): array {
         global $PAGE;
-        [$state, $params] = self::handle_security_check(['stateid' => $stateid, 'text' => $text, 'format' => $format],
-            self::execute_parameters());
+        [$state, $params] = self::handle_security_check(
+            ['stateid' => $stateid, 'text' => $text, 'format' => $format],
+            self::execute_parameters()
+        );
         $renderer = $PAGE->get_renderer('block_workflow');
 
         // Retrieve the next step.
@@ -77,7 +78,11 @@ class finish_step extends external_api_base {
             $addableworkflows = block_workflow_workflow::available_workflows($appliesto);
             $result['listworkflows'] = $canadd && $addableworkflows;
             $result['response'] = $renderer->block_display_no_more_steps(
-                $state->contextid, $canadd, $addableworkflows, $previous);
+                $state->contextid,
+                $canadd,
+                $addableworkflows,
+                $previous
+            );
         }
         return $result;
     }

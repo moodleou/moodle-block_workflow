@@ -31,18 +31,21 @@ require_once($CFG->libdir . '/formslib.php');
  * Class import_workflow
  */
 class import_workflow extends moodleform {
-
     #[\Override]
     protected function definition() {
         $mform = $this->_form;
 
         $mform->addElement('header', 'general', get_string('workflowimport', 'block_workflow'));
 
-        $mform->addElement('filepicker', 'importfile', get_string('importfile', 'block_workflow'),
-                null, ['accepted_type' => '*.xml']);
+        $mform->addElement(
+            'filepicker',
+            'importfile',
+            get_string('importfile', 'block_workflow'),
+            null,
+            ['accepted_type' => '*.xml']
+        );
         $mform->addRule('importfile', null, 'required', null, 'client');
 
         $this->add_action_buttons(true, get_string('importworkflow', 'block_workflow'));
     }
 }
-

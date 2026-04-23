@@ -30,7 +30,6 @@ require_once($CFG->libdir . '/formslib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class step_edit extends moodleform {
-
     #[\Override]
     protected function definition() {
         global $DB;
@@ -44,8 +43,12 @@ class step_edit extends moodleform {
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', null, 'maxlength', 255);
 
-        $mform->addElement('editor',   'instructions_editor', get_string('instructions', 'block_workflow'),
-                block_workflow_editor_options());
+        $mform->addElement(
+            'editor',
+            'instructions_editor',
+            get_string('instructions', 'block_workflow'),
+            block_workflow_editor_options()
+        );
         $mform->setType('instructions_editor', PARAM_RAW);
         $mform->addRule('instructions_editor', null, 'required', null, 'client');
 
@@ -62,8 +65,9 @@ class step_edit extends moodleform {
         $mform->addElement('hidden', 'beforeafter');
         $mform->setType('beforeafter', PARAM_INT);
 
-        list($options, $days) = block_workflow_step::get_autofinish_options(
-                $this->_customdata['appliesto']);
+        [$options, $days] = block_workflow_step::get_autofinish_options(
+            $this->_customdata['appliesto']
+        );
 
         // Step activation.
         $mform->addElement('header', 'stepactivation', get_string('stepactivation', 'block_workflow'));

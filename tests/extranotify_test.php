@@ -77,8 +77,11 @@ final class extranotify_test extends \block_workflow_testlib {
                 "VALUES ('$courseshortname', '$studentopendate')");
 
         $courseondataloadtable = $DB->get_record_sql(
-                'SELECT * FROM vl_v_crs_version_pres ' .
-                'WHERE vle_course_short_name = ?', [$courseshortname], MUST_EXIST);
+            'SELECT * FROM vl_v_crs_version_pres ' .
+            'WHERE vle_course_short_name = ?',
+            [$courseshortname],
+            MUST_EXIST
+        );
 
         // Create an email template.
         $data = new \stdClass();
@@ -92,7 +95,7 @@ final class extranotify_test extends \block_workflow_testlib {
         // Create a new workflow object which applies to course.
         $stepoptions = ['extranotify' => 'course;startdate', 'extranotifyoffset' => $before5days,
                 'onextranotifyscript' => 'email testing to manager'];
-        list($courseworkflow, $step1) = $this->create_a_workflow_with_one_step($stepoptions);
+        [$courseworkflow, $step1] = $this->create_a_workflow_with_one_step($stepoptions);
 
         // Required DB tables are not populated and therefore following methods return empty arrays.
         $stepoptions = ['extranotify', 'extranotifyoffset', 'onextranotifyscript'];
@@ -149,12 +152,22 @@ final class extranotify_test extends \block_workflow_testlib {
         $generator = $this->getDataGenerator();
         $course = $generator->create_course(['shortname' => 'M123-19B', 'startdate' => strtotime('2019-02-06')]);
 
-        $timestamp = block_workflow_get_offset_time('M123-19B', $course->id, null,
-                'course;startdate', $this->get_days(5));
+        $timestamp = block_workflow_get_offset_time(
+            'M123-19B',
+            $course->id,
+            null,
+            'course;startdate',
+            $this->get_days(5)
+        );
         $this->assertEquals(strtotime('2019-02-11'), $timestamp);
 
-        $timestamp = block_workflow_get_offset_time('M123-19B', $course->id, null,
-                'course;startdate', $this->get_days(5, 'before'));
+        $timestamp = block_workflow_get_offset_time(
+            'M123-19B',
+            $course->id,
+            null,
+            'course;startdate',
+            $this->get_days(5, 'before')
+        );
         $this->assertEquals(strtotime('2019-02-01'), $timestamp);
     }
 
@@ -170,12 +183,22 @@ final class extranotify_test extends \block_workflow_testlib {
         $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
         $quiz = $quizgenerator->create_instance(['course' => $SITE->id, 'timeclose' => strtotime('2019-02-06')]);
 
-        $timestamp = block_workflow_get_offset_time('M123-19B', $quiz->course, $quiz->id,
-                'quiz;timeclose', $this->get_days(5));
+        $timestamp = block_workflow_get_offset_time(
+            'M123-19B',
+            $quiz->course,
+            $quiz->id,
+            'quiz;timeclose',
+            $this->get_days(5)
+        );
         $this->assertEquals(strtotime('2019-02-11'), $timestamp);
 
-        $timestamp = block_workflow_get_offset_time('M123-19B', $quiz->course, $quiz->id,
-                'quiz;timeclose', $this->get_days(5, 'before'));
+        $timestamp = block_workflow_get_offset_time(
+            'M123-19B',
+            $quiz->course,
+            $quiz->id,
+            'quiz;timeclose',
+            $this->get_days(5, 'before')
+        );
         $this->assertEquals(strtotime('2019-02-01'), $timestamp);
     }
 
@@ -198,12 +221,22 @@ final class extranotify_test extends \block_workflow_testlib {
         \local_createwebsite_utils::create_fake_crs_version_pres_entry('M123', '19B', 'M123-19B', '2019-02-09');
         \local_createwebsite_utils::create_fake_crs_version_pres_entry('MZX123', '19B', 'M123-19B', '2019-02-06');
 
-        $timestamp = block_workflow_get_offset_time('M123-19B', $course->id, null,
-                'vl_v_crs_version_pres;vle_student_open_date', $this->get_days(5));
+        $timestamp = block_workflow_get_offset_time(
+            'M123-19B',
+            $course->id,
+            null,
+            'vl_v_crs_version_pres;vle_student_open_date',
+            $this->get_days(5)
+        );
         $this->assertEquals(strtotime('2019-02-11'), $timestamp);
 
-        $timestamp = block_workflow_get_offset_time('M123-19B', $course->id, null,
-                'vl_v_crs_version_pres;vle_student_open_date', $this->get_days(5, 'before'));
+        $timestamp = block_workflow_get_offset_time(
+            'M123-19B',
+            $course->id,
+            null,
+            'vl_v_crs_version_pres;vle_student_open_date',
+            $this->get_days(5, 'before')
+        );
         $this->assertEquals(strtotime('2019-02-01'), $timestamp);
     }
 }

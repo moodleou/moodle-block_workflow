@@ -58,24 +58,40 @@ final class todos_test extends \block_workflow_testlib {
         $data = new stdClass();
 
         // Missing task should throw block_workflow_invalid_todo_exception.
-        $this->expect_exception_without_halting('block_workflow_invalid_todo_exception',
-                $todo, 'create_todo', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_todo_exception',
+            $todo,
+            'create_todo',
+            $data
+        );
         $data->task = 'TASK-ONE';
 
         // Missing stepid.
-        $this->expect_exception_without_halting('block_workflow_invalid_todo_exception',
-                $todo, 'create_todo', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_todo_exception',
+            $todo,
+            'create_todo',
+            $data
+        );
 
         // Invalid stepid.
         $data->stepid = -1;
-        $this->expect_exception_without_halting('block_workflow_invalid_step_exception',
-                $todo, 'create_todo', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_step_exception',
+            $todo,
+            'create_todo',
+            $data
+        );
         $data->stepid = $step->id;
 
         // Invalid field.
         $data->badfield = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_todo_exception',
-                $todo, 'create_todo', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_todo_exception',
+            $todo,
+            'create_todo',
+            $data
+        );
         unset($data->badfield);
 
         // Give an obsolete value of obsolete which we'll check in a minute.
@@ -113,14 +129,22 @@ final class todos_test extends \block_workflow_testlib {
 
         // Attempt to update the stepid with something different.
         $data->stepid = -1;
-        $this->expect_exception_without_halting('block_workflow_invalid_todo_exception',
-                $todo, 'update_todo', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_todo_exception',
+            $todo,
+            'update_todo',
+            $data
+        );
         unset($data->stepid);
 
         // Invalid field.
         $data->badfield = 'baddata';
-        $this->expect_exception_without_halting('block_workflow_invalid_todo_exception',
-                $todo, 'update_todo', $data);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_todo_exception',
+            $todo,
+            'update_todo',
+            $data
+        );
         unset($data->badfield);
     }
 
@@ -211,9 +235,9 @@ final class todos_test extends \block_workflow_testlib {
         $newstep = $this->create_step($workflow);
         $clone = $todo->clone_todo($todo->id, $newstep->id);
         $this->compare_todo($todo, $clone, ['id', 'stepid']);
-        $this->assertNotEquals($todo->id,        $clone->id);
-        $this->assertNotEquals($todo->stepid,    $clone->stepid);
-        $this->assertEquals($clone->stepid,      $newstep->id);
+        $this->assertNotEquals($todo->id, $clone->id);
+        $this->assertNotEquals($todo->stepid, $clone->stepid);
+        $this->assertEquals($clone->stepid, $newstep->id);
     }
 
     /**
@@ -236,8 +260,12 @@ final class todos_test extends \block_workflow_testlib {
 
         // Confirm that we can't load it any more.
         $reload = new block_workflow_todo();
-        $this->expect_exception_without_halting('block_workflow_invalid_todo_exception',
-                $reload, 'load_by_id', $todo->id);
+        $this->expect_exception_without_halting(
+            'block_workflow_invalid_todo_exception',
+            $reload,
+            'load_by_id',
+            $todo->id
+        );
     }
 
     /**

@@ -46,13 +46,15 @@ $wx = new SimpleXMLElement("<?xml version='1.0' encoding='utf-8'?><workflow/>");
 $wx->addAttribute('version', 2);
 
 // Set the data for the workflow itself.
-$wx->addChild('shortname',           $workflow->shortname);
-$wx->addChild('name',                check_output_text($workflow->name));
-$d = $wx->addChild('description',    check_output_text($workflow->description));
-$d->addAttribute('format',
-        block_workflow_editor_format($workflow->descriptionformat));
-$wx->addChild('appliesto',           $workflow->appliesto);
-$wx->addChild('atendgobacktostep',   $workflow->atendgobacktostep);
+$wx->addChild('shortname', $workflow->shortname);
+$wx->addChild('name', check_output_text($workflow->name));
+$d = $wx->addChild('description', check_output_text($workflow->description));
+$d->addAttribute(
+    'format',
+    block_workflow_editor_format($workflow->descriptionformat)
+);
+$wx->addChild('appliesto', $workflow->appliesto);
+$wx->addChild('atendgobacktostep', $workflow->atendgobacktostep);
 
 // We need to store the various steps.
 $sx = $wx->addChild('steps');
@@ -66,27 +68,29 @@ foreach ($workflow->steps() as $step) {
 
     // Add the step and it's children/attributes.
     $stepx = $sx->addChild('step');
-    $stepx->addAttribute('no',              $step->stepno);
-    $stepx->addChild('name',                check_output_text($step->name));
-    $i = $stepx->addChild('instructions',   check_output_text($step->instructions));
-    $i->addAttribute('format',
-            block_workflow_editor_format($step->instructionsformat));
-    $stepx->addChild('onactivescript',      check_output_text($step->onactivescript));
-    $stepx->addChild('oncompletescript',    check_output_text($step->oncompletescript));
-    $stepx->addChild('autofinish',          check_output_text($step->autofinish));
-    $stepx->addChild('autofinishoffset',    $step->autofinishoffset);
-    $stepx->addChild('extranotify',         check_output_text($step->extranotify));
-    $stepx->addChild('extranotifyoffset',   $step->extranotifyoffset);
+    $stepx->addAttribute('no', $step->stepno);
+    $stepx->addChild('name', check_output_text($step->name));
+    $i = $stepx->addChild('instructions', check_output_text($step->instructions));
+    $i->addAttribute(
+        'format',
+        block_workflow_editor_format($step->instructionsformat)
+    );
+    $stepx->addChild('onactivescript', check_output_text($step->onactivescript));
+    $stepx->addChild('oncompletescript', check_output_text($step->oncompletescript));
+    $stepx->addChild('autofinish', check_output_text($step->autofinish));
+    $stepx->addChild('autofinishoffset', $step->autofinishoffset);
+    $stepx->addChild('extranotify', check_output_text($step->extranotify));
+    $stepx->addChild('extranotifyoffset', $step->extranotifyoffset);
     $stepx->addChild('onextranotifyscript', check_output_text($step->onextranotifyscript));
 
     // Add the roles for this step.
     foreach ($step->roles() as $role) {
-        $stepx->addChild('doer',            $role->shortname);
+        $stepx->addChild('doer', $role->shortname);
     }
 
     // Add the todos for this step.
     foreach ($step->todos() as $todo) {
-        $stepx->addChild('todo',            check_output_text($todo->task));
+        $stepx->addChild('todo', check_output_text($todo->task));
     }
 
     // As we loop through each step, we need to check each script for use
@@ -119,11 +123,10 @@ $emailsx = $wx->addChild('emailtemplates');
 // Now add any e-mail templates that this workflow currently uses.
 // To do this, we need to attempt to validate.
 foreach ($templatelist as $t) {
-
     $etx = $emailsx->addChild('emailtemplate');
     $etx->addChild('shortname', $t->shortname);
-    $etx->addChild('subject',   check_output_text($t->subject));
-    $etx->addChild('body',      check_output_text($t->message));
+    $etx->addChild('subject', check_output_text($t->subject));
+    $etx->addChild('body', check_output_text($t->message));
 }
 
 // Calculate the filename.

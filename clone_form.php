@@ -34,7 +34,6 @@ require_once($CFG->libdir . '/formslib.php');
  * This class extends the moodleform base class.
  */
 class clone_workflow extends moodleform {
-
     #[\Override]
     protected function definition() {
         $mform = $this->_form;
@@ -54,15 +53,19 @@ class clone_workflow extends moodleform {
         $mform->addRule('name', null, 'maxlength', 255);
 
         // Description_editor.
-        $mform->addElement('editor',   'description_editor',  get_string('description', 'block_workflow'),
-                block_workflow_editor_options());
+        $mform->addElement(
+            'editor',
+            'description_editor',
+            get_string('description', 'block_workflow'),
+            block_workflow_editor_options()
+        );
         $mform->addRule('description_editor', null, 'required', null, 'client');
         $mform->setType('description_editor', PARAM_RAW);
 
-        $mform->addElement('static',   'appliesto',           get_string('appliesto', 'block_workflow'));
+        $mform->addElement('static', 'appliesto', get_string('appliesto', 'block_workflow'));
 
         // Workflowid.
-        $mform->addElement('hidden',   'workflowid');
+        $mform->addElement('hidden', 'workflowid');
         $mform->setType('workflowid', PARAM_INT);
 
         $this->add_action_buttons(true, get_string('clone', 'block_workflow'));

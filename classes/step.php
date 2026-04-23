@@ -245,8 +245,10 @@ class block_workflow_step {
      */
     public function load_workflow_stepno($workflowid, $stepno) {
         global $DB;
-        $step = $DB->get_record('block_workflow_steps',
-                ['workflowid' => $workflowid, 'stepno' => $stepno]);
+        $step = $DB->get_record(
+            'block_workflow_steps',
+            ['workflowid' => $workflowid, 'stepno' => $stepno]
+        );
         if (!$step) {
             throw new block_workflow_invalid_step_exception(get_string('invalidworkflowstepno', 'block_workflow'));
         }
@@ -367,7 +369,8 @@ class block_workflow_step {
             $result = $this->validate_script($step->onactivescript);
             if ($result->errors) {
                 $transaction->rollback(new block_workflow_invalid_command_exception(
-                        get_string('invalidscript', 'block_workflow', $result->errors[0])));
+                    get_string('invalidscript', 'block_workflow', $result->errors[0])
+                ));
             }
         }
 
@@ -375,7 +378,8 @@ class block_workflow_step {
             $result = $this->validate_script($step->oncompletescript);
             if ($result->errors) {
                 $transaction->rollback(new block_workflow_invalid_command_exception(
-                        get_string('invalidscript', 'block_workflow', $result->errors[0])));
+                    get_string('invalidscript', 'block_workflow', $result->errors[0])
+                ));
             }
         }
 
@@ -383,7 +387,8 @@ class block_workflow_step {
             $result = $this->validate_script($step->onextranotifyscript);
             if ($result->errors) {
                 $transaction->rollback(new block_workflow_invalid_command_exception(
-                        get_string('invalidscript', 'block_workflow', $result->errors[0])));
+                    get_string('invalidscript', 'block_workflow', $result->errors[0])
+                ));
             }
         }
 
@@ -540,7 +545,8 @@ class block_workflow_step {
         foreach ((array) $data as $k => $v) {
             if (!in_array($k, $expectedsettings)) {
                 $transaction->rollback(new block_workflow_invalid_step_exception(
-                        get_string('invalidfield', 'block_workflow', $k)));
+                    get_string('invalidfield', 'block_workflow', $k)
+                ));
             }
         }
 
@@ -566,7 +572,8 @@ class block_workflow_step {
             $result = $this->validate_script($data->onactivescript);
             if ($result->errors) {
                 $transaction->rollback(new block_workflow_invalid_command_exception(
-                        get_string('invalidscript', 'block_workflow', $result->errors[0])));
+                    get_string('invalidscript', 'block_workflow', $result->errors[0])
+                ));
             }
         }
 
@@ -574,7 +581,8 @@ class block_workflow_step {
             $result = $this->validate_script($data->onextranotifyscript);
             if ($result->errors) {
                 $transaction->rollback(new block_workflow_invalid_command_exception(
-                        get_string('invalidscript', 'block_workflow', $result->errors[0])));
+                    get_string('invalidscript', 'block_workflow', $result->errors[0])
+                ));
             }
         }
 
@@ -582,7 +590,8 @@ class block_workflow_step {
             $result = $this->validate_script($data->oncompletescript);
             if ($result->errors) {
                 $transaction->rollback(new block_workflow_invalid_command_exception(
-                        get_string('invalidscript', 'block_workflow', $result->errors[0])));
+                    get_string('invalidscript', 'block_workflow', $result->errors[0])
+                ));
             }
         }
 
@@ -609,7 +618,8 @@ class block_workflow_step {
     public function set_workflow($workflowid) {
         if ($this->workflowid !== null) {
             throw new block_workflow_invalid_step_exception(
-                    get_string('workflowalreadyset', 'block_workflow'));
+                get_string('workflowalreadyset', 'block_workflow')
+            );
         }
         $this->workflowid = $workflowid;
     }
@@ -622,8 +632,10 @@ class block_workflow_step {
      */
     public static function is_step_in_use($stepid) {
         global $DB;
-        return $DB->count_records('block_workflow_step_states',
-                ['stepid' => $stepid, 'state' => BLOCK_WORKFLOW_STATE_ACTIVE]);
+        return $DB->count_records(
+            'block_workflow_step_states',
+            ['stepid' => $stepid, 'state' => BLOCK_WORKFLOW_STATE_ACTIVE]
+        );
     }
 
     /**
@@ -734,9 +746,11 @@ class block_workflow_step {
             // * exist; and
             // * extend block_workflow_command, which has all required classes defined.
             $c->classname = 'block_workflow_command_' . $c->command;
-            if (!class_exists($c->classname)
-                    || !is_subclass_of($c->classname, 'block_workflow_command')) {
-                    $return->errors[] = get_string('invalidcommand', 'block_workflow', $c->command);
+            if (
+                !class_exists($c->classname)
+                || !is_subclass_of($c->classname, 'block_workflow_command')
+            ) {
+                $return->errors[] = get_string('invalidcommand', 'block_workflow', $c->command);
             } else {
                 // Append the current command to the array.
                 $return->commands[] = $c;
@@ -801,7 +815,8 @@ class block_workflow_step {
         // Check for errors.
         if ($return->errors) {
             throw new block_workflow_invalid_command_exception(
-                    get_string('invalidscript', 'block_workflow', $return->errors[0]));
+                get_string('invalidscript', 'block_workflow', $return->errors[0])
+            );
         }
         return true;
     }
@@ -839,8 +854,8 @@ class block_workflow_step {
         // Check for errors.
         if ($commands->errors) {
             throw new block_workflow_invalid_command_exception(
-                    get_string('invalidscript', 'block_workflow', $commands->errors[0]));
-
+                get_string('invalidscript', 'block_workflow', $commands->errors[0])
+            );
         }
 
         // Call require_valid and execute on each command.
@@ -874,8 +889,14 @@ class block_workflow_step {
         global $DB;
 
         // Determine the stepid of the next step.
-        $stepid = $DB->get_field('block_workflow_steps', 'id',
-                ['workflowid' => $this->workflowid, 'stepno' => ($this->stepno + 1)]);
+        $stepid = $DB->get_field(
+            'block_workflow_steps',
+            'id',
+            [
+                'workflowid' => $this->workflowid,
+                'stepno' => ($this->stepno + 1),
+            ]
+        );
 
         if ($stepid) {
             // If there is another step, return that step object.
@@ -1025,8 +1046,14 @@ class block_workflow_step {
             $replaces['%%cmid%%'] = $context->instanceid;
         }
         $instructions = str_replace(array_keys($replaces), array_values($replaces), $this->instructions);
-        return format_text($instructions, $this->instructionsformat,
-                ['noclean' => true, 'context' => $context]);
+        return format_text(
+            $instructions,
+            $this->instructionsformat,
+            [
+                'noclean' => true,
+                'context' => $context,
+            ]
+        );
     }
 
     /**

@@ -33,7 +33,6 @@ use Behat\Mink\Exception\ExpectationException;
  * Steps definitions related to the workflow block.
  */
 class behat_block_workflow extends behat_base {
-
     /**
      * Add the workflow block, and select a particular workflow, in a given context.
      *
@@ -50,8 +49,12 @@ class behat_block_workflow extends behat_base {
         $cm = get_coursemodule_from_instance('quiz', $quiz->id, $quiz->course);
         $context = context_module::instance($cm->id);
 
-        $workflow = $DB->get_record('block_workflow_workflows',
-                ['shortname' => $workflowshortname, 'appliesto' => 'quiz'], '*', MUST_EXIST);
+        $workflow = $DB->get_record(
+            'block_workflow_workflows',
+            ['shortname' => $workflowshortname, 'appliesto' => 'quiz'],
+            '*',
+            MUST_EXIST
+        );
 
         // Add the block.
         $data = [
@@ -100,11 +103,13 @@ class behat_block_workflow extends behat_base {
      */
     public function test_course_visibility(string $coursefullname, string $isvisible): void {
         global $DB;
-        $course = $DB->get_record("course", ["fullname" => $coursefullname], 'visible', MUST_EXIST);
+        $course = $DB->get_record('course', ['fullname' => $coursefullname], 'visible', MUST_EXIST);
         $expectedvisibility = $isvisible == 'visible';
         if ($course->visible != $expectedvisibility) {
-            throw new ExpectationException('"' . $coursefullname . '" should be ' . $isvisible . ' but isn\'t.',
-                $this->getSession());
+            throw new ExpectationException(
+                '"' . $coursefullname . '" should be ' . $isvisible . ' but isn\'t.',
+                $this->getSession()
+            );
         }
     }
 }

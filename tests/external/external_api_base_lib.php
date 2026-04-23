@@ -31,7 +31,6 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class external_api_base_lib extends externallib_advanced_testcase {
-
     /**
      * @var int|null ID of the first workflow state, or null if not set.
      */

@@ -41,7 +41,6 @@ require_once(dirname(__FILE__) . '/../locallib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class privacy_provider_test extends \core_privacy\tests\provider_testcase {
-
     /** @var \stdClass A student who is enrolled in course */
     protected $student1;
     /** @var \stdClass A student who is enrolled in course */

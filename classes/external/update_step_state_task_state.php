@@ -28,7 +28,6 @@ use core_external\external_value;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class update_step_state_task_state extends external_api_base {
-
     /**
      * Returns description of method parameters
      *
@@ -50,8 +49,10 @@ class update_step_state_task_state extends external_api_base {
      * @return array of the new state of the task
      */
     public static function execute(int $stateid, int $todoid, bool $check): array {
-        [$state, $params] = self::handle_security_check(['stateid' => $stateid, 'todoid' => $todoid, 'check' => $check],
-            self::execute_parameters());
+        [$state, $params] = self::handle_security_check(
+            ['stateid' => $stateid, 'todoid' => $todoid, 'check' => $check],
+            self::execute_parameters()
+        );
         $result['response'] = $state->todo_toggle($params['todoid'], $params['check']);
         return $result;
     }

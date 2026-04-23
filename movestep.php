@@ -55,7 +55,6 @@ if ($direction == 'up') {
         redirect($returnurl);
     }
     $swapwith->load_workflow_stepno($step->workflowid, $stepno - 1);
-
 } else {
     try {
         $swapwith->load_workflow_stepno($step->workflowid, $stepno + 1);

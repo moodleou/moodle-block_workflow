@@ -24,7 +24,6 @@ namespace block_workflow\task;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class send_extra_notification extends \core\task\scheduled_task {
-
     /**
      * Get a descriptive name for this task (shown to admins).
      *
@@ -42,7 +41,7 @@ class send_extra_notification extends \core\task\scheduled_task {
     public function execute() {
         global $CFG, $DB;
 
-        require_once(dirname(__FILE__).'/../../locallib.php');
+        require_once(dirname(__FILE__) . '/../../locallib.php');
 
         // Run extra notifications.
         try {

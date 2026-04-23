@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 // Make sure the code being tested is accessible.
 require_once($CFG->dirroot . '/blocks/workflow/locallib.php');
 
-
 /**
  * Class block_workflow_testing_context_hack.
  */
@@ -59,9 +58,10 @@ class block_workflow_testing_context_hack extends context_system {
 
 /**
  * Abstract test library for the block_workflow plugin.
+ * @package block_workflow
  */
+// phpcs:ignore PSR1.Classes.ClassDeclaration.MultipleClasses,moodle.Commenting.MissingDocblock.Class
 abstract class block_workflow_testlib extends advanced_testcase {
-
     /**
      * @var array  Add code coverage for the libraries.
      */
@@ -154,7 +154,7 @@ abstract class block_workflow_testlib extends advanced_testcase {
             'egstudent'         => 'student',
         ];
         foreach ($users as $username => $role) {
-            $user = new StdClass;
+            $user = new StdClass();
             $user->username     = $username;
             $user->firstname    = $username;
             $user->lastname     = $username;
@@ -439,8 +439,12 @@ abstract class block_workflow_testlib extends advanced_testcase {
         set_config('hasdataloadtables', 1);
 
         // Check nobody's trying to test on a 'real' database.
-        if ($DB->record_exists_sql("SELECT 1 FROM information_schema.tables " .
-                "WHERE table_name='vl_c_crs_version_pres_a'")) {
+        if (
+            $DB->record_exists_sql(
+                "SELECT 1 FROM information_schema.tables " .
+                "WHERE table_name='vl_c_crs_version_pres_a'"
+            )
+        ) {
                 throw new Exception('You cannot run phpunit tests on a database that ' .
                         'contains vl_c_crs_version_pres_a table; automated and manual ' .
                         'testing might need to be on different databases');
@@ -449,9 +453,12 @@ abstract class block_workflow_testlib extends advanced_testcase {
         // Create the table if it doesn't exist. NOTE we are not using Moodle
         // database manager because the table (actually it's normally a view)
         // is not prefixed.
-        if (!$DB->record_exists_sql("SELECT 1 FROM information_schema.tables " .
-                "WHERE table_name='vl_v_crs_version_pres'")) {
-
+        if (
+            !$DB->record_exists_sql(
+                "SELECT 1 FROM information_schema.tables " .
+                "WHERE table_name='vl_v_crs_version_pres'"
+            )
+        ) {
             $createsql = "
                     CREATE TABLE vl_v_crs_version_pres
                 (

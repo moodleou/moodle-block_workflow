@@ -32,7 +32,6 @@
  *
  */
 class block_workflow_command_setcoursevisibility extends block_workflow_command {
-
     /**
      * Parses the provided arguments to set the course visibility.
      *

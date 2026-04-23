@@ -44,7 +44,6 @@ require_once(dirname(__FILE__) . '/lib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class commandsetactivitylinkedsetting_test extends \block_workflow_testlib {
-
     /** @var object current workflow*/
     private $workflow;
     /** @var object current step*/

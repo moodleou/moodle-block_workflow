@@ -29,7 +29,6 @@ require_once($CFG->libdir . '/formslib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class comment_form extends \moodleform {
-
     #[\Override]
     protected function definition() {
         $mform = $this->_form;
@@ -38,10 +37,14 @@ class comment_form extends \moodleform {
             'autosave' => false,
         ];
         // Tiny need the pre-fix 'id_'.
-        $mform->addElement('editor', 'comment_editor',
+        $mform->addElement(
+            'editor',
+            'comment_editor',
             get_string('commentlabel', 'block_workflow'),
-            ['id' => 'id_wkf-comment-editor'], $editoroptions);
+            ['id' => 'id_wkf-comment-editor'],
+            $editoroptions
+        );
         $mform->setType('commentext', PARAM_RAW);
-        $mform->addElement("button", 'wfk-submit', $this->_customdata['inputLabel']);
+        $mform->addElement('button', 'wfk-submit', $this->_customdata['inputLabel']);
     }
 }
