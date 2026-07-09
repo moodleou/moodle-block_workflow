@@ -97,6 +97,13 @@ class block_workflow_renderer extends plugin_renderer_base {
 
         $output .= html_writer::tag('div', $state->step()->format_instructions($state->context()));
 
+        // Activity-specific extra information (extension point).
+        $appliesto = $state->step()->workflow()->appliesto;
+        $method = 'block_display_' . $appliesto . '_extra_information';
+        if (method_exists($this, $method)) {
+            $output .= $this->$method($state);
+        }
+
         // Comments.
         $output .= html_writer::tag('h3', get_string('comments', 'block_workflow'));
         $commentsblock = html_writer::start_tag('div', ['class' => 'block_workflow_comments']);
@@ -141,12 +148,12 @@ class block_workflow_renderer extends plugin_renderer_base {
             if (!$renderforajax) {
                 $output .= '<div class="block-workflow-panel hidden">
                                 <div class="loading-lightbox d-flex justify-content-center align-item-center">' .
-                                    $this->pix_icon(
-                                        'i/loading',
-                                        get_string('loading', 'admin'),
-                                        'moodle',
-                                        ['class' => 'loading-icon']
-                                    ) . '
+                    $this->pix_icon(
+                        'i/loading',
+                        get_string('loading', 'admin'),
+                        'moodle',
+                        ['class' => 'loading-icon']
+                    ) . '
                                 </div>
                             </div>';
             }
@@ -1712,5 +1719,142 @@ class block_workflow_renderer extends plugin_renderer_base {
             return null;
         }
         return  html_writer::tag('span', ' ' . $this->get_userinfo_button($options, $numberofusers));
+    }
+
+    /**
+     * Render the visibility check section for a quiz workflow.
+     *
+     * @param block_workflow_step_state $state The active workflow step state.
+     * @return string Rendered HTML, or an empty string when not applicable.
+     */
+    public function block_display_quiz_extra_information(block_workflow_step_state $state): string {
+        return $this->render_quiz_visibility_check($state, 'quiz');
+    }
+
+    /**
+     * Render the visibility check section for an externalquiz workflow.
+     *
+     * @param block_workflow_step_state $state The active workflow step state.
+     * @return string Rendered HTML, or an empty string when not applicable.
+     */
+    public function block_display_externalquiz_extra_information(block_workflow_step_state $state): string {
+        return $this->render_quiz_visibility_check($state, 'externalquiz');
+    }
+
+    /**
+     * Shared implementation for quiz/externalquiz visibility check rendering.
+     *
+     * @param block_workflow_step_state $state The current step state.
+     * @param string $modulename The module table name ('quiz' or 'externalquiz').
+     * @return string HTML output or empty string.
+     */
+    protected function render_quiz_visibility_check(block_workflow_step_state $state, string $modulename): string {
+        global $DB;
+
+        $cm = get_coursemodule_from_id($modulename, $state->context()->instanceid);
+        if (!$cm) {
+            return '';
+        }
+
+        $quiz = $DB->get_record($modulename, ['id' => $cm->instance]);
+        if (!$quiz) {
+            return '';
+        }
+
+        $status = new stdClass();
+        $status->timeopen  = (int) $quiz->timeopen;
+        $status->timeclose = (int) $quiz->timeclose;
+        $status->visible   = (int) $cm->visible;
+        $todayend = usergetmidnight(time()) + DAYSECS; // Start of tomorrow.
+
+        $status->opendate_ok  = ($status->timeopen > 0 && $status->timeopen >= $todayend);
+        $status->closedate_ok = (
+            $status->timeclose > 0 &&
+            $status->timeclose >= $todayend &&
+            $status->timeclose >= $status->timeopen
+        );
+
+        // Hidden is OK: the quiz is not yet revealed to students.
+        $status->hidden_ok = ($status->visible == 0);
+
+        $output = html_writer::start_tag('div', ['class' => 'block-workflow-visibility-check']);
+        $output .= html_writer::tag('h3', get_string('visibilitycheck', 'block_workflow'));
+
+        // Open time sub-heading.
+        $output .= html_writer::tag('h3', get_string('visibilitycheck_opentime', 'block_workflow'));
+
+        // Open date line.
+        $output .= $this->render_date_row($status->timeopen, 'visibilitycheck_opendate', $status->opendate_ok);
+
+        // Close date line.
+        $output .= $this->render_date_row($status->timeclose, 'visibilitycheck_closedate', $status->closedate_ok);
+
+        // Quiz availability sub-heading.
+        $output .= html_writer::tag('h3', get_string('visibilitycheck_quizavailability', 'block_workflow'));
+
+        // Visibility line.
+        $vistext = ($status->visible == 0)
+            ? get_string('visibilitycheck_hidden', 'block_workflow')
+            : get_string('visibilitycheck_shown', 'block_workflow');
+        $output .= html_writer::tag(
+            'p',
+            $vistext . ' ' . $this->visibility_check_indicator($status->hidden_ok)
+        );
+
+        $output .= html_writer::end_tag('div');
+        return $output;
+    }
+
+    /**
+     * Render a single date-field row: label + formatted date (or "Not set") + indicator.
+     *
+     * @param int    $timestamp The unix timestamp; 0 means "not set".
+     * @param string $stringkey The lang string key for the label (e.g. 'visibilitycheck_opendate').
+     * @param bool   $ok        True if the check passed (shows OK indicator).
+     * @return string HTML fragment.
+     */
+    private function render_date_row(int $timestamp, string $stringkey, bool $ok): string {
+        $text = ($timestamp > 0)
+            ? get_string($stringkey, 'block_workflow', userdate($timestamp))
+            : get_string($stringkey, 'block_workflow', get_string('visibilitycheck_nodateset', 'block_workflow'));
+        return html_writer::tag(
+            'span',
+            $text . ' ' . $this->visibility_check_indicator($ok),
+            ['class' => 'd-block']
+        );
+    }
+
+    /**
+     * Return an inline HTML indicator showing whether a visibility check passed.
+     *
+     * @param bool $ok True = check passed (OK), false = check failed (Warning).
+     * @return string HTML fragment.
+     */
+    protected function visibility_check_indicator(bool $ok): string {
+        if ($ok) {
+            return html_writer::tag(
+                'span',
+                html_writer::tag(
+                    'i',
+                    '',
+                    [
+                        'class' => 'fa-lg fa-solid fa-check',
+                    ]
+                ),
+                ['class' => 'block-workflow-vischeck-ok']
+            );
+        }
+
+        return html_writer::tag(
+            'span',
+            html_writer::tag(
+                'i',
+                '',
+                [
+                    'class' => 'fa-lg fa-solid fa-exclamation',
+                ]
+            ) . ' ' . get_string('visibilitycheck_isitok', 'block_workflow'),
+            ['class' => 'block-workflow-vischeck-warning']
+        );
     }
 }

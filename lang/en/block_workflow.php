@@ -350,6 +350,15 @@ $string['updatecomment']                = 'Update comment';
 
 $string['vieweditemail']                = 'View/Edit email';
 $string['vieweditworkflow']             = 'View/Edit workflow';
+$string['visibilitycheck'] = 'Visibility check';
+$string['visibilitycheck_closedate'] = 'Close date: {$a}';
+$string['visibilitycheck_hidden'] = 'Hidden';
+$string['visibilitycheck_isitok'] = '[Is it OK?]';
+$string['visibilitycheck_nodateset'] = 'Not set';
+$string['visibilitycheck_opendate'] = 'Open date: {$a}';
+$string['visibilitycheck_opentime'] = 'Open time';
+$string['visibilitycheck_quizavailability'] = 'Quiz availability';
+$string['visibilitycheck_shown'] = 'Shown';
 $string['workflow']                     = 'Workflow';
 $string['workflow:addinstance'] = 'Add a new workflow block';
 
