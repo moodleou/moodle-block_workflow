@@ -34,6 +34,8 @@ require_once($CFG->dirroot . '/blocks/workflow/classes/todo.php');
 require_once($CFG->dirroot . '/blocks/workflow/classes/command.php');
 require_once($CFG->dirroot . '/blocks/workflow/classes/command_assignrole.php');
 require_once($CFG->dirroot . '/blocks/workflow/classes/command_email.php');
+require_once($CFG->dirroot . '/blocks/workflow/classes/command_groupsadd.php');
+require_once($CFG->dirroot . '/blocks/workflow/classes/command_groupsremove.php');
 require_once($CFG->dirroot . '/blocks/workflow/classes/command_override.php');
 require_once($CFG->dirroot . '/blocks/workflow/classes/command_setactivitysetting.php');
 require_once($CFG->dirroot . '/blocks/workflow/classes/command_setactivityvisibility.php');
