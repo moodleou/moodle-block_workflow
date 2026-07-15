@@ -1,8 +1,13 @@
 # Change log for the Workflow block
 
+## Changes in 2.6
+* This version works with Moodle 5.2+.
+* Improved the Workflow quiz open/close date handling for more nuanced scheduling behaviour.
+* Fixed the `setactivitysetting` workflow script to update related data correctly.
+* Fixed an undefined method error in the Workflow block settings.
+
 ## Changes in 2.5
 * This version works with Moodle 5.1.
-
 
 ## Changes in 2.4
 * This version works with Moodle 5.0.

@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-import ModalFactory from 'core/modal_factory';
+import Modal from 'core/modal';
 import * as Str from 'core/str';
 import Notification from 'core/notification';
 import {TodoList} from 'block_workflow/todolist';
@@ -57,7 +57,7 @@ class Comment {
      * @returns {Promise} The modal promise (modal's body will be rendered later).
      */
     async buildCommentModal() {
-        return ModalFactory.create({type: ModalFactory.types.DEFAULT});
+        return Modal.create();
     }
 
     /**

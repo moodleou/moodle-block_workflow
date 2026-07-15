@@ -72,3 +72,11 @@
 #page-admin-blocks-workflow-manage #manage td.c2 {
     font-size: 0.8em;
 }
+
+.block_workflow .block-workflow-vischeck-ok > i {
+    color: #357a32;
+}
+
+.block_workflow .block-workflow-vischeck-warning > i {
+    color: #f00;
+}

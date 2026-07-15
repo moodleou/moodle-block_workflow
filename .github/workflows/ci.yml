@@ -9,9 +9,9 @@ jobs:
       matrix:
         # Note: Workflow block has SQL that only works in Postgres.
         include:
-          - { php: '8.2', moodle-branch: MOODLE_405_STABLE, database: pgsql }
-          - { php: '8.3', moodle-branch: MOODLE_500_STABLE, database: pgsql }
-          - { php: '8.4', moodle-branch: MOODLE_501_STABLE, database: pgsql }
+          - { php: '8.3', moodle-branch: MOODLE_501_STABLE, database: pgsql }
+          - { php: '8.4', moodle-branch: MOODLE_502_STABLE, database: pgsql }
+          - { php: '8.4', moodle-branch: main, database: pgsql }
 
     services:
       postgres:

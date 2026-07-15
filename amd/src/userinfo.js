@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-import ModalFactory from 'core/modal_factory';
+import Modal from 'core/modal';
 
 /**
  * User info functionality for a popup in workflow block.
@@ -54,7 +54,7 @@ class Popup {
      */
     async displayDialog(e, header, body) {
         e.preventDefault();
-        const modal = await ModalFactory.create({
+        const modal = await Modal.create({
             title: header,
             body: body,
             large: true,
